@@ -8,6 +8,8 @@ function createWindow () {
   const win = new BrowserWindow({
     width: 400,
     height: 200,
+    frame: false, // Remove window controls
+    resizable: false, // Prevent resizing
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
