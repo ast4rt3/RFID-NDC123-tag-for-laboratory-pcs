@@ -1,9 +1,13 @@
-run xampp php my admin first
---then switch to the directory of the files before running these commands
+run xampp php my admin first\
+then switch to the directory of the files before running these commands 
+---
+## future plans
+ - too put local logs on each computer
+    > maybe a text file that is saved on the local pc
 
----objective
---too put local logsa on each computer
-     
+
+---
+### commands
      node server/server.js
 for server
 
