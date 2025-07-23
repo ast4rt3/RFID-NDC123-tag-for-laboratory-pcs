@@ -9,3 +9,7 @@ contextBridge.exposeInMainWorld('timerAPI', {
     }, 1000);
   }
 });
+
+contextBridge.exposeInMainWorld('appAPI', {
+  onAppUpdate: (callback) => ipcRenderer.on('app-update', (event, appName) => callback(appName))
+});

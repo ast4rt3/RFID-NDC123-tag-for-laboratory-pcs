@@ -3,13 +3,14 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 let loggerProcess;
+let win; // <-- Keep a reference
 
 function createWindow () {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 400,
     height: 200,
-    frame: false, // Remove window controls
-    resizable: false, // Prevent resizing
+    frame: false, 
+    resizable: false, 
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -20,8 +21,21 @@ function createWindow () {
 }
 
 app.whenReady().then(() => {
-  // Start the logger process (send 'start')
-  loggerProcess = spawn('node', [path.join(__dirname, 'pc-logger.js'), 'start']);
+  // Start the logger process
+  loggerProcess = spawn('node', [path.join(__dirname, 'pc-logger.js')]);
+
+  // Safely attach listeners
+  if (loggerProcess && loggerProcess.stdout) {
+    loggerProcess.stdout.on('data', (data) => {
+      console.log(`pc-logger: ${data}`);
+      if (win) {
+        win.webContents.send('app-update', data.toString().trim());
+      }
+    });
+    loggerProcess.stderr.on('data', (data) => {
+      console.error(`pc-logger error: ${data}`);
+    });
+  }
 
   createWindow();
 
@@ -31,11 +45,9 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  // Send 'stop' to the logger
-  // This will run the stop command and wait for it to finish before quitting
   event.preventDefault();
-  const stopProcess = spawn('node', [path.join(__dirname, 'pc-logger.js'), 'stop']);
-  stopProcess.on('close', () => {
-    app.exit();
-  });
+  if (loggerProcess) {
+    loggerProcess.kill();
+  }
+  app.exit();
 });
