@@ -1,7 +1,7 @@
 run xampp php my admin first\
 then switch to the directory of the files before running these commands 
 ---
-## future plans
+## for tommorow
  - too put local logs on each computer
     > maybe a text file that is saved on the local pc
  - beta test using qr code
