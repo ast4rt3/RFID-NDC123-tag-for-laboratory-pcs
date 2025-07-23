@@ -40,6 +40,7 @@ wss.on('connection', ws => {
 
   ws.on('message', msg => {
     const data = JSON.parse(msg);
+
     if (data.type === 'start') {
       // PC starts
       clientId = data.pc_name;
@@ -62,6 +63,30 @@ wss.on('connection', ws => {
 
         delete activeSessions[data.pc_name];
       }
+    } else if (
+      data.type === 'app_usage_start' ||
+      data.type === 'app_usage_update' ||
+      data.type === 'app_usage_end'
+    ) {
+      // Insert or update app usage log
+      // Use a unique key (pc_name, app_name, start_time) for upsert
+      const sql = `
+        INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds)
+        VALUES (?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          end_time = VALUES(end_time),
+          duration_seconds = VALUES(duration_seconds)
+      `;
+      db.query(sql, [
+        data.pc_name,
+        data.app_name,
+        data.start_time,
+        data.end_time,
+        data.duration_seconds
+      ], (err) => {
+        if (err) console.error('DB insert error (app_usage):', err);
+        else console.log('App usage log upserted');
+      });
     }
   });
 
