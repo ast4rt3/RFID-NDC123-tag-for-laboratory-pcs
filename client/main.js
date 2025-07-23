@@ -1,6 +1,8 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
+
+let loggerProcess;
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -13,12 +15,12 @@ function createWindow () {
 
   win.setMenuBarVisibility(false);
   win.loadFile('index.html');
-
-  // Send start signal to backend (optional, if you want to integrate with your logger)
-  exec('node ../pc-logger.js start');
 }
 
 app.whenReady().then(() => {
+  // Start the logger process (send 'start')
+  loggerProcess = spawn('node', [path.join(__dirname, 'pc-logger.js'), 'start']);
+
   createWindow();
 
   app.on('activate', function () {
@@ -26,8 +28,12 @@ app.whenReady().then(() => {
   });
 });
 
-app.on('window-all-closed', function () {
-  // Send stop signal to backend (optional)
-  exec('node ../pc-logger.js stop');
-  if (process.platform !== 'darwin') app.quit();
+app.on('before-quit', (event) => {
+  // Send 'stop' to the logger
+  // This will run the stop command and wait for it to finish before quitting
+  event.preventDefault();
+  const stopProcess = spawn('node', [path.join(__dirname, 'pc-logger.js'), 'stop']);
+  stopProcess.on('close', () => {
+    app.exit();
+  });
 });
