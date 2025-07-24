@@ -8,16 +8,17 @@ const wsUrl = 'ws://localhost:8080'; // Change to server IP if not local
 
 const ws = new WebSocket(wsUrl);
 
-// Helper to format date in Philippine Standard Time (UTC+8) in 24-hour format
+// Robust helper to format date in Philippine Standard Time (UTC+8) in 24-hour format
 function toPhilippineTimeString(date) {
-  const offsetMs = 8 * 60 * 60 * 1000;
-  const phTime = new Date(date.getTime() + offsetMs);
-  const year = phTime.getFullYear();
-  const month = String(phTime.getMonth() + 1).padStart(2, '0');
-  const day = String(phTime.getDate()).padStart(2, '0');
-  const hour = String(phTime.getHours()).padStart(2, '0');
-  const minute = String(phTime.getMinutes()).padStart(2, '0');
-  const second = String(phTime.getSeconds()).padStart(2, '0');
+  // Get UTC time, then add 8 hours for Philippine time
+  const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+  const phTime = new Date(utc + (8 * 60 * 60 * 1000));
+  const year = phTime.getUTCFullYear();
+  const month = String(phTime.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(phTime.getUTCDate()).padStart(2, '0');
+  const hour = String(phTime.getUTCHours()).padStart(2, '0');
+  const minute = String(phTime.getUTCMinutes()).padStart(2, '0');
+  const second = String(phTime.getUTCSeconds()).padStart(2, '0');
   return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 }
 
@@ -65,7 +66,7 @@ ws.on('open', () => {
         pc_name: pcName,
         app_name: appName,
         start_time: toPhilippineTimeString(now),
-        end_time: toPhilippineTimeString(lastStart),
+        end_time: toPhilippineTimeString(now),
         duration_seconds: 0,
         memory_usage_bytes: memoryUsage,
         cpu_percent: cpuPercent,
@@ -81,8 +82,8 @@ ws.on('open', () => {
         type: 'app_usage_end',
         pc_name: pcName,
         app_name: lastApp,
-        start_time: toPhilippineTimeString(now),
-        end_time: toPhilippineTimeString(lastStart),
+        start_time: toPhilippineTimeString(lastStart),
+        end_time: toPhilippineTimeString(now),
         duration_seconds: Math.floor((now - lastStart) / 1000),
         memory_usage_bytes: memoryUsage,
         cpu_percent: cpuPercent,
@@ -95,7 +96,7 @@ ws.on('open', () => {
         pc_name: pcName,
         app_name: appName,
         start_time: toPhilippineTimeString(now),
-        end_time: toPhilippineTimeString(lastStart),
+        end_time: toPhilippineTimeString(now),
         duration_seconds: 0,
         memory_usage_bytes: memoryUsage,
         cpu_percent: cpuPercent,
@@ -111,8 +112,8 @@ ws.on('open', () => {
         type: 'app_usage_update',
         pc_name: pcName,
         app_name: appName,
-        start_time: toPhilippineTimeString(now),
-        end_time: toPhilippineTimeString(lastStart),
+        start_time: toPhilippineTimeString(lastStart),
+        end_time: toPhilippineTimeString(now),
         duration_seconds: Math.floor((now - lastStart) / 1000),
         memory_usage_bytes: memoryUsage,
         cpu_percent: cpuPercent,
@@ -144,8 +145,8 @@ function handleExit() {
       type: 'app_usage_end',
       pc_name: pcName,
       app_name: lastApp,
-      start_time: toPhilippineTimeString(now),
-      end_time: toPhilippineTimeString(lastStart),
+      start_time: toPhilippineTimeString(lastStart),
+      end_time: toPhilippineTimeString(now),
       duration_seconds: Math.floor((now - lastStart) / 1000),
       memory_usage_bytes: null,
       cpu_percent: null,

@@ -28,6 +28,7 @@ db.connect(err => {
 
 // Store active sessions in memory
 const activeSessions = {}; // { clientId: { pc_name, start_time } }
+const appActiveSessions = {}; // { clientId: { app_name, start_time } }
 
 // WebSocket server
 const wss = new WebSocket.Server({ port: wsPort });
@@ -46,6 +47,7 @@ wss.on('connection', ws => {
       clientId = data.pc_name;
       const startTime = new Date();
       activeSessions[clientId] = { start_time: startTime };
+      appActiveSessions[clientId] = {}; // Initialize app session tracking
       console.log(`▶ Started session for ${clientId} at ${startTime}`);
     } else if (data.type === 'stop') {
       // PC stops
@@ -62,37 +64,79 @@ wss.on('connection', ws => {
         });
 
         delete activeSessions[data.pc_name];
+        delete appActiveSessions[data.pc_name];
       }
     } else if (
-      data.type === 'app_usage_start' ||
-      data.type === 'app_usage_update' ||
+      data.type === 'app_usage_start'
+    ) {
+      // Start tracking a new app session for this client
+      if (!appActiveSessions[clientId]) appActiveSessions[clientId] = {};
+      appActiveSessions[clientId][data.app_name] = { start_time: new Date() };
+    } else if (
       data.type === 'app_usage_end'
     ) {
-      // Insert or update app usage log
-      // Use a unique key (pc_name, app_name, start_time) for upsert
-      const sql = `
-        INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          end_time = VALUES(end_time),
-          duration_seconds = VALUES(duration_seconds),
-          memory_usage_bytes = VALUES(memory_usage_bytes),
-          cpu_percent = VALUES(cpu_percent),
-          gpu_percent = VALUES(gpu_percent)
-      `;
-      db.query(sql, [
-        data.pc_name,
-        data.app_name,
-        data.start_time,
-        data.end_time,
-        data.duration_seconds,
-        data.memory_usage_bytes,
-        data.cpu_percent,
-        data.gpu_percent
-      ], (err) => {
-        if (err) console.error('DB insert error (app_usage):', err);
-        else console.log('App usage log upserted');
-      });
+      // End the app session and log to DB
+      if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
+        const startTime = appActiveSessions[clientId][data.app_name].start_time;
+        const endTime = new Date();
+        const duration = Math.floor((endTime - startTime) / 1000);
+        const sql = `
+          INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+            end_time = VALUES(end_time),
+            duration_seconds = VALUES(duration_seconds),
+            memory_usage_bytes = VALUES(memory_usage_bytes),
+            cpu_percent = VALUES(cpu_percent),
+            gpu_percent = VALUES(gpu_percent)
+        `;
+        db.query(sql, [
+          data.pc_name,
+          data.app_name,
+          startTime,
+          endTime,
+          duration,
+          data.memory_usage_bytes,
+          data.cpu_percent,
+          data.gpu_percent
+        ], (err) => {
+          if (err) console.error('DB insert error (app_usage):', err);
+          else console.log('App usage log upserted');
+        });
+        delete appActiveSessions[clientId][data.app_name];
+      }
+    } else if (
+      data.type === 'app_usage_update'
+    ) {
+      // Update the end_time and duration for the current app session
+      if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
+        const startTime = appActiveSessions[clientId][data.app_name].start_time;
+        const endTime = new Date();
+        const duration = Math.floor((endTime - startTime) / 1000);
+        const sql = `
+          INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+            end_time = VALUES(end_time),
+            duration_seconds = VALUES(duration_seconds),
+            memory_usage_bytes = VALUES(memory_usage_bytes),
+            cpu_percent = VALUES(cpu_percent),
+            gpu_percent = VALUES(gpu_percent)
+        `;
+        db.query(sql, [
+          data.pc_name,
+          data.app_name,
+          startTime,
+          endTime,
+          duration,
+          data.memory_usage_bytes,
+          data.cpu_percent,
+          data.gpu_percent
+        ], (err) => {
+          if (err) console.error('DB insert error (app_usage):', err);
+          else console.log('App usage log upserted');
+        });
+      }
     }
   });
 
