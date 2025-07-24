@@ -11,6 +11,7 @@ then switch to the directory of the files before running these commands
     > find a way to automate the ipconfiguration when implemented on different devices
  - scan process
     > like process usage, ram usage, gpu usage and all
+    > make new colum in the database for this
 
 
 ---
