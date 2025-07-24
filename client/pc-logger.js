@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const os = require('os');
 const activeWin = require('active-win'); // <--- Add this
 const pidusage = require('pidusage');
-
+const { exec } = require('child_process');
 const pcName = os.hostname();
 const wsUrl = 'ws://localhost:8080'; // Change to server IP if not local
 
@@ -35,6 +35,26 @@ ws.on('open', () => {
     // Add more as needed
   ];
 
+  function getSystemGpuUsage(callback) {
+    exec('powershell.exe Get-Counter -Counter "\\GPU Engine(*)\\Utilization Percentage"', (err, stdout, stderr) => {
+      if (err) {
+        callback(null);
+        return;
+      }
+      // Parse the output to get the average GPU usage
+      const matches = stdout.match(/\\GPU Engine\([^)]+\)\\Utilization Percentage\s+:\s+([0-9.]+)/g);
+      if (!matches) {
+        callback(null);
+        return;
+      }
+      const usages = matches.map(line => parseFloat(line.split(':').pop()));
+      // Filter out NaN and sum only non-zero engines (usually the first is the main GPU)
+      const validUsages = usages.filter(u => !isNaN(u));
+      const avgUsage = validUsages.length ? validUsages.reduce((a, b) => a + b, 0) / validUsages.length : null;
+      callback(avgUsage);
+    });
+  }
+
   setInterval(async () => {
     console.log('App usage interval running...');
     const result = await activeWin();
@@ -59,77 +79,75 @@ ws.on('open', () => {
     }
     const now = new Date();
 
-    if (!appActive) {
-      // First non-ignored app seen
-      ws.send(JSON.stringify({
-        type: 'app_usage_start',
-        pc_name: pcName,
-        app_name: appName,
-        start_time: toPhilippineTimeString(now),
-        end_time: toPhilippineTimeString(now),
-        duration_seconds: 0,
-        memory_usage_bytes: memoryUsage,
-        cpu_percent: cpuPercent,
-        gpu_percent: null
-      }));
-      console.log('Sent app_usage_start for', appName);
-      lastApp = appName;
-      lastStart = now;
-      appActive = true;
-    } else if (appName !== lastApp) {
-      // App changed: finalize previous, start new
-      ws.send(JSON.stringify({
-        type: 'app_usage_end',
-        pc_name: pcName,
-        app_name: lastApp,
-        start_time: toPhilippineTimeString(lastStart),
-        end_time: toPhilippineTimeString(now),
-        duration_seconds: Math.floor((now - lastStart) / 1000),
-        memory_usage_bytes: memoryUsage,
-        cpu_percent: cpuPercent,
-        gpu_percent: null
-      }));
-      console.log('Sent app_usage_end for', lastApp);
+    // Get GPU usage and send the log inside the callback
+    getSystemGpuUsage((gpuPercent) => {
+      if (!appActive) {
+        // First non-ignored app seen
+        ws.send(JSON.stringify({
+          type: 'app_usage_start',
+          pc_name: pcName,
+          app_name: appName,
+          start_time: toPhilippineTimeString(now),
+          end_time: toPhilippineTimeString(now),
+          duration_seconds: 0,
+          memory_usage_bytes: memoryUsage,
+          cpu_percent: cpuPercent,
+          gpu_percent: gpuPercent
+        }));
+        console.log('Sent app_usage_start for', appName);
+        lastApp = appName;
+        lastStart = now;
+        appActive = true;
+      } else if (appName !== lastApp) {
+        // App changed: finalize previous, start new
+        ws.send(JSON.stringify({
+          type: 'app_usage_end',
+          pc_name: pcName,
+          app_name: lastApp,
+          start_time: toPhilippineTimeString(lastStart),
+          end_time: toPhilippineTimeString(now),
+          duration_seconds: Math.floor((now - lastStart) / 1000),
+          memory_usage_bytes: memoryUsage,
+          cpu_percent: cpuPercent,
+          gpu_percent: gpuPercent
+        }));
+        console.log('Sent app_usage_end for', lastApp);
 
-      ws.send(JSON.stringify({
-        type: 'app_usage_start',
-        pc_name: pcName,
-        app_name: appName,
-        start_time: toPhilippineTimeString(now),
-        end_time: toPhilippineTimeString(now),
-        duration_seconds: 0,
-        memory_usage_bytes: memoryUsage,
-        cpu_percent: cpuPercent,
-        gpu_percent: null
-      }));
-      console.log('Sent app_usage_start for', appName);
+        ws.send(JSON.stringify({
+          type: 'app_usage_start',
+          pc_name: pcName,
+          app_name: appName,
+          start_time: toPhilippineTimeString(now),
+          end_time: toPhilippineTimeString(now),
+          duration_seconds: 0,
+          memory_usage_bytes: memoryUsage,
+          cpu_percent: cpuPercent,
+          gpu_percent: gpuPercent
+        }));
+        console.log('Sent app_usage_start for', appName);
 
-      lastApp = appName;
-      lastStart = now;
-    } else {
-      // App is still active, update
-      ws.send(JSON.stringify({
-        type: 'app_usage_update',
-        pc_name: pcName,
-        app_name: appName,
-        start_time: toPhilippineTimeString(lastStart),
-        end_time: toPhilippineTimeString(now),
-        duration_seconds: Math.floor((now - lastStart) / 1000),
-        memory_usage_bytes: memoryUsage,
-        cpu_percent: cpuPercent,
-        gpu_percent: null
-      }));
-      console.log('Sent app_usage_update for', appName);
-    }
+        lastApp = appName;
+        lastStart = now;
+      } else {
+        // App is still active, update
+        ws.send(JSON.stringify({
+          type: 'app_usage_update',
+          pc_name: pcName,
+          app_name: appName,
+          start_time: toPhilippineTimeString(lastStart),
+          end_time: toPhilippineTimeString(now),
+          duration_seconds: Math.floor((now - lastStart) / 1000),
+          memory_usage_bytes: memoryUsage,
+          cpu_percent: cpuPercent,
+          gpu_percent: gpuPercent
+        }));
+        console.log('Sent app_usage_update for', appName);
+      }
+    });
   }, 3000); // 3 seconds
   // --- End app usage tracking ---
 });
 
-
-ws.on('open', () => {
-  ws.send(JSON.stringify({ type: 'start', pc_name: pcName }));
-  console.log('Session started');
-});
 
 // Listen for shutdown/logoff signals
 function handleExit() {

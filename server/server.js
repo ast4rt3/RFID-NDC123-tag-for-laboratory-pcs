@@ -97,8 +97,8 @@ wss.on('connection', ws => {
           endTime,
           duration,
           data.memory_usage_bytes,
-          data.cpu_percent
-          
+          data.cpu_percent,
+          data.gpu_percent
         ], (err) => {
           if (err) console.error('DB insert error (app_usage):', err);
           else console.log('App usage log upserted');
@@ -130,8 +130,8 @@ wss.on('connection', ws => {
           endTime,
           duration,
           data.memory_usage_bytes,
-          data.cpu_percent
-          
+          data.cpu_percent,
+          data.gpu_percent
         ], (err) => {
           if (err) console.error('DB insert error (app_usage):', err);
           else console.log('App usage log upserted');
