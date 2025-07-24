@@ -1,4 +1,5 @@
 run xampp php my admin first\
+copy or import the database schema\
 then switch to the directory of the files before running these commands 
 ---
 ## for tommorow
