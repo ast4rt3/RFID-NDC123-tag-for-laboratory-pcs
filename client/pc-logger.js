@@ -1,11 +1,25 @@
 const WebSocket = require('ws');
 const os = require('os');
 const activeWin = require('active-win'); // <--- Add this
+const pidusage = require('pidusage');
 
 const pcName = os.hostname();
 const wsUrl = 'ws://localhost:8080'; // Change to server IP if not local
 
 const ws = new WebSocket(wsUrl);
+
+// Helper to format date in Philippine Standard Time (UTC+8) in 24-hour format
+function toPhilippineTimeString(date) {
+  const offsetMs = 8 * 60 * 60 * 1000;
+  const phTime = new Date(date.getTime() + offsetMs);
+  const year = phTime.getFullYear();
+  const month = String(phTime.getMonth() + 1).padStart(2, '0');
+  const day = String(phTime.getDate()).padStart(2, '0');
+  const hour = String(phTime.getHours()).padStart(2, '0');
+  const minute = String(phTime.getMinutes()).padStart(2, '0');
+  const second = String(phTime.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
 
 ws.on('open', () => {
   ws.send(JSON.stringify({ type: 'start', pc_name: pcName }));
@@ -27,11 +41,21 @@ ws.on('open', () => {
     if (!result) return;
 
     const appName = result.owner.name;
+    const processId = result.owner.processId;
+    const memoryUsage = result.memoryUsage; // in bytes
+
+    let cpuPercent = null;
+    try {
+      const stats = await pidusage(processId);
+      cpuPercent = stats.cpu; // percent
+    } catch (e) {
+      cpuPercent = null;
+    }
+
     if (IGNORED_APPS.includes(appName)) {
       // If the current app is ignored, do not update lastApp or lastStart
       return;
     }
-
     const now = new Date();
 
     if (!appActive) {
@@ -40,9 +64,12 @@ ws.on('open', () => {
         type: 'app_usage_start',
         pc_name: pcName,
         app_name: appName,
-        start_time: now.toISOString().slice(0, 19).replace('T', ' '),
-        end_time: now.toISOString().slice(0, 19).replace('T', ' '),
-        duration_seconds: 0
+        start_time: toPhilippineTimeString(now),
+        end_time: toPhilippineTimeString(lastStart),
+        duration_seconds: 0,
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: null
       }));
       console.log('Sent app_usage_start for', appName);
       lastApp = appName;
@@ -54,9 +81,12 @@ ws.on('open', () => {
         type: 'app_usage_end',
         pc_name: pcName,
         app_name: lastApp,
-        start_time: lastStart.toISOString().slice(0, 19).replace('T', ' '),
-        end_time: now.toISOString().slice(0, 19).replace('T', ' '),
-        duration_seconds: Math.floor((now - lastStart) / 1000)
+        start_time: toPhilippineTimeString(now),
+        end_time: toPhilippineTimeString(lastStart),
+        duration_seconds: Math.floor((now - lastStart) / 1000),
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: null
       }));
       console.log('Sent app_usage_end for', lastApp);
 
@@ -64,9 +94,12 @@ ws.on('open', () => {
         type: 'app_usage_start',
         pc_name: pcName,
         app_name: appName,
-        start_time: now.toISOString().slice(0, 19).replace('T', ' '),
-        end_time: now.toISOString().slice(0, 19).replace('T', ' '),
-        duration_seconds: 0
+        start_time: toPhilippineTimeString(now),
+        end_time: toPhilippineTimeString(lastStart),
+        duration_seconds: 0,
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: null
       }));
       console.log('Sent app_usage_start for', appName);
 
@@ -78,13 +111,16 @@ ws.on('open', () => {
         type: 'app_usage_update',
         pc_name: pcName,
         app_name: appName,
-        start_time: lastStart.toISOString().slice(0, 19).replace('T', ' '),
-        end_time: now.toISOString().slice(0, 19).replace('T', ' '),
-        duration_seconds: Math.floor((now - lastStart) / 1000)
+        start_time: toPhilippineTimeString(now),
+        end_time: toPhilippineTimeString(lastStart),
+        duration_seconds: Math.floor((now - lastStart) / 1000),
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: null
       }));
       console.log('Sent app_usage_update for', appName);
     }
-  }, 2000); // Check every 5 seconds
+  }, 3000); // 3 seconds
   // --- End app usage tracking ---
 });
 
@@ -100,6 +136,21 @@ function handleExit() {
     ws.send(JSON.stringify({ type: 'stop', pc_name: pcName }));
     ws.close();
     console.log('Session stopped');
+  }
+  // On shutdown, finalize the last app usage if needed
+  if (appActive && lastApp) {
+    const now = new Date();
+    ws.send(JSON.stringify({
+      type: 'app_usage_end',
+      pc_name: pcName,
+      app_name: lastApp,
+      start_time: toPhilippineTimeString(now),
+      end_time: toPhilippineTimeString(lastStart),
+      duration_seconds: Math.floor((now - lastStart) / 1000),
+      memory_usage_bytes: null,
+      cpu_percent: null,
+      gpu_percent: null
+    }));
   }
   process.exit();
 }

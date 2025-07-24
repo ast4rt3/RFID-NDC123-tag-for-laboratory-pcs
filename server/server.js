@@ -71,18 +71,24 @@ wss.on('connection', ws => {
       // Insert or update app usage log
       // Use a unique key (pc_name, app_name, start_time) for upsert
       const sql = `
-        INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
           end_time = VALUES(end_time),
-          duration_seconds = VALUES(duration_seconds)
+          duration_seconds = VALUES(duration_seconds),
+          memory_usage_bytes = VALUES(memory_usage_bytes),
+          cpu_percent = VALUES(cpu_percent),
+          gpu_percent = VALUES(gpu_percent)
       `;
       db.query(sql, [
         data.pc_name,
         data.app_name,
         data.start_time,
         data.end_time,
-        data.duration_seconds
+        data.duration_seconds,
+        data.memory_usage_bytes,
+        data.cpu_percent,
+        data.gpu_percent
       ], (err) => {
         if (err) console.error('DB insert error (app_usage):', err);
         else console.log('App usage log upserted');
