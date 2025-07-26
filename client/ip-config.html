@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Configure Server IP</h2>
+    <form id="ipForm">
+      <input type="text" id="serverIP" placeholder="Enter server IP" required />
+      <button type="submit">Save</button>
+    </form>
+    <script>
+      const { ipcRenderer } = require('electron');
+      document.getElementById('ipForm').onsubmit = (e) => {
+        e.preventDefault();
+        ipcRenderer.send('save-ip', document.getElementById('serverIP').value);
+      };
+    </script>
+  </body>
+</html>

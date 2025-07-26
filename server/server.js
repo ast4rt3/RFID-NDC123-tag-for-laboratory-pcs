@@ -87,8 +87,8 @@ wss.on('connection', ws => {
             end_time = VALUES(end_time),
             duration_seconds = VALUES(duration_seconds),
             memory_usage_bytes = VALUES(memory_usage_bytes),
-            cpu_percent = VALUES(cpu_percent),
-            gpu_percent = VALUES(gpu_percent)
+            cpu_percent = VALUES(cpu_percent)
+          
         `;
         db.query(sql, [
           data.pc_name,
@@ -97,8 +97,8 @@ wss.on('connection', ws => {
           endTime,
           duration,
           data.memory_usage_bytes,
-          data.cpu_percent,
-          data.gpu_percent
+          data.cpu_percent
+         
         ], (err) => {
           if (err) console.error('DB insert error (app_usage):', err);
           else console.log('App usage log upserted');
@@ -120,8 +120,8 @@ wss.on('connection', ws => {
             end_time = VALUES(end_time),
             duration_seconds = VALUES(duration_seconds),
             memory_usage_bytes = VALUES(memory_usage_bytes),
-            cpu_percent = VALUES(cpu_percent),
-            gpu_percent = VALUES(gpu_percent)
+            cpu_percent = VALUES(cpu_percent)
+            
         `;
         db.query(sql, [
           data.pc_name,
@@ -130,8 +130,8 @@ wss.on('connection', ws => {
           endTime,
           duration,
           data.memory_usage_bytes,
-          data.cpu_percent,
-          data.gpu_percent
+          data.cpu_percent
+
         ], (err) => {
           if (err) console.error('DB insert error (app_usage):', err);
           else console.log('App usage log upserted');
@@ -167,6 +167,6 @@ app.get('/logs', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`✅ API listening on http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`✅ API listening on http://0.0.0.0:${port}`);
 });
