@@ -1,7 +1,7 @@
 # Node.js dependencies
 node_modules/
 
-# Electron build output (if you package your app)
+# Electron build output 
 dist/
 out/
 release/
@@ -18,3 +18,5 @@ yarn-error.log*
 
 # Environment files
 .env
+allfileshas.txt
+bfg.jar

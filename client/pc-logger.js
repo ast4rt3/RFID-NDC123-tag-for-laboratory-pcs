@@ -3,8 +3,10 @@ const os = require('os');
 const activeWin = require('active-win'); // <--- Add this
 const pidusage = require('pidusage');
 const { exec } = require('child_process');
+const config = require('./config');
+
 const pcName = os.hostname();
-const wsUrl = 'ws://localhost:8080'; // Change to server IP if not local
+const wsUrl = config.getWebSocketURL(); // Use config instead of hardcoded localhost
 
 const ws = new WebSocket(wsUrl);
 

@@ -1,3 +1,7 @@
+// Remove require statements - use APIs exposed by preload script instead
+// const { ipcRenderer } = require('electron');
+// const config = require('./config');
+
 function formatTime(seconds) {
   const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
   const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
