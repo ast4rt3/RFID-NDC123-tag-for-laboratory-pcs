@@ -39,6 +39,7 @@
       "node_modules/**/*"
     ],
     "win": {
+      "icon": "client/assets/icon.ico",
       "target": [
         {
           "target": "nsis",
@@ -51,7 +52,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "RFID NDC123 Client"
+      "shortcutName": "Darwin"
     },
     "asarUnpack": [
       "client/pc-logger.js",
@@ -67,5 +68,6 @@
       "node_modules/nan/**",
       "node_modules/which/**"
     ]
+    
   }
 }

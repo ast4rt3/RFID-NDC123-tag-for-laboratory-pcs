@@ -5,7 +5,7 @@ const fs = require('fs');
 const config = require('./config');
 
 let loggerProcess;
-let win; // <-- Keep a reference
+
 
 function createWindow () {
   win = new BrowserWindow({
@@ -23,6 +23,12 @@ function createWindow () {
   win.setMenuBarVisibility(false);
   win.loadFile(path.join(__dirname, 'index.html'));
 }
+
+const win = new BrowserWindow({
+  width: 800,
+  height: 600,
+  icon: path.join(__dirname, 'assets', 'icon.ico')
+});
 
 function showIPConfigWindow() {
   const configWin = new BrowserWindow({

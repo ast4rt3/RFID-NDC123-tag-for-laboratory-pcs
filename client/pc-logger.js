@@ -22,7 +22,7 @@ console.error = function(...args) {
 const pcName = os.hostname();
 const wsUrl = config.getWebSocketURL(); // Use config instead of hardcoded localhost
 
-const ws = new WebSocket(wsUrl);
+const ws = new WebSocket(`ws://${config.server_ip}:${config.server_port}`);
 
 // Add explicit logging for connection, error, and close events
 ws.on('open', () => {
@@ -59,7 +59,7 @@ ws.on('open', () => {
     });
   }
   console.log("Connecting to WebSocket at:", wsUrl);
-  
+
   setInterval(async () => {
     console.log('App usage interval running...');
     const result = await activeWin();

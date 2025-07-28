@@ -1,10 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const { app } = require('electron');
 
 class Config {
   constructor() {
-    const basePath = process.resourcesPath || __dirname;
-    this.configPath = path.join(basePath, 'config.json');
+    const userDataPath = app.getPath('userData');
+    this.configPath = path.join(userDataPath, 'config.json');
     this.defaultConfig = {
       serverIP: '127.0.0.1',
       serverPort: 8080
@@ -15,12 +16,13 @@ class Config {
         const data = fs.readFileSync(this.configPath, 'utf-8');
         this.config = JSON.parse(data);
       } catch (err) {
-        console.error('Error reading config.json:', err);
+        console.error('Failed to parse config.json, using default:', err);
         this.config = this.defaultConfig;
       }
     } else {
-      console.warn('No config.json found, using default settings.');
+      console.warn('No config.json found, writing default.');
       this.config = this.defaultConfig;
+      fs.writeFileSync(this.configPath, JSON.stringify(this.defaultConfig, null, 2));
     }
   }
 
