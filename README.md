@@ -11,12 +11,12 @@ then switch to the directory of the files before running these commands
     \
         > not looking good so far
     
- - scan process
+ - scan process (done)
     > like process usage, ram usage, gpu usage and all
     > make new colum in the database for this
     
     -i messed up the application
-   >something about the website not being opened idk ill eep
+   >something about the website not being opened or somtn about the build, e tweak ranako json file aaaa idk ill eep
 
 
 ---
