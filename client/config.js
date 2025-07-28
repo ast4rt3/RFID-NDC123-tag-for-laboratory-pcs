@@ -3,7 +3,8 @@ const path = require('path');
 
 class Config {
     constructor() {
-        this.configPath = path.join(process.resourcesPath || __dirname, 'config.json');
+        const basePath = process.resourcesPath || __dirname;
+        this.configPath = path.join(basePath, 'config.json');
         this.defaultConfig = {
             serverIP: 'localhost'
         };

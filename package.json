@@ -59,6 +59,7 @@
       "client/*.node",
       "node_modules/pidusage/**",
       "node_modules/active-win/**",
+      "node_modules/ws/**",
       "node_modules/@mapbox/**",
       "node_modules/node-addon-api/**",
       "node_modules/bindings/**",
