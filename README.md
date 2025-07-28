@@ -12,6 +12,9 @@ then switch to the directory of the files before running these commands
  - scan process
     > like process usage, ram usage, gpu usage and all
     > make new colum in the database for this
+    
+    -i messed up the application
+   >something about the website not being opened idk ill eep
 
 
 ---
