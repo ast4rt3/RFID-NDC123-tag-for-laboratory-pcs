@@ -6,8 +6,10 @@ then switch to the directory of the files before running these commands
  - too put local logs on each computer
     > maybe a text file that is saved on the local pc
  - work on multiple connections (on progress)
-    > find a way to automate the ipconfiguration when implemented on different devices
-        >not looking good so far
+    > find a way to automate the ipconfiguration when implemented on different devices\
+    > <i>update</i>: so yeah its not automated but manual, much preferred since incase mo lahi ang connection. basically goods for testing putposes
+    \
+        > not looking good so far
     
  - scan process
     > like process usage, ram usage, gpu usage and all
