@@ -4,27 +4,27 @@ const activeWin = require('active-win'); // <--- Add this
 const pidusage = require('pidusage');
 const { exec } = require('child_process');
 const config = require('./config');
+const fs = require('fs');
+const logStream = fs.createWriteStream('rfid-client-debug.log', { flags: 'a' });
+const origLog = console.log;
+console.log = function(...args) {
+  logStream.write(args.join(' ') + '\n');
+  origLog.apply(console, args);
+};
+const origError = console.error;
+console.error = function(...args) {
+  logStream.write('[ERROR] ' + args.join(' ') + '\n');
+  origError.apply(console, args);
+};
 
 const pcName = os.hostname();
 const wsUrl = config.getWebSocketURL(); // Use config instead of hardcoded localhost
 
 const ws = new WebSocket(wsUrl);
 
-// Robust helper to format date in Philippine Standard Time (UTC+8) in 24-hour format
-function toPhilippineTimeString(date) {
-  // Get UTC time, then add 8 hours for Philippine time
-  const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-  const phTime = new Date(utc + (8 * 60 * 60 * 1000));
-  const year = phTime.getUTCFullYear();
-  const month = String(phTime.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(phTime.getUTCDate()).padStart(2, '0');
-  const hour = String(phTime.getUTCHours()).padStart(2, '0');
-  const minute = String(phTime.getUTCMinutes()).padStart(2, '0');
-  const second = String(phTime.getUTCSeconds()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-}
-
+// Add explicit logging for connection, error, and close events
 ws.on('open', () => {
+  console.log('WebSocket connected to', wsUrl);
   ws.send(JSON.stringify({ type: 'start', pc_name: pcName }));
   console.log('Session started');
 
@@ -149,6 +149,28 @@ ws.on('open', () => {
   }, 3000); // 3 seconds
   // --- End app usage tracking ---
 });
+
+// Add error and close event logging
+ws.on('error', (err) => {
+  console.error('WebSocket error:', err);
+});
+ws.on('close', () => {
+  console.log('WebSocket closed');
+});
+
+// Robust helper to format date in Philippine Standard Time (UTC+8) in 24-hour format
+function toPhilippineTimeString(date) {
+  // Get UTC time, then add 8 hours for Philippine time
+  const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+  const phTime = new Date(utc + (8 * 60 * 60 * 1000));
+  const year = phTime.getUTCFullYear();
+  const month = String(phTime.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(phTime.getUTCDate()).padStart(2, '0');
+  const hour = String(phTime.getUTCHours()).padStart(2, '0');
+  const minute = String(phTime.getUTCMinutes()).padStart(2, '0');
+  const second = String(phTime.getUTCSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
 
 
 // Listen for shutdown/logoff signals

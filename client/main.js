@@ -52,8 +52,14 @@ app.whenReady().then(async () => {
     await showIPConfigWindow();
   }
 
+  // Determine correct path for pc-logger.js
+  const isPackaged = __dirname.includes('app.asar');
+  const loggerPath = isPackaged
+    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'client', 'pc-logger.js')
+    : path.join(__dirname, 'pc-logger.js');
+
   // Start the logger process
-  loggerProcess = spawn('node', [path.join(__dirname, 'pc-logger.js')]);
+  loggerProcess = spawn('node', [loggerPath]);
 
   // Safely attach listeners
   if (loggerProcess && loggerProcess.stdout) {
@@ -65,6 +71,9 @@ app.whenReady().then(async () => {
     });
     loggerProcess.stderr.on('data', (data) => {
       console.error(`pc-logger error: ${data}`);
+    });
+    loggerProcess.on('error', (err) => {
+      console.error('Failed to start logger process:', err);
     });
   }
 

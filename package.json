@@ -52,6 +52,11 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "RFID NDC123 Client"
-    }
+    },
+    "asarUnpack": [
+      "client/pc-logger.js",
+      "client/config.js",
+      "client/*.node"
+    ]
   }
 }
