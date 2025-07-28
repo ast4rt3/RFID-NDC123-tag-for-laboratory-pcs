@@ -21,3 +21,8 @@ for server
 
      npx electron client/main.js
 for application to start
+
+\
+\
+\
+need node js for it to run on client side
