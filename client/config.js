@@ -2,40 +2,31 @@ const fs = require('fs');
 const path = require('path');
 
 class Config {
-    constructor() {
-        const basePath = process.resourcesPath || __dirname;
-        this.configPath = path.join(basePath, 'config.json');
-        this.defaultConfig = {
-            serverIP: 'localhost'
-        };
-    }
+  constructor() {
+    const basePath = process.resourcesPath || __dirname;
+    this.configPath = path.join(basePath, 'config.json');
+    this.defaultConfig = {
+      serverIP: '127.0.0.1',
+      serverPort: 8080
+    };
 
-    load() {
-        try {
-            if (fs.existsSync(this.configPath)) {
-                const configData = fs.readFileSync(this.configPath, 'utf8');
-                return JSON.parse(configData);
-            }
-        } catch (error) {
-            console.error('Error loading config:', error);
-        }
-        return this.defaultConfig;
+    if (fs.existsSync(this.configPath)) {
+      try {
+        const data = fs.readFileSync(this.configPath, 'utf-8');
+        this.config = JSON.parse(data);
+      } catch (err) {
+        console.error('Error reading config.json:', err);
+        this.config = this.defaultConfig;
+      }
+    } else {
+      console.warn('No config.json found, using default settings.');
+      this.config = this.defaultConfig;
     }
+  }
 
-    getServerIP() {
-        const config = this.load();
-        return config.serverIP || this.defaultConfig.serverIP;
-    }
-
-    getWebSocketURL() {
-        const serverIP = this.getServerIP();
-        return `ws://${serverIP}:8080`;
-    }
-
-    getApiURL() {
-        const serverIP = this.getServerIP();
-        return `http://${serverIP}:3000`;
-    }
+  getWebSocketURL() {
+    return `ws://${this.config.serverIP}:${this.config.serverPort}`;
+  }
 }
 
-module.exports = new Config(); 
+module.exports = new Config();

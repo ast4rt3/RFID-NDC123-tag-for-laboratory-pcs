@@ -3,6 +3,8 @@ const os = require('os');
 const activeWin = require('active-win'); // <--- Add this
 const pidusage = require('pidusage');
 const { exec } = require('child_process');
+
+
 const config = require('./config');
 const fs = require('fs');
 const logStream = fs.createWriteStream('rfid-client-debug.log', { flags: 'a' });
@@ -56,7 +58,8 @@ ws.on('open', () => {
       callback(avgUsage);
     });
   }
-
+  console.log("Connecting to WebSocket at:", wsUrl);
+  
   setInterval(async () => {
     console.log('App usage interval running...');
     const result = await activeWin();
