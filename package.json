@@ -56,7 +56,15 @@
     "asarUnpack": [
       "client/pc-logger.js",
       "client/config.js",
-      "client/*.node"
+      "client/*.node",
+      "node_modules/pidusage/**",
+      "node_modules/active-win/**",
+      "node_modules/@mapbox/**",
+      "node_modules/node-addon-api/**",
+      "node_modules/bindings/**",
+      "node_modules/prebuild-install/**",
+      "node_modules/nan/**",
+      "node_modules/which/**"
     ]
   }
 }
