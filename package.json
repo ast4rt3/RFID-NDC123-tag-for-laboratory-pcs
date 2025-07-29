@@ -36,7 +36,8 @@
     },
     "files": [
       "client/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "config.json"
     ],
     "win": {
       "icon": "client/assets/icon.ico",
@@ -58,6 +59,7 @@
       "client/pc-logger.js",
       "client/config.js",
       "client/*.node",
+      "config.json",
       "node_modules/pidusage/**",
       "node_modules/active-win/**",
       "node_modules/ws/**",
@@ -66,8 +68,12 @@
       "node_modules/bindings/**",
       "node_modules/prebuild-install/**",
       "node_modules/nan/**",
-      "node_modules/which/**"
+      "node_modules/which/**",
+      "node_modules/node-gyp/**",
+      "node_modules/node-pre-gyp/**",
+      "node_modules/fs-extra/**",
+      "node_modules/graceful-fs/**",
+      "node_modules/nopt/**"
     ]
-    
   }
 }

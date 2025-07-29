@@ -20,3 +20,5 @@ yarn-error.log*
 .env
 allfileshas.txt
 bfg.jar
+config.json
+rebuild.bat

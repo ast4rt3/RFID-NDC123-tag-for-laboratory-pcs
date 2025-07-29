@@ -17,12 +17,17 @@ const origError = console.error;
 console.error = function(...args) {
   logStream.write('[ERROR] ' + args.join(' ') + '\n');
   origError.apply(console, args);
-};
+}; 
 
 const pcName = os.hostname();
-const wsUrl = config.getWebSocketURL(); // Use config instead of hardcoded localhost
+console.log('PC Name:', pcName);
 
-const ws = new WebSocket(`ws://${config.server_ip}:${config.server_port}`);
+// Load config and log details
+console.log('Loading configuration...');
+const wsUrl = config.getWebSocketURL(); // Use config instead of hardcoded localhost
+console.log('WebSocket URL:', wsUrl);
+
+const ws = new WebSocket(wsUrl);
 
 // Add explicit logging for connection, error, and close events
 ws.on('open', () => {
@@ -156,9 +161,20 @@ ws.on('open', () => {
 // Add error and close event logging
 ws.on('error', (err) => {
   console.error('WebSocket error:', err);
+  console.error('Failed to connect to:', wsUrl);
+  console.error('Please check:');
+  console.error('1. Server is running on the correct IP and port');
+  console.error('2. Firewall allows connections on port 8080');
+  console.error('3. Config file has the correct server IP');
 });
+
 ws.on('close', () => {
   console.log('WebSocket closed');
+  console.log('Attempting to reconnect in 5 seconds...');
+  setTimeout(() => {
+    console.log('Reconnecting...');
+    // You could implement reconnection logic here
+  }, 5000);
 });
 
 // Robust helper to format date in Philippine Standard Time (UTC+8) in 24-hour format

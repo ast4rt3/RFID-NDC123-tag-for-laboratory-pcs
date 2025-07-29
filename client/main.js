@@ -2,17 +2,17 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
-const config = require('./config');
 
 let loggerProcess;
-
+let win;
 
 function createWindow () {
   win = new BrowserWindow({
     width: 400,
     height: 200,
     frame: false, 
-    resizable: true, 
+    resizable: true,
+    icon: path.join(__dirname, 'assets', 'icon.ico'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -23,12 +23,6 @@ function createWindow () {
   win.setMenuBarVisibility(false);
   win.loadFile(path.join(__dirname, 'index.html'));
 }
-
-const win = new BrowserWindow({
-  width: 800,
-  height: 600,
-  icon: path.join(__dirname, 'assets', 'icon.ico')
-});
 
 function showIPConfigWindow() {
   const configWin = new BrowserWindow({
@@ -45,15 +39,19 @@ function showIPConfigWindow() {
   configWin.loadFile(path.join(__dirname, 'ip-config.html'));
 
   ipcMain.once('save-ip', (event, ip) => {
-    const configPath = path.join(process.resourcesPath || __dirname, 'config.json');
-    fs.writeFileSync(configPath, JSON.stringify({ serverIP: ip }, null, 2));
+    // Save config in the main installation directory
+    const configPath = path.join(path.dirname(process.resourcesPath), 'config.json');
+    fs.writeFileSync(configPath, JSON.stringify({ 
+      serverIP: ip, 
+      serverPort: 8080 
+    }, null, 2));
     configWin.close();
   });
 }
 
 app.whenReady().then(async () => {
   // Show IP configuration window on first run
-  const configPath = path.join(process.resourcesPath || __dirname, 'config.json');
+  const configPath = path.join(path.dirname(process.resourcesPath), 'config.json');
   if (!fs.existsSync(configPath)) {
     await showIPConfigWindow();
   }
@@ -64,8 +62,18 @@ app.whenReady().then(async () => {
     ? path.join(process.resourcesPath, 'app.asar.unpacked', 'client', 'pc-logger.js')
     : path.join(__dirname, 'pc-logger.js');
 
-  // Start the logger process
-  loggerProcess = spawn('node', [loggerPath]);
+  // Set NODE_PATH for the child process
+  const nodeModulesPath = isPackaged
+    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules')
+    : path.join(__dirname, '..', 'node_modules');
+
+  // Start the logger process with proper environment
+  loggerProcess = spawn('node', [loggerPath], {
+    env: {
+      ...process.env,
+      NODE_PATH: nodeModulesPath
+    }
+  });
 
   // Safely attach listeners
   if (loggerProcess && loggerProcess.stdout) {

@@ -31,8 +31,8 @@ const activeSessions = {}; // { clientId: { pc_name, start_time } }
 const appActiveSessions = {}; // { clientId: { app_name, start_time } }
 
 // WebSocket server
-const wss = new WebSocket.Server({ port: wsPort });
-console.log(`✅ WebSocket listening on ws://localhost:${wsPort}`);
+const wss = new WebSocket.Server({ port: wsPort, host: '0.0.0.0' });
+console.log(`✅ WebSocket listening on ws://0.0.0.0:${wsPort}`);
 
 // On connection
 wss.on('connection', ws => {
@@ -97,8 +97,8 @@ wss.on('connection', ws => {
           endTime,
           duration,
           data.memory_usage_bytes,
-          data.cpu_percent
-         
+          data.cpu_percent,
+          data.gpu_percent
         ], (err) => {
           if (err) console.error('DB insert error (app_usage):', err);
           else console.log('App usage log upserted');
@@ -130,7 +130,8 @@ wss.on('connection', ws => {
           endTime,
           duration,
           data.memory_usage_bytes,
-          data.cpu_percent
+          data.cpu_percent,
+          data.gpu_percent
 
         ], (err) => {
           if (err) console.error('DB insert error (app_usage):', err);
