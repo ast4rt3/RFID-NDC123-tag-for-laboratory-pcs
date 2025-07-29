@@ -1,6 +1,6 @@
 {
   "name": "rfid-ndc123-tag-for-laboratory-pc",
-  "version": "1.1.26",
+  "version": "1.1.29",
   "description": "RFID NDC123 Tag for Laboratory PC - Client Application",
   "main": "client/main.js",
   "scripts": {
@@ -21,13 +21,14 @@
   "type": "commonjs",
   "dependencies": {
     "active-win": "^8.2.1",
-    "aproba": "^2.1.0",
+    "aproba": "^1.0.3 || ^2.0.0",
     "body-parser": "^2.2.0",
     "chalk": "^5.4.1",
     "cors": "^2.8.5",
     "delegates": "^1.0.0",
     "emoji-regex": "^10.4.0",
     "express": "^5.1.0",
+    "has-unicode": "^2.0.1",
     "inherits": "^2.0.4",
     "is-fullwidth-code-point": "^5.0.0",
     "mysql2": "^3.14.2",
@@ -35,6 +36,7 @@
     "readable-stream": "^4.7.0",
     "string-width": "^7.2.0",
     "util-deprecate": "^1.0.2",
+    "color-support": "^1.1.3",
     "ws": "^8.18.3"
   },
   "devDependencies": {
@@ -107,7 +109,11 @@
       "node_modules/delegates/**",
       "node_modules/string-width/**",
       "node_modules/is-fullwidth-code-point/**",
-      "node_modules/emoji-regex/**"
+      "node_modules/emoji-regex/**",
+      "node_modules/is-unicode-supported/**",
+      "node_modules/aproba/**",
+      "node_modules/has-unicode/**",
+      "node_modules/color-support/**"
     ]
   }
 }
