@@ -8,7 +8,7 @@ class Config {
       serverPort: 8080
     };
 
-    // Always use the asar.unpacked client directory for config.json in production
+    // Always use the asar.unpacked/client directory for config.json in production
     let baseDir;
     if (process.resourcesPath) {
       baseDir = path.join(process.resourcesPath, 'app.asar.unpacked', 'client');

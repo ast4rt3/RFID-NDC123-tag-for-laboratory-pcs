@@ -1,6 +1,6 @@
 {
   "name": "rfid-ndc123-tag-for-laboratory-pc",
-  "version": "1.0.0",
+  "version": "1.1.24",
   "description": "RFID NDC123 Tag for Laboratory PC - Client Application",
   "main": "client/main.js",
   "scripts": {
@@ -10,8 +10,13 @@
     "build": "electron-builder",
     "build-installer": "electron-builder --win"
   },
-  "keywords": ["rfid", "laboratory", "pc", "monitoring"],
-  "author": "",
+  "keywords": [
+    "rfid",
+    "laboratory",
+    "pc",
+    "monitoring"
+  ],
+  "author": "Lawrence Heras",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
@@ -19,9 +24,14 @@
     "body-parser": "^2.2.0",
     "chalk": "^5.4.1",
     "cors": "^2.8.5",
+    "delegates": "^1.0.0",
     "express": "^5.1.0",
+    "inherits": "^2.0.4",
     "mysql2": "^3.14.2",
     "pidusage": "^4.0.1",
+    "readable-stream": "^4.7.0",
+    "string-width": "^7.2.0",
+    "util-deprecate": "^1.0.2",
     "ws": "^8.18.3"
   },
   "devDependencies": {
@@ -44,7 +54,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -73,7 +85,24 @@
       "node_modules/node-pre-gyp/**",
       "node_modules/fs-extra/**",
       "node_modules/graceful-fs/**",
-      "node_modules/nopt/**"
+      "node_modules/nopt/**",
+      "node_modules/abbrev/**",
+      "node_modules/npmlog/**",
+      "node_modules/semver/**",
+      "node_modules/tar/**",
+      "node_modules/are-we-there-yet/**",
+      "node_modules/gauge/**",
+      "node_modules/ansi-regex/**",
+      "node_modules/strip-ansi/**",
+      "node_modules/wide-align/**",
+      "node_modules/signal-exit/**",
+      "node_modules/console-control-strings/**",
+      "node_modules/set-blocking/**",
+      "node_modules/readable-stream/**",
+      "node_modules/inherits/**",
+      "node_modules/util-deprecate/**",
+      "node_modules/delegates/**",
+      "node_modules/string-width/**"
     ]
   }
 }
