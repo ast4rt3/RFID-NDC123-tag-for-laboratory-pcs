@@ -12,7 +12,7 @@ A cross-platform application for tracking laboratory PC usage and application ac
 - [Configuration](#configuration)
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
-- [License](#license)
+- [Useful Commands](#UsefulCommands)
 
 ---
 
@@ -109,7 +109,7 @@ node server/server.js
      - Client: ```client/main.js```
      - Server: ```server/server.js```
 
-### Useful Commands
+## Useful Commands
 
 #### Starting Server
 ```node server/server.js```
