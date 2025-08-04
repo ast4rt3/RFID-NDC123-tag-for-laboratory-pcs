@@ -112,8 +112,18 @@ node server/server.js
 ## Useful-Commands
 
 #### Starting Server
-```node server/server.js```
+```
+node server/server.js
+```
 #### Running client application on CLI
-```npx electron client/main.js```
-#### Buildong the client application
-```npm run build-installer```
+```
+npx electron client/main.js
+```
+#### Building the client application
+```
+npm run build-installer
+```
+#### My Directory
+```
+cd C:\Users\law\Documents\JuglonProject\RFID-NDC123-tag-for-laboratory-pc
+```
