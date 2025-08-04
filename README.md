@@ -68,3 +68,8 @@ npm install
 - Start XAMPP and launch phpMyAdmin.
 - Import the provided database schema (see /server/db.sql or your own schema file).
 - Ensure the database name is juglone (or update in server/server.js).
+
+### 4. Starting the server
+```
+node server/server.js
+```
