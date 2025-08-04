@@ -51,3 +51,17 @@ A cross-platform application for tracking laboratory PC usage and application ac
 ```sh
 git clone https://github.com/your-org/RFID-NDC123-tag-for-laboratory-pc.git
 cd RFID-NDC123-tag-for-laboratory-pc
+
+---
+``
+npm install
+cd client
+npm install
+cd ../server
+npm install
+
+
+3. Set Up the Database
+Start XAMPP and launch phpMyAdmin.
+Import the provided database schema (see /server/db.sql or your own schema file).
+Ensure the database name is juglone (or update in server/server.js).
