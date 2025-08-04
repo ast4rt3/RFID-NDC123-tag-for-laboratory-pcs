@@ -61,9 +61,10 @@ cd client
 npm install
 cd ../server
 npm install
+```
 
+### 3. Set Up the Database
 
-3. Set Up the Database
-Start XAMPP and launch phpMyAdmin.
-Import the provided database schema (see /server/db.sql or your own schema file).
-Ensure the database name is juglone (or update in server/server.js).
+>Start XAMPP and launch phpMyAdmin.
+>Import the provided database schema (see /server/db.sql or your own schema file).
+>Ensure the database name is juglone (or update in server/server.js).
