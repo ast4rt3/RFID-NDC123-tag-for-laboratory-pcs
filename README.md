@@ -73,3 +73,22 @@ npm install
 ```
 node server/server.js
 ```
+
+## Configuration
+---
+ 
+ ### Server
+ - Edit database credentials in server/server.js if needed.
+
+ ### Client
+ - On first run, the client will prompt for the server IP.
+ - Or, manually edit client/config.json (see README-CONFIG.md):
+
+ ```
+ {
+  "serverIP": "192.168.1.100",
+  "serverPort": 8080
+}
+```
+---
+## Usage
