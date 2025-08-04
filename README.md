@@ -10,9 +10,6 @@ A cross-platform application for tracking laboratory PC usage and application ac
 - [System Requirements](#system-requirements)
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Usage](#usage)
-- [Local Logging](#local-logging)
-- [Server API](#server-api)
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
 - [License](#license)
@@ -93,4 +90,30 @@ node server/server.js
 }
 ```
 ---
-## Usage
+## Troubleshooting
+- ### Cannot connect to server:
+     - Check server IP and port in ```config.json.```
+     - Ensure server is running and firewall allows ports 3000 (API) and 8080 (WebSocket).
+- ### Database errors:
+     - Verify MySQL is running and credentials are correct.
+     - Check that the ```juglone``` database and required tables exist.
+- ### Client not logging:
+     - Check ```rfid-client-debug.log``` for errors
+     - Ensure Node.js and Electron are installed.
+
+## Development 
+- client code: ```client/```
+- server code: ```server/```
+- Configuration: ```client/config.js```, ```client/README-CONFIG.md```
+- Main entry points:
+     - Client: ```client/main.js```
+     - Server: ```server/server.js```
+
+### Useful Commands
+
+#### Starting Server
+```node server/server.js```
+#### Running client application on CLI
+```npx electron client/main.js```
+#### Buildong the client application
+```npm run build-installer```
