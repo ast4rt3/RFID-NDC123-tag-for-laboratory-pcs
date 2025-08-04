@@ -69,19 +69,21 @@ npm install
 - Import the provided database schema (see /server/db.sql or your own schema file).
 - Ensure the database name is juglone (or update in server/server.js).
 
-### 4. Starting the server
-```
-node server/server.js
-```
-
 ## Configuration
----
  
  ### Server
  - Edit database credentials in server/server.js if needed.
 
+ #### To start the server
+ ```
+node server/server.js
+```
+
  ### Client
  - On first run, the client will prompt for the server IP.
+ - You can find the clients ip if you run 
+     ``` ipconfig```
+     on any CLI
  - Or, manually edit client/config.json (see README-CONFIG.md):
 
  ```
