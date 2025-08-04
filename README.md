@@ -51,9 +51,11 @@ A cross-platform application for tracking laboratory PC usage and application ac
 ```sh
 git clone https://github.com/your-org/RFID-NDC123-tag-for-laboratory-pc.git
 cd RFID-NDC123-tag-for-laboratory-pc
+```
 
----
-``
+### 2. Install Dependencies
+
+```sh
 npm install
 cd client
 npm install
