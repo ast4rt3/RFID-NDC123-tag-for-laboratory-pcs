@@ -17,3 +17,9 @@ activeWin result: [object Object]
 Sent app_usage_update for Electron
 App usage interval running...
 activeWin result: [object Object]
+PC Name: i3S
+Loading configuration...
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
