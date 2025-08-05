@@ -19,10 +19,10 @@ A cross-platform application for tracking laboratory PC usage and application ac
 ## Features
 
 - **Tracks PC session times** (start/stop) for each laboratory computer.
-- **Monitors active application usage** (app name, duration, memory, CPU, GPU).
+- **Monitors active application usage** (app name, duration, memory, CPU).
 - **Logs data to a MySQL database via a Node.js/Express server.**
 - **WebSocket-based real-time communication** between clients and server.
-- **Electron-based client** with a simple timer UI and background logger.
+- **Electron-based client** background logger.
 - **Configurable server IP and port** for flexible deployment.
 - **Local log file** for each client for redundancy and debugging.
 
@@ -36,8 +36,8 @@ A cross-platform application for tracking laboratory PC usage and application ac
 - **Client:**
   - Node.js (for development or running unpackaged)
   - Electron (for GUI)
-  - Windows OS (for full feature support, e.g., GPU stats)
-  - RFID reader hardware (optional, for authentication)
+  - Windows OS (for full feature support, e.g.)
+  - RFID reader hardware (to display reports)
 
 ---
 
@@ -112,8 +112,18 @@ node server/server.js
 ## Useful-Commands
 
 #### Starting Server
-```node server/server.js```
+```
+node server/server.js
+```
 #### Running client application on CLI
-```npx electron client/main.js```
-#### Buildong the client application
-```npm run build-installer```
+```
+npx electron client/main.js
+```
+#### Building the client application
+```
+npm run build-installer
+```
+#### My Directory
+```
+cd C:\Users\law\Documents\JuglonProject\RFID-NDC123-tag-for-laboratory-pc
+```
