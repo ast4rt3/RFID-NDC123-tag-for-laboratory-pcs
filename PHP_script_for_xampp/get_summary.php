@@ -48,7 +48,7 @@ if ($pcName) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PC Logbook - <?= htmlspecialchars($pcName) ?></title>
+    <title>RFID scan - <?= htmlspecialchars($pcName) ?></title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial; padding: 20px; }
@@ -59,7 +59,7 @@ if ($pcName) {
     </style>
 </head>
 <body>
-    <h2>Logbook for PC: <strong><?= htmlspecialchars($pcName) ?></strong></h2>
+    <h2>Report for PC: <strong><?= htmlspecialchars($pcName) ?></strong></h2>
 
     <form method="get">
         <input type="hidden" name="pc_name" value="<?= htmlspecialchars($pcName) ?>">
