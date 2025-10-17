@@ -1154,3 +1154,107 @@ Sent app_usage_update for Brave Browser
 App usage interval running...
 🔍 Active window result: [object Object]
 🔍 Extracted data: [object Object]
+PC Name: i3S
+Loading configuration...
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Microsoft Edge
+🔍 Window title: New tab - Personal - Microsoft​ Edge
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: New tab - Personal - Microsoft​ Edge
+🔍 Browser activity without search query detected
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+🔍 Browser detected: Microsoft Edge
+🔍 Window title: New tab - Personal - Microsoft​ Edge
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: New tab - Personal - Microsoft​ Edge
+🔍 Browser activity without search query detected
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Microsoft Edge
+Sent app_usage_update for Microsoft Edge
+🔍 Browser detected: Microsoft Edge
+🔍 Window title: ulala - Search - Personal - Microsoft​ Edge
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: ulala - Search - Personal - Microsoft​ Edge
+🔍 Browser activity without search query detected
+🔍 Using full title as search query: ulala - Search - Personal - Microsoft​ Edge
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Microsoft Edge
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - i3S - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - i3S - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - i3S - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - i3S - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_end for Microsoft Edge
+Sent app_usage_start for Brave Browser
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Microsoft Edge
+🔍 Window title: ulala - Search - Personal - Microsoft​ Edge
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: ulala - Search - Personal - Microsoft​ Edge
+🔍 Browser activity without search query detected
+🔍 Using full title as search query: ulala - Search - Personal - Microsoft​ Edge
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Microsoft Edge
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Microsoft Edge
+🔍 Window title: ulala - Search - Personal - Microsoft​ Edge
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: ulala - Search - Personal - Microsoft​ Edge
+🔍 Browser activity without search query detected
+🔍 Using full title as search query: ulala - Search - Personal - Microsoft​ Edge
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
