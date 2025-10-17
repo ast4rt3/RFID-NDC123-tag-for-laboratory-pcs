@@ -1,6 +1,6 @@
 {
   "name": "rfid-ndc123-tag-for-laboratory-pc",
-  "version": "1.1.30",
+  "version": "Alpha-1.2.0",
   "description": "RFID NDC123 Tag for Laboratory PC - Client Application",
   "main": "client/main.js",
   "scripts": {
@@ -38,6 +38,7 @@
     "object-assign": "^4.1.1",
     "pidusage": "^4.0.1",
     "readable-stream": "^4.7.0",
+    "sqlite3": "^5.1.7",
     "string-width": "^7.2.0",
     "strip-ansi": "^7.1.0",
     "util-deprecate": "^1.0.2",
@@ -123,6 +124,7 @@
       "node_modules/signal-exit/**",
       "node_modules/console-control-strings/**",
       "node_modules/set-blocking/**",
+      "node_modules/sqlite3/**",
       "node_modules/readable-stream/**",
       "node_modules/inherits/**",
       "node_modules/util-deprecate/**",
@@ -180,7 +182,6 @@
       "node_modules/setprototypeof/**",
       "node_modules/set-blocking/**",
       "node_modules/serve-static/**"
-      
     ]
   }
 }

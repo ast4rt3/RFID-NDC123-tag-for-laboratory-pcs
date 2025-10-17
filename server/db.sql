@@ -95,6 +95,22 @@ CREATE TABLE `pc_session_resource_summary` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `browser_search_logs`
+--
+
+CREATE TABLE `browser_search_logs` (
+  `id` int(11) NOT NULL,
+  `pc_name` varchar(50) NOT NULL,
+  `browser` varchar(50) NOT NULL,
+  `url` text DEFAULT NULL,
+  `search_query` text DEFAULT NULL,
+  `search_engine` varchar(50) DEFAULT NULL,
+  `timestamp` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `time_logs`
 --
 
@@ -152,6 +168,16 @@ ALTER TABLE `app_usage_logs`
   ADD UNIQUE KEY `unique_app_usage` (`pc_name`,`app_name`,`start_time`);
 
 --
+-- Indexes for table `browser_search_logs`
+--
+ALTER TABLE `browser_search_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_browser_search` (`pc_name`,`browser`,`url`,`timestamp`),
+  ADD KEY `idx_pc_name` (`pc_name`),
+  ADD KEY `idx_timestamp` (`timestamp`),
+  ADD KEY `idx_search_engine` (`search_engine`);
+
+--
 -- Indexes for table `time_logs`
 --
 ALTER TABLE `time_logs`
@@ -166,6 +192,12 @@ ALTER TABLE `time_logs`
 --
 ALTER TABLE `app_usage_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+
+--
+-- AUTO_INCREMENT for table `browser_search_logs`
+--
+ALTER TABLE `browser_search_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `time_logs`

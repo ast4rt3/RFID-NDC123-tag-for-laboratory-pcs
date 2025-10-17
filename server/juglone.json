@@ -1,0 +1,60 @@
+[
+{"type":"header","version":"5.2.1","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"juglone"},
+{"type":"table","name":"app_usage_logs","database":"juglone","data":
+[
+{"id":"59","pc_name":"DESKTOP-7MUAVV6","app_name":"RFID NDC123 Client","start_time":"2025-07-30 01:58:32","end_time":"2025-07-30 01:58:41","duration_seconds":"9","memory_usage_bytes":"188866560","cpu_percent":"4.65","gpu_percent":null},
+{"id":"62","pc_name":"DESKTOP-7MUAVV6","app_name":"RFID NDC123 Client","start_time":"2025-08-05 19:12:40","end_time":"2025-08-05 19:13:02","duration_seconds":"21","memory_usage_bytes":"170168320","cpu_percent":"0","gpu_percent":null},
+{"id":"86","pc_name":"DESKTOP-7MUAVV6","app_name":"Windows Explorer","start_time":"2025-08-05 19:13:02","end_time":"2025-08-05 19:13:45","duration_seconds":"43","memory_usage_bytes":"169635840","cpu_percent":"10.4333","gpu_percent":null},
+{"id":"102","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-06 14:07:14","end_time":"2025-08-06 14:07:14","duration_seconds":"0","memory_usage_bytes":"92925952","cpu_percent":"0","gpu_percent":null},
+{"id":"103","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-06 14:07:14","end_time":"2025-08-06 14:07:15","duration_seconds":"1","memory_usage_bytes":"145350656","cpu_percent":"0","gpu_percent":null},
+{"id":"104","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-06 14:07:15","end_time":"2025-08-06 14:08:14","duration_seconds":"58","memory_usage_bytes":"91353088","cpu_percent":"0.154098","gpu_percent":null},
+{"id":"124","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-06 14:08:14","end_time":"2025-08-06 14:08:16","duration_seconds":"2","memory_usage_bytes":"174198784","cpu_percent":"10.1667","gpu_percent":null},
+{"id":"125","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-06 14:08:16","end_time":"2025-08-06 14:08:34","duration_seconds":"17","memory_usage_bytes":"91570176","cpu_percent":"0.152381","gpu_percent":null},
+{"id":"131","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-06 14:08:34","end_time":"2025-08-06 14:08:37","duration_seconds":"3","memory_usage_bytes":"174854144","cpu_percent":"5.98333","gpu_percent":null},
+{"id":"132","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-06 14:08:37","end_time":"2025-08-06 14:09:35","duration_seconds":"57","memory_usage_bytes":"91987968","cpu_percent":"0.155","gpu_percent":null},
+{"id":"151","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-06 14:11:02","end_time":"2025-08-06 14:11:31","duration_seconds":"28","memory_usage_bytes":"210894848","cpu_percent":"362.6","gpu_percent":null},
+{"id":"153","pc_name":"DESKTOP-O0QLKPU","app_name":"The Great Ace Attorney Chronicles","start_time":"2025-08-06 14:11:31","end_time":"2025-08-06 14:11:55","duration_seconds":"24","memory_usage_bytes":"137445376","cpu_percent":"1.63182","gpu_percent":null},
+{"id":"164","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 08:31:19","end_time":"2025-08-07 08:34:14","duration_seconds":"174","memory_usage_bytes":"236810240","cpu_percent":"0","gpu_percent":null},
+{"id":"223","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-07 08:34:14","end_time":"2025-08-07 08:35:44","duration_seconds":"89","memory_usage_bytes":"232792064","cpu_percent":"7.3","gpu_percent":null},
+{"id":"253","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 08:35:55","end_time":"2025-08-07 08:37:25","duration_seconds":"90","memory_usage_bytes":"240807936","cpu_percent":"0","gpu_percent":null},
+{"id":"283","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-07 08:37:25","end_time":"2025-08-07 08:37:37","duration_seconds":"11","memory_usage_bytes":"92114944","cpu_percent":"0.62","gpu_percent":null},
+{"id":"287","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 08:37:37","end_time":"2025-08-07 08:37:43","duration_seconds":"5","memory_usage_bytes":"231997440","cpu_percent":"6.625","gpu_percent":null},
+{"id":"288","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-07 08:37:43","end_time":"2025-08-07 08:38:06","duration_seconds":"23","memory_usage_bytes":"281169920","cpu_percent":"110.467","gpu_percent":null},
+{"id":"289","pc_name":"DESKTOP-O0QLKPU","app_name":"The Great Ace Attorney Chronicles","start_time":"2025-08-07 08:38:06","end_time":"2025-08-07 08:38:52","duration_seconds":"45","memory_usage_bytes":"395132928","cpu_percent":"167.575","gpu_percent":null},
+{"id":"295","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 15:35:18","end_time":"2025-08-07 15:35:29","duration_seconds":"11","memory_usage_bytes":"120528896","cpu_percent":"0","gpu_percent":null},
+{"id":"300","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 15:35:29","end_time":"2025-08-07 15:35:59","duration_seconds":"29","memory_usage_bytes":"96964608","cpu_percent":"0.0454545","gpu_percent":null},
+{"id":"310","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 15:35:59","end_time":"2025-08-07 15:36:42","duration_seconds":"42","memory_usage_bytes":"124456960","cpu_percent":"3.36889","gpu_percent":null},
+{"id":"324","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 15:36:42","end_time":"2025-08-07 15:37:15","duration_seconds":"33","memory_usage_bytes":"112566272","cpu_percent":"0","gpu_percent":null},
+{"id":"335","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-07 15:37:15","end_time":"2025-08-07 15:37:17","duration_seconds":"1","memory_usage_bytes":"95956992","cpu_percent":"0.328947","gpu_percent":null},
+{"id":"336","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 15:37:17","end_time":"2025-08-07 15:38:02","duration_seconds":"45","memory_usage_bytes":"151011328","cpu_percent":"4.65686","gpu_percent":null},
+{"id":"351","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 15:38:02","end_time":"2025-08-07 15:38:08","duration_seconds":"5","memory_usage_bytes":"96354304","cpu_percent":"0.7","gpu_percent":null},
+{"id":"353","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 15:38:08","end_time":"2025-08-07 15:38:18","duration_seconds":"10","memory_usage_bytes":"139075584","cpu_percent":"0","gpu_percent":null},
+{"id":"356","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-07 15:38:18","end_time":"2025-08-07 15:38:53","duration_seconds":"34","memory_usage_bytes":"155090944","cpu_percent":"1.52917","gpu_percent":null},
+{"id":"368","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 15:38:53","end_time":"2025-08-07 15:52:01","duration_seconds":"788","memory_usage_bytes":"69206016","cpu_percent":"1.56667","gpu_percent":null},
+{"id":"629","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Shell Experience Host","start_time":"2025-08-07 15:52:01","end_time":"2025-08-07 15:52:05","duration_seconds":"3","memory_usage_bytes":"148852736","cpu_percent":"6.61111","gpu_percent":null},
+{"id":"631","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 15:52:05","end_time":"2025-08-07 15:52:34","duration_seconds":"28","memory_usage_bytes":"67575808","cpu_percent":"1.19667","gpu_percent":null},
+{"id":"640","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Shell Experience Host","start_time":"2025-08-07 15:52:34","end_time":"2025-08-07 15:52:38","duration_seconds":"4","memory_usage_bytes":"157417472","cpu_percent":"4.16667","gpu_percent":null},
+{"id":"642","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 15:52:38","end_time":"2025-08-07 15:58:57","duration_seconds":"379","memory_usage_bytes":"28454912","cpu_percent":"0","gpu_percent":null},
+{"id":"768","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 15:58:57","end_time":"2025-08-07 15:59:00","duration_seconds":"3","memory_usage_bytes":"118460416","cpu_percent":"1.6","gpu_percent":null},
+{"id":"769","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Explorer","start_time":"2025-08-07 15:59:00","end_time":"2025-08-07 15:59:02","duration_seconds":"2","memory_usage_bytes":"29052928","cpu_percent":"0.94","gpu_percent":null},
+{"id":"770","pc_name":"DESKTOP-O0QLKPU","app_name":"RFID NDC123 Client","start_time":"2025-08-07 15:59:02","end_time":"2025-08-07 15:59:05","duration_seconds":"3","memory_usage_bytes":"161861632","cpu_percent":"6.63333","gpu_percent":null},
+{"id":"771","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 15:59:05","end_time":"2025-08-07 16:04:15","duration_seconds":"309","memory_usage_bytes":"69259264","cpu_percent":"0","gpu_percent":null},
+{"id":"873","pc_name":"DESKTOP-O0QLKPU","app_name":"Windows Shell Experience Host","start_time":"2025-08-07 16:04:15","end_time":"2025-08-07 16:04:15","duration_seconds":"0","memory_usage_bytes":"150790144","cpu_percent":"3.38333","gpu_percent":null},
+{"id":"874","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 16:04:15","end_time":"2025-08-07 16:23:07","duration_seconds":"1131","memory_usage_bytes":"50892800","cpu_percent":null,"gpu_percent":null},
+{"id":"1250","pc_name":"DESKTOP-O0QLKPU","app_name":"File Picker UI Host","start_time":"2025-08-07 16:23:07","end_time":"2025-08-07 16:23:10","duration_seconds":"2","memory_usage_bytes":"171061248","cpu_percent":"4.68","gpu_percent":null},
+{"id":"1251","pc_name":"DESKTOP-O0QLKPU","app_name":"Brave Browser","start_time":"2025-08-07 16:23:10","end_time":"2025-08-07 16:38:45","duration_seconds":"935","memory_usage_bytes":"204161024","cpu_percent":"2.6","gpu_percent":null}
+]
+}
+,{"type":"table","name":"time_logs","database":"juglone","data":
+[
+{"id":"50","pc_name":"DESKTOP-7MUAVV6","start_time":"2025-07-30 01:58:24","end_time":"2025-07-30 01:58:42","duration_seconds":"18"},
+{"id":"51","pc_name":"i3S","start_time":"2025-08-05 02:02:27","end_time":"2025-08-05 02:02:29","duration_seconds":"2"},
+{"id":"52","pc_name":"DESKTOP-7MUAVV6","start_time":"2025-08-05 19:11:37","end_time":"2025-08-05 19:13:48","duration_seconds":"130"},
+{"id":"53","pc_name":"DESKTOP-O0QLKPU","start_time":"2025-08-06 14:07:02","end_time":"2025-08-06 14:09:36","duration_seconds":"153"},
+{"id":"54","pc_name":"DESKTOP-O0QLKPU","start_time":"2025-08-07 08:31:12","end_time":"2025-08-07 08:35:45","duration_seconds":"272"},
+{"id":"55","pc_name":"i3S","start_time":"2025-10-15 20:22:09","end_time":"2025-10-15 20:22:24","duration_seconds":"15"},
+{"id":"56","pc_name":"i3S","start_time":"2025-10-15 20:45:24","end_time":"2025-10-15 20:45:41","duration_seconds":"16"}
+]
+}
+]

@@ -139,6 +139,83 @@ wss.on('connection', ws => {
         });
       }
     }
+    
+    // Handle browser activity messages
+    else if (data.type === 'browser_activity') {
+      console.log('🔍 Browser activity logged:', data);
+      const sql = `
+        INSERT INTO browser_search_logs (pc_name, browser, url, search_query, search_engine, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          url = VALUES(url),
+          search_query = VALUES(search_query),
+          search_engine = VALUES(search_engine)
+      `;
+      db.query(sql, [
+        data.pc_name,
+        data.browser,
+        data.url,
+        data.search_query,
+        data.search_engine,
+        data.timestamp
+      ], (err) => {
+        if (err) console.error('DB insert error (browser_activity):', err);
+        else console.log('✅ Browser activity saved to database');
+      });
+    }
+    
+    // Handle browser history messages
+    else if (data.type === 'browser_history') {
+      console.log('📚 Browser history logged:', data.entries?.length || 0, 'entries');
+      if (data.entries && data.entries.length > 0) {
+        const sql = `
+          INSERT INTO browser_search_logs (pc_name, browser, url, search_query, search_engine, timestamp)
+          VALUES (?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+            url = VALUES(url),
+            search_query = VALUES(search_query),
+            search_engine = VALUES(search_engine)
+        `;
+        
+        data.entries.forEach(entry => {
+          db.query(sql, [
+            data.pc_name,
+            entry.browser,
+            entry.url,
+            entry.searchQuery,
+            entry.searchEngine,
+            entry.timestamp
+          ], (err) => {
+            if (err) console.error('DB insert error (browser_history):', err);
+          });
+        });
+        console.log('✅ Browser history saved to database');
+      }
+    }
+    
+    // Handle browser extension search messages
+    else if (data.type === 'browser_extension_search') {
+      console.log('🔌 Extension search logged:', data);
+      const sql = `
+        INSERT INTO browser_search_logs (pc_name, browser, url, search_query, search_engine, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          url = VALUES(url),
+          search_query = VALUES(search_query),
+          search_engine = VALUES(search_engine)
+      `;
+      db.query(sql, [
+        data.pc_name,
+        data.browser,
+        data.url,
+        data.search_query,
+        data.search_engine,
+        data.timestamp
+      ], (err) => {
+        if (err) console.error('DB insert error (browser_extension):', err);
+        else console.log('✅ Extension search saved to database');
+      });
+    }
   });
 
   ws.on('close', () => {
@@ -164,6 +241,36 @@ wss.on('connection', ws => {
 app.get('/logs', (req, res) => {
   db.query('SELECT * FROM time_logs ORDER BY start_time DESC', (err, results) => {
     if (err) return res.status(500).json({ error: 'DB error' });
+    res.json(results);
+  });
+});
+
+// Browser logs API endpoint
+app.get('/browser-logs', (req, res) => {
+  const { pc_name, search_engine, limit = 100 } = req.query;
+  
+  let sql = 'SELECT * FROM browser_search_logs WHERE 1=1';
+  const params = [];
+  
+  if (pc_name) {
+    sql += ' AND pc_name = ?';
+    params.push(pc_name);
+  }
+  
+  if (search_engine) {
+    sql += ' AND search_engine = ?';
+    params.push(search_engine);
+  }
+  
+  sql += ' ORDER BY timestamp DESC LIMIT ?';
+  params.push(parseInt(limit));
+  
+  db.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('Error fetching browser logs:', err);
+      res.status(500).json({ error: 'Database error' });
+      return;
+    }
     res.json(results);
   });
 });
