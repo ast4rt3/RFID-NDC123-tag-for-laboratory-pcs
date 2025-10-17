@@ -268,6 +268,21 @@ if ($pcName) {
             border-radius: 15px;
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .chart-container canvas {
+            max-height: 400px !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            height: 400px !important;
         }
 
         .chart-title {
@@ -684,7 +699,9 @@ if ($pcName) {
         <div id="apps-tab" class="tab-content" style="display: <?= $tab === 'apps' ? 'block' : 'none' ?>">
             <div class="chart-container">
                 <div class="chart-title"><i class="fas fa-chart-bar"></i> App Usage Distribution</div>
-                <canvas id="appUsageChart" width="800" height="400"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="appUsageChart"></canvas>
+                </div>
             </div>
 
             <div class="data-table">
@@ -731,7 +748,9 @@ if ($pcName) {
         <div id="searches-tab" class="tab-content" style="display: <?= $tab === 'searches' ? 'block' : 'none' ?>">
             <div class="chart-container">
                 <div class="chart-title"><i class="fas fa-chart-pie"></i> Search Engine Distribution</div>
-                <canvas id="searchChart" width="800" height="400"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="searchChart"></canvas>
+                </div>
             </div>
             
             <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #4f46e5;">
@@ -845,6 +864,12 @@ if ($pcName) {
         // App Usage Chart
         function initAppChart() {
             const appChartData = <?= json_encode($appChartData) ?>;
+            
+            if (!appChartData || appChartData.length === 0) {
+                console.log('No app chart data available');
+                return;
+            }
+            
             const appLabels = appChartData.map(item => item.app_name);
             const appDurations = appChartData.map(item => (item.total_duration / 60).toFixed(1));
 
@@ -886,8 +911,8 @@ if ($pcName) {
             options: {
                 indexAxis: 'y',
                 responsive: true,
-
-                    maintainAspectRatio: false,
+                maintainAspectRatio: false,
+                devicePixelRatio: 1,
                 plugins: {
 
                         legend: { 
@@ -944,6 +969,9 @@ if ($pcName) {
         // Search Engine Chart
         function initSearchChart() {
             const searchChartData = <?= json_encode($searchChartData) ?>;
+            
+           
+            
             const searchLabels = searchChartData.map(item => item.search_engine);
             const searchCounts = searchChartData.map(item => item.search_count);
 
@@ -976,6 +1004,7 @@ if ($pcName) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    devicePixelRatio: 1,
                     plugins: {
                         legend: {
                             position: 'bottom',

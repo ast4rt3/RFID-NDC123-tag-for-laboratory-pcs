@@ -1067,3 +1067,90 @@ App usage interval running...
 🔍 Extracted browser data: [object Object]
 🔍 Sent browser activity to server
 Sent app_usage_update for Brave Browser
+PC Name: i3S
+Loading configuration...
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - i3S - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - i3S - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Brave Browser
+🔍 Browser detected: Brave Browser
+🔍 Window title: Messenger | Facebook - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: Messenger | Facebook - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: Messenger | Facebook - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: Messenger | Facebook - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: Messenger - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: Messenger - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+🔍 Browser detected: Brave Browser
+🔍 Window title: Speedtest by Ookla - The Global Broadband Speed Test - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: Speedtest by Ookla - The Global Broadband Speed Test - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: Speedtest by Ookla - The Global Broadband Speed Test - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: Speedtest by Ookla - The Global Broadband Speed Test - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
