@@ -1,5 +1,13 @@
 <?php
-require_once 'supabase-config.php';
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "juglone";
+
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 $pcName = $_GET['pc_name'] ?? '';
 $selectedDate = $_GET['date'] ?? date('Y-m-d');
@@ -15,57 +23,73 @@ $dates = [];
 $summaryStats = [];
 
 if ($pcName) {
-    // Get available dates
-    $dates = getAvailableDates($pcName);
 
-
-    // Get app usage data
-    $appData = getAppUsageData($pcName, $selectedDate);
-
-    // Process app chart data
-    if ($appData) {
-        $appUsageByApp = [];
-        foreach ($appData as $row) {
-            $appName = $row['app_name'];
-            if (!isset($appUsageByApp[$appName])) {
-                $appUsageByApp[$appName] = 0;
-            }
-            $appUsageByApp[$appName] += $row['duration_seconds'];
-        }
-        
-        foreach ($appUsageByApp as $app => $duration) {
-            $appChartData[] = [
-                'app_name' => $app,
-                'total_duration' => $duration
-            ];
-        }
+    // Fetch available dates for dropdown (from both tables)
+    $dateQuery = $conn->prepare("
+        SELECT DISTINCT log_date FROM (
+            SELECT DATE(start_time) as log_date FROM app_usage_logs WHERE pc_name = ?
+            UNION
+            SELECT DATE(timestamp) as log_date FROM browser_search_logs WHERE pc_name = ?
+        ) combined_dates 
+        ORDER BY log_date DESC
+    ");
+    $dateQuery->bind_param("ss", $pcName, $pcName);
+    $dateQuery->execute();
+    $dateResult = $dateQuery->get_result();
+    while ($row = $dateResult->fetch_assoc()) {
+        $dates[] = $row['log_date'];
     }
 
-    // Get browser search data
-    $searchData = getBrowserSearchData($pcName, $selectedDate);
 
-    // Process search chart data
-    if ($searchData) {
-        $searchByEngine = [];
-        foreach ($searchData as $row) {
-            $engine = $row['search_engine'] ?: 'Unknown';
-            if (!isset($searchByEngine[$engine])) {
-                $searchByEngine[$engine] = 0;
-            }
-            $searchByEngine[$engine]++;
-        }
-        
-        foreach ($searchByEngine as $engine => $count) {
-            $searchChartData[] = [
-                'search_engine' => $engine,
-                'search_count' => $count
-            ];
-        }
+    // App usage data for selected date
+    $appStmt = $conn->prepare("SELECT start_time, end_time, duration_seconds, app_name, memory_usage_bytes, cpu_percent, gpu_percent FROM app_usage_logs WHERE pc_name = ? AND DATE(start_time) = ? ORDER BY start_time DESC");
+    $appStmt->bind_param("ss", $pcName, $selectedDate);
+    $appStmt->execute();
+    $appResult = $appStmt->get_result();
+    while ($row = $appResult->fetch_assoc()) {
+        $appData[] = $row;
     }
 
-    // Get summary statistics
-    $stats = getSummaryStats($pcName, $selectedDate);
-    $summaryStats = $stats;
+    // App usage chart data
+    $appChartStmt = $conn->prepare("SELECT app_name, SUM(duration_seconds) AS total_duration FROM app_usage_logs WHERE pc_name = ? AND DATE(start_time) = ? GROUP BY app_name ORDER BY total_duration DESC");
+    $appChartStmt->bind_param("ss", $pcName, $selectedDate);
+    $appChartStmt->execute();
+    $appChartResult = $appChartStmt->get_result();
+    while ($row = $appChartResult->fetch_assoc()) {
+        $appChartData[] = $row;
+    }
+
+    // Browser search data for selected date
+    $searchStmt = $conn->prepare("SELECT browser, url, search_query, search_engine, timestamp FROM browser_search_logs WHERE pc_name = ? AND DATE(timestamp) = ? ORDER BY timestamp DESC");
+    $searchStmt->bind_param("ss", $pcName, $selectedDate);
+    $searchStmt->execute();
+    $searchResult = $searchStmt->get_result();
+    while ($row = $searchResult->fetch_assoc()) {
+        $searchData[] = $row;
+    }
+
+    // Browser search chart data
+    $searchChartStmt = $conn->prepare("SELECT search_engine, COUNT(*) AS search_count FROM browser_search_logs WHERE pc_name = ? AND DATE(timestamp) = ? AND search_engine IS NOT NULL GROUP BY search_engine ORDER BY search_count DESC");
+    $searchChartStmt->bind_param("ss", $pcName, $selectedDate);
+    $searchChartStmt->execute();
+    $searchChartResult = $searchChartStmt->get_result();
+    while ($row = $searchChartResult->fetch_assoc()) {
+        $searchChartData[] = $row;
+    }
+
+    // Summary statistics
+    $summaryStmt = $conn->prepare("
+        SELECT 
+            (SELECT COUNT(*) FROM app_usage_logs WHERE pc_name = ? AND DATE(start_time) = ?) as app_sessions,
+            (SELECT SUM(duration_seconds) FROM app_usage_logs WHERE pc_name = ? AND DATE(start_time) = ?) as total_app_time,
+            (SELECT COUNT(*) FROM browser_search_logs WHERE pc_name = ? AND DATE(timestamp) = ?) as total_searches,
+            (SELECT COUNT(DISTINCT search_engine) FROM browser_search_logs WHERE pc_name = ? AND DATE(timestamp) = ? AND search_engine IS NOT NULL) as unique_engines,
+            (SELECT COUNT(*) FROM browser_search_logs WHERE pc_name = ? AND DATE(timestamp) = ? AND search_query IS NOT NULL AND search_query != '' AND search_query != 'N/A') as actual_queries
+    ");
+    $summaryStmt->bind_param("ssssssssss", $pcName, $selectedDate, $pcName, $selectedDate, $pcName, $selectedDate, $pcName, $selectedDate, $pcName, $selectedDate);
+    $summaryStmt->execute();
+    $summaryResult = $summaryStmt->get_result();
+    $summaryStats = $summaryResult->fetch_assoc();
 }
 ?>
 <!DOCTYPE html>

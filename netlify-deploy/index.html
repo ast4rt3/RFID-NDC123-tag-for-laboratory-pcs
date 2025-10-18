@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Laboratory Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .controls {
+            background: #f8fafc;
+            padding: 30px 40px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px 40px;
+            background: #f8fafc;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #4f46e5;
+        }
+
+        .stat-card .number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .tab.active {
+            background: white;
+            color: #4f46e5;
+            border-bottom: 3px solid #4f46e5;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e2e8f0;
+            color: #374151;
+        }
+
+        .tab-content {
+            padding: 30px 40px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .chart-container canvas {
+            max-height: 400px !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            height: 400px !important;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-google { background: #4285f4; color: white; }
+        .badge-bing { background: #0078d4; color: white; }
+        .badge-yahoo { background: #6001d2; color: white; }
+        .badge-duckduckgo { background: #de5833; color: white; }
+        .badge-youtube { background: #ff0000; color: white; }
+        .badge-chrome { background: #4285f4; color: white; }
+        .badge-firefox { background: #ff7139; color: white; }
+        .badge-edge { background: #0078d4; color: white; }
+        .badge-brave { background: #fb542b; color: white; }
+
+        .search-query {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+            
+            .header .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .controls {
+                padding: 20px 15px;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .form-group label {
+                font-size: 0.85rem;
+            }
+            
+            select {
+                min-width: auto;
+                width: 100%;
+                padding: 15px;
+                font-size: 1.1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 20px 15px;
+            }
+            
+            .stat-card {
+                padding: 20px 15px;
+            }
+            
+            .stat-card i {
+                font-size: 2rem;
+            }
+            
+            .stat-card .number {
+                font-size: 1.8rem;
+            }
+            
+            .tab-content {
+                padding: 20px 15px;
+            }
+            
+            .chart-container {
+                padding: 20px 15px;
+            }
+            
+            .chart-wrapper {
+                height: 300px;
+            }
+            
+            .data-table {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 600px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .container {
+                background: #1f2937;
+                color: #f9fafb;
+            }
+            
+            .controls {
+                background: #374151;
+                border-bottom-color: #4a5568;
+            }
+            
+            .form-group input, .form-group select {
+                background: #374151;
+                border-color: #4a5568;
+                color: #f9fafb;
+            }
+            
+            .stats-grid {
+                background: #374151;
+            }
+            
+            .stat-card {
+                background: #374151;
+                border-color: #4a5568;
+            }
+            
+            .stat-card .number {
+                color: #f9fafb;
+            }
+            
+            .tabs {
+                background: #374151;
+                border-bottom-color: #4a5568;
+            }
+            
+            .tab-content {
+                background: #1f2937;
+            }
+            
+            .chart-container, .data-table {
+                background: #374151;
+            }
+            
+            .chart-title {
+                color: #f9fafb;
+            }
+            
+            th {
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            }
+            
+            td {
+                border-bottom-color: #4a5568;
+                color: #f9fafb;
+            }
+            
+            tr:hover {
+                background: #4a5568;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-desktop"></i> RFID Laboratory Monitor</h1>
+            <div class="subtitle" id="headerSubtitle">Enter PC name to get started</div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <div class="form-group">
+                    <label for="pcName"><i class="fas fa-desktop"></i> PC Name</label>
+                    <input type="text" id="pcName" placeholder="Enter PC name (e.g., DESKTOP-7MUAVV6)">
+                </div>
+                <div class="form-group">
+                    <label for="selectedDate"><i class="fas fa-calendar"></i> Select Date</label>
+                    <input type="date" id="selectedDate">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="loadData()">
+                        <i class="fas fa-search"></i> Load Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="statsGrid" class="stats-grid" style="display: none;">
+            <!-- Stats will be populated here -->
+        </div>
+
+        <div class="tabs" id="tabsContainer" style="display: none;">
+            <button class="tab active" onclick="switchTab('apps')">
+                <i class="fas fa-desktop"></i> App Usage
+            </button>
+            <button class="tab" onclick="switchTab('searches')">
+                <i class="fas fa-search"></i> Search Activity
+            </button>
+        </div>
+
+        <div id="apps-tab" class="tab-content" style="display: none;">
+            <div class="chart-container">
+                <div class="chart-title"><i class="fas fa-chart-bar"></i> App Usage Distribution</div>
+                <div class="chart-wrapper">
+                    <canvas id="appUsageChart"></canvas>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-desktop"></i> Application</th>
+                            <th><i class="fas fa-play"></i> Start Time</th>
+                            <th><i class="fas fa-stop"></i> End Time</th>
+                            <th><i class="fas fa-clock"></i> Duration</th>
+                            <th><i class="fas fa-memory"></i> Memory</th>
+                            <th><i class="fas fa-microchip"></i> CPU</th>
+                            <th><i class="fas fa-video"></i> GPU</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appTableBody">
+                        <!-- App data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="searches-tab" class="tab-content" style="display: none;">
+            <div class="chart-container">
+                <div class="chart-title"><i class="fas fa-chart-pie"></i> Search Engine Distribution</div>
+                <div class="chart-wrapper">
+                    <canvas id="searchChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <p>
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Search Query</strong> field contains extracted search terms or browser window titles when search queries are detected.
+                </p>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-globe"></i> Browser</th>
+                            <th><i class="fas fa-search"></i> Search Query</th>
+                            <th><i class="fas fa-external-link-alt"></i> Search Engine</th>
+                            <th><i class="fas fa-clock"></i> Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchTableBody">
+                        <!-- Search data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="loadingMessage" class="loading">
+            <i class="fas fa-spinner fa-spin"></i> Enter PC name and click "Load Data" to get started
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://uxhefdybgjluzkbodryd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4aGVmZHliZ2psdXprYm9kcnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDExMzAsImV4cCI6MjA3NjM3NzEzMH0.jvFSOUUNiWvLFdPHplVuRgvKkvt2zlet6NA_x3mLaJM';
+
+        let currentTab = 'apps';
+        let appChart = null;
+        let searchChart = null;
+        let currentData = { appData: [], searchData: [] };
+
+        // Set today's date as default
+        document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+
+        async function loadData() {
+            const pcName = document.getElementById('pcName').value.trim();
+            const selectedDate = document.getElementById('selectedDate').value;
+
+            if (!pcName) {
+                alert('Please enter a PC name');
+                return;
+            }
+
+            // Update header
+            document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
+
+            document.getElementById('loadingMessage').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
+            document.getElementById('loadingMessage').style.display = 'block';
+            document.getElementById('statsGrid').style.display = 'none';
+            document.getElementById('tabsContainer').style.display = 'none';
+
+            try {
+                // Fetch data from Supabase
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/app_usage_logs?pc_name=eq.${pcName}&start_time=gte.${selectedDate}T00:00:00&start_time=lte.${selectedDate}T23:59:59`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                const appData = await response.json();
+
+                const searchResponse = await fetch(`${SUPABASE_URL}/rest/v1/browser_search_logs?pc_name=eq.${pcName}&timestamp=gte.${selectedDate}T00:00:00&timestamp=lte.${selectedDate}T23:59:59`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                const searchData = await searchResponse.json();
+
+                // Store data globally
+                currentData = { appData, searchData };
+
+                // Process data
+                processData(appData, searchData, pcName, selectedDate);
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loadingMessage').innerHTML = '<div class="error">Error loading data. Please check your Supabase configuration.</div>';
+            }
+        }
+
+        function processData(appData, searchData, pcName, selectedDate) {
+            // Calculate summary stats
+            const totalAppSessions = appData.length;
+            const totalAppTime = appData.reduce((sum, row) => sum + (row.duration_seconds || 0), 0);
+            const totalSearches = searchData.length;
+            const actualQueries = searchData.filter(row => row.search_query && row.search_query.trim() !== '' && row.search_query !== 'N/A').length;
+            const uniqueEngines = new Set(searchData.map(row => row.search_engine).filter(engine => engine)).size;
+
+            // Display stats
+            displayStats(totalAppSessions, totalAppTime, totalSearches, actualQueries, uniqueEngines);
+
+            // Process chart data
+            const appChartData = processAppChartData(appData);
+            const searchChartData = processSearchChartData(searchData);
+
+            // Create charts
+            createAppChart(appChartData);
+            createSearchChart(searchChartData);
+
+            // Populate tables
+            populateAppTable(appData);
+            populateSearchTable(searchData);
+
+            // Show results
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('statsGrid').style.display = 'grid';
+            document.getElementById('tabsContainer').style.display = 'flex';
+            document.getElementById('apps-tab').style.display = 'block';
+        }
+
+        function displayStats(appSessions, appTime, searches, queries, uniqueEngines) {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <i class="fas fa-desktop"></i>
+                    <div class="number">${appSessions}</div>
+                    <div class="label">App Sessions</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="number">${Math.round(appTime / 3600 * 10) / 10}h</div>
+                    <div class="label">Total Usage</div>
+                </div>
+                <div class="stat-card" title="Actual search queries detected (${searches} total browser activities)">
+                    <i class="fas fa-search"></i>
+                    <div class="number">${queries}</div>
+                    <div class="label">Search Queries</div>
+                    <div style="font-size: 0.7rem; opacity: 0.8; margin-top: 5px;">
+                        (${searches} browser activities)
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-globe"></i>
+                    <div class="number">${uniqueEngines}</div>
+                    <div class="label">Search Engines</div>
+                </div>
+            `;
+        }
+
+        function processAppChartData(appData) {
+            const appUsageByApp = {};
+            appData.forEach(row => {
+                const appName = row.app_name;
+                if (!appUsageByApp[appName]) {
+                    appUsageByApp[appName] = 0;
+                }
+                appUsageByApp[appName] += row.duration_seconds || 0;
+            });
+
+            return Object.entries(appUsageByApp).map(([app, duration]) => ({
+                app,
+                duration
+            }));
+        }
+
+        function processSearchChartData(searchData) {
+            const searchByEngine = {};
+            searchData.forEach(row => {
+                const engine = row.search_engine || 'Unknown';
+                if (!searchByEngine[engine]) {
+                    searchByEngine[engine] = 0;
+                }
+                searchByEngine[engine]++;
+            });
+
+            return Object.entries(searchByEngine).map(([engine, count]) => ({
+                engine,
+                count
+            }));
+        }
+
+        function createAppChart(data) {
+            const ctx = document.getElementById('appUsageChart').getContext('2d');
+            
+            if (appChart) {
+                appChart.destroy();
+            }
+
+            if (data.length === 0) {
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#64748b';
+                ctx.textAlign = 'center';
+                ctx.fillText('No app usage data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+
+            appChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.app),
+                    datasets: [{
+                        label: 'Usage Time (seconds)',
+                        data: data.map(item => item.duration),
+                        backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    devicePixelRatio: 1,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function createSearchChart(data) {
+            const ctx = document.getElementById('searchChart').getContext('2d');
+            
+            if (searchChart) {
+                searchChart.destroy();
+            }
+
+            if (data.length === 0) {
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#64748b';
+                ctx.textAlign = 'center';
+                ctx.fillText('No search data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+
+            const colors = [
+                'rgba(79, 70, 229, 0.8)',
+                'rgba(124, 58, 237, 0.8)',
+                'rgba(66, 133, 244, 0.8)',
+                'rgba(0, 120, 212, 0.8)',
+                'rgba(96, 1, 210, 0.8)',
+                'rgba(222, 88, 51, 0.8)'
+            ];
+
+            searchChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.engine),
+                    datasets: [{
+                        data: data.map(item => item.count),
+                        backgroundColor: colors.slice(0, data.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    devicePixelRatio: 1,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function populateAppTable(appData) {
+            const tbody = document.getElementById('appTableBody');
+            
+            if (appData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="fas fa-desktop"></i>
+                            <h3>No App Usage Data</h3>
+                            <p>No application usage recorded for this date.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = appData.map(entry => `
+                <tr>
+                    <td><strong>${escapeHtml(entry.app_name)}</strong></td>
+                    <td>${formatTime(entry.start_time)}</td>
+                    <td>${formatTime(entry.end_time)}</td>
+                    <td>${Math.round(entry.duration_seconds / 60 * 10) / 10} min</td>
+                    <td>${Math.round(entry.memory_usage_bytes / 1048576 * 10) / 10} MB</td>
+                    <td>${Math.round(entry.cpu_percent * 10) / 10}%</td>
+                    <td>${entry.gpu_percent ? Math.round(entry.gpu_percent * 10) / 10 + '%' : 'N/A'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function populateSearchTable(searchData) {
+            const tbody = document.getElementById('searchTableBody');
+            
+            if (searchData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>No Search Activity</h3>
+                            <p>No search queries or browser activities recorded for this date.</p>
+                            <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px;">
+                                <i class="fas fa-info-circle"></i> 
+                                Make sure the client application is running and browsers are being used.
+                            </p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = searchData.map(entry => `
+                <tr>
+                    <td>
+                        <span class="badge badge-${entry.browser.toLowerCase()}">
+                            ${escapeHtml(entry.browser)}
+                        </span>
+                    </td>
+                    <td class="search-query" title="${escapeHtml(entry.search_query || '')}">
+                        ${formatSearchQuery(entry.search_query)}
+                    </td>
+                    <td>
+                        ${entry.search_engine ? 
+                            `<span class="badge badge-${entry.search_engine.toLowerCase()}">${escapeHtml(entry.search_engine)}</span>` : 
+                            '<span style="color: #64748b;">N/A</span>'
+                        }
+                    </td>
+                    <td>${formatTime(entry.timestamp)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function formatTime(timeString) {
+            return new Date(timeString).toLocaleTimeString('en-US', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        function formatSearchQuery(query) {
+            if (!query || query === 'N/A') {
+                return '<span style="color: #64748b;">No search query detected</span>';
+            }
+            return escapeHtml(query);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+
+            currentTab = tabName;
+        }
+    </script>
+</body>
+</html>

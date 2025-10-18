@@ -1,29 +1,29 @@
 const express = require('express');
 const WebSocket = require('ws');
-const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const SupabaseDB = require('./supabase-client');
+
+// Load environment variables
+require('dotenv').config();
 
 const app = express();
-const port = 3000;
-const wsPort = 8080;
+const port = process.env.PORT || 3000;
+const wsPort = process.env.WS_PORT || 8080;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// MySQL connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'juglone', 
-});
+// Initialize Supabase database client
+const db = new SupabaseDB();
 
-
-db.connect(err => {
-  if (err) console.error('DB error:', err);
-  else console.log('✅ Connected to MySQL');
+// Test database connection
+db.testConnection().then(connected => {
+  if (!connected) {
+    console.error('❌ Failed to connect to Supabase. Exiting...');
+    process.exit(1);
+  }
 });
 
 // Store active sessions in memory
@@ -57,11 +57,7 @@ wss.on('connection', ws => {
         const duration = Math.floor((endTime - startTime) / 1000);
 
         // Save to database
-        const sql = 'INSERT INTO time_logs (pc_name, start_time, end_time, duration_seconds) VALUES (?, ?, ?, ?)';
-        db.query(sql, [data.pc_name, startTime, endTime, duration], (err) => {
-          if (err) console.error('DB insert error:', err);
-          else console.log(`💾 Log saved for ${data.pc_name}`);
-        });
+        db.insertTimeLog(data.pc_name, startTime, endTime, duration);
 
         delete activeSessions[data.pc_name];
         delete appActiveSessions[data.pc_name];
@@ -80,17 +76,7 @@ wss.on('connection', ws => {
         const startTime = appActiveSessions[clientId][data.app_name].start_time;
         const endTime = new Date();
         const duration = Math.floor((endTime - startTime) / 1000);
-        const sql = `
-          INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          ON DUPLICATE KEY UPDATE
-            end_time = VALUES(end_time),
-            duration_seconds = VALUES(duration_seconds),
-            memory_usage_bytes = VALUES(memory_usage_bytes),
-            cpu_percent = VALUES(cpu_percent)
-          
-        `;
-        db.query(sql, [
+        db.insertAppUsageLog(
           data.pc_name,
           data.app_name,
           startTime,
@@ -99,10 +85,7 @@ wss.on('connection', ws => {
           data.memory_usage_bytes,
           data.cpu_percent,
           data.gpu_percent
-        ], (err) => {
-          if (err) console.error('DB insert error (app_usage):', err);
-          else console.log('App usage log upserted');
-        });
+        );
         delete appActiveSessions[clientId][data.app_name];
       }
     } else if (
@@ -113,17 +96,7 @@ wss.on('connection', ws => {
         const startTime = appActiveSessions[clientId][data.app_name].start_time;
         const endTime = new Date();
         const duration = Math.floor((endTime - startTime) / 1000);
-        const sql = `
-          INSERT INTO app_usage_logs (pc_name, app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          ON DUPLICATE KEY UPDATE
-            end_time = VALUES(end_time),
-            duration_seconds = VALUES(duration_seconds),
-            memory_usage_bytes = VALUES(memory_usage_bytes),
-            cpu_percent = VALUES(cpu_percent)
-            
-        `;
-        db.query(sql, [
+        db.insertAppUsageLog(
           data.pc_name,
           data.app_name,
           startTime,
@@ -132,62 +105,36 @@ wss.on('connection', ws => {
           data.memory_usage_bytes,
           data.cpu_percent,
           data.gpu_percent
-
-        ], (err) => {
-          if (err) console.error('DB insert error (app_usage):', err);
-          else console.log('App usage log upserted');
-        });
+        );
       }
     }
     
     // Handle browser activity messages
     else if (data.type === 'browser_activity') {
       console.log('🔍 Browser activity logged:', data);
-      const sql = `
-        INSERT INTO browser_search_logs (pc_name, browser, url, search_query, search_engine, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          url = VALUES(url),
-          search_query = VALUES(search_query),
-          search_engine = VALUES(search_engine)
-      `;
-      db.query(sql, [
+      db.insertBrowserSearchLog(
         data.pc_name,
         data.browser,
         data.url,
         data.search_query,
         data.search_engine,
         data.timestamp
-      ], (err) => {
-        if (err) console.error('DB insert error (browser_activity):', err);
-        else console.log('✅ Browser activity saved to database');
-      });
+      );
     }
     
     // Handle browser history messages
     else if (data.type === 'browser_history') {
       console.log('📚 Browser history logged:', data.entries?.length || 0, 'entries');
       if (data.entries && data.entries.length > 0) {
-        const sql = `
-          INSERT INTO browser_search_logs (pc_name, browser, url, search_query, search_engine, timestamp)
-          VALUES (?, ?, ?, ?, ?, ?)
-          ON DUPLICATE KEY UPDATE
-            url = VALUES(url),
-            search_query = VALUES(search_query),
-            search_engine = VALUES(search_engine)
-        `;
-        
         data.entries.forEach(entry => {
-          db.query(sql, [
+          db.insertBrowserSearchLog(
             data.pc_name,
             entry.browser,
             entry.url,
             entry.searchQuery,
             entry.searchEngine,
             entry.timestamp
-          ], (err) => {
-            if (err) console.error('DB insert error (browser_history):', err);
-          });
+          );
         });
         console.log('✅ Browser history saved to database');
       }
@@ -196,25 +143,14 @@ wss.on('connection', ws => {
     // Handle browser extension search messages
     else if (data.type === 'browser_extension_search') {
       console.log('🔌 Extension search logged:', data);
-      const sql = `
-        INSERT INTO browser_search_logs (pc_name, browser, url, search_query, search_engine, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          url = VALUES(url),
-          search_query = VALUES(search_query),
-          search_engine = VALUES(search_engine)
-      `;
-      db.query(sql, [
+      db.insertBrowserSearchLog(
         data.pc_name,
         data.browser,
         data.url,
         data.search_query,
         data.search_engine,
         data.timestamp
-      ], (err) => {
-        if (err) console.error('DB insert error (browser_extension):', err);
-        else console.log('✅ Extension search saved to database');
-      });
+      );
     }
   });
 
@@ -224,11 +160,7 @@ wss.on('connection', ws => {
       const startTime = activeSessions[clientId].start_time;
       const duration = Math.floor((endTime - startTime) / 1000);
 
-      const sql = 'INSERT INTO time_logs (pc_name, start_time, end_time, duration_seconds) VALUES (?, ?, ?, ?)';
-      db.query(sql, [clientId, startTime, endTime, duration], (err) => {
-        if (err) console.error('DB insert error on close:', err);
-        else console.log(`💾 Log saved for ${clientId} on close`);
-      });
+      db.insertTimeLog(clientId, startTime, endTime, duration);
 
       delete activeSessions[clientId];
     }
@@ -238,41 +170,27 @@ wss.on('connection', ws => {
 
 
 // API to get logs
-app.get('/logs', (req, res) => {
-  db.query('SELECT * FROM time_logs ORDER BY start_time DESC', (err, results) => {
-    if (err) return res.status(500).json({ error: 'DB error' });
-    res.json(results);
-  });
+app.get('/logs', async (req, res) => {
+  try {
+    const logs = await db.getTimeLogs();
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
 // Browser logs API endpoint
-app.get('/browser-logs', (req, res) => {
+app.get('/browser-logs', async (req, res) => {
   const { pc_name, search_engine, limit = 100 } = req.query;
   
-  let sql = 'SELECT * FROM browser_search_logs WHERE 1=1';
-  const params = [];
-  
-  if (pc_name) {
-    sql += ' AND pc_name = ?';
-    params.push(pc_name);
+  try {
+    const logs = await db.getBrowserLogs(pc_name, search_engine, limit);
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching browser logs:', error);
+    res.status(500).json({ error: 'Database error' });
   }
-  
-  if (search_engine) {
-    sql += ' AND search_engine = ?';
-    params.push(search_engine);
-  }
-  
-  sql += ' ORDER BY timestamp DESC LIMIT ?';
-  params.push(parseInt(limit));
-  
-  db.query(sql, params, (err, results) => {
-    if (err) {
-      console.error('Error fetching browser logs:', err);
-      res.status(500).json({ error: 'Database error' });
-      return;
-    }
-    res.json(results);
-  });
 });
 
 app.listen(port, '0.0.0.0', () => {
