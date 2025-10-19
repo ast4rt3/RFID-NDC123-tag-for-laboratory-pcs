@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Monitor - Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .status-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .status-section h3 {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .status-value {
+            color: #64748b;
+            font-family: monospace;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-running {
+            background: #10b981;
+        }
+
+        .status-stopped {
+            background: #ef4444;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Settings</h1>
+            <p>Configure RFID Monitor connection settings</p>
+        </div>
+
+        <div class="content">
+            <div id="alertContainer"></div>
+
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="serverIP">Server IP Address</label>
+                    <input type="text" id="serverIP" placeholder="192.168.1.100" required>
+                    <small>Enter the IP address of your central RFID monitoring server</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="serverPort">WebSocket Port</label>
+                    <input type="number" id="serverPort" placeholder="8080" min="1" max="65535" required>
+                    <small>Port used for WebSocket communication with the server</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="reconnectInterval">Reconnection Interval (ms)</label>
+                    <input type="number" id="reconnectInterval" placeholder="5000" min="1000" max="30000" required>
+                    <small>How often to attempt reconnection if connection is lost</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxReconnectAttempts">Max Reconnection Attempts</label>
+                    <input type="number" id="maxReconnectAttempts" placeholder="10" min="1" max="100" required>
+                    <small>Maximum number of reconnection attempts before giving up</small>
+                </div>
+
+                <div class="buttons">
+                    <button type="submit" class="btn">💾 Save Settings</button>
+                    <button type="button" class="btn btn-secondary" onclick="restartLogger()">🔄 Restart Logger</button>
+                </div>
+            </form>
+
+            <div class="status-section">
+                <h3>📊 Current Status</h3>
+                <div class="status-item">
+                    <div style="display: flex; align-items: center;">
+                        <span class="status-indicator" id="statusIndicator"></span>
+                        <span class="status-label">Logger Status:</span>
+                    </div>
+                    <span class="status-value" id="loggerStatus">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Uptime:</span>
+                    <span class="status-value" id="uptime">-</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Version:</span>
+                    <span class="status-value" id="version">-</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Server:</span>
+                    <span class="status-value" id="serverAddress">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        let currentConfig = {};
+
+        // Load current configuration
+        async function loadConfig() {
+            try {
+                currentConfig = await ipcRenderer.invoke('get-config');
+                
+                document.getElementById('serverIP').value = currentConfig.serverIP || '192.168.1.100';
+                document.getElementById('serverPort').value = currentConfig.serverPort || 8080;
+                document.getElementById('reconnectInterval').value = currentConfig.reconnectInterval || 5000;
+                document.getElementById('maxReconnectAttempts').value = currentConfig.maxReconnectAttempts || 10;
+                
+                updateStatus();
+            } catch (error) {
+                showAlert('Error loading configuration: ' + error.message, 'error');
+            }
+        }
+
+        // Update status display
+        async function updateStatus() {
+            try {
+                const status = await ipcRenderer.invoke('get-status');
+                
+                const statusIndicator = document.getElementById('statusIndicator');
+                const loggerStatus = document.getElementById('loggerStatus');
+                const uptime = document.getElementById('uptime');
+                const version = document.getElementById('version');
+                const serverAddress = document.getElementById('serverAddress');
+                
+                if (status.isRunning) {
+                    statusIndicator.className = 'status-indicator status-running';
+                    loggerStatus.textContent = 'Running';
+                } else {
+                    statusIndicator.className = 'status-indicator status-stopped';
+                    loggerStatus.textContent = 'Stopped';
+                }
+                
+                uptime.textContent = formatUptime(status.uptime);
+                version.textContent = status.version || '1.0.0';
+                serverAddress.textContent = `${status.config.serverIP}:${status.config.serverPort}`;
+                
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
+        }
+
+        // Format uptime in human-readable format
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m ${secs}s`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${secs}s`;
+            } else {
+                return `${secs}s`;
+            }
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
+            
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass}">
+                    ${message}
+                </div>
+            `;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Save settings
+        async function saveSettings(config) {
+            try {
+                const success = await ipcRenderer.invoke('save-config', config);
+                if (success) {
+                    showAlert('Settings saved successfully!');
+                    currentConfig = config;
+                    updateStatus();
+                } else {
+                    showAlert('Error saving settings', 'error');
+                }
+            } catch (error) {
+                showAlert('Error saving settings: ' + error.message, 'error');
+            }
+        }
+
+        // Restart logger
+        async function restartLogger() {
+            try {
+                await ipcRenderer.invoke('restart-logger');
+                showAlert('Logger restarted successfully!');
+                setTimeout(updateStatus, 1000);
+            } catch (error) {
+                showAlert('Error restarting logger: ' + error.message, 'error');
+            }
+        }
+
+        // Form submission
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const config = {
+                serverIP: document.getElementById('serverIP').value,
+                serverPort: parseInt(document.getElementById('serverPort').value),
+                reconnectInterval: parseInt(document.getElementById('reconnectInterval').value),
+                maxReconnectAttempts: parseInt(document.getElementById('maxReconnectAttempts').value)
+            };
+            
+            await saveSettings(config);
+        });
+
+        // Update status every 5 seconds
+        setInterval(updateStatus, 5000);
+
+        // Initialize
+        loadConfig();
+    </script>
+</body>
+</html>

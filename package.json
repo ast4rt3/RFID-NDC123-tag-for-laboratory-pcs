@@ -7,8 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server/server.js",
     "start-client": "electron client/main.js",
+    "dev": "electron client/main.js --dev",
     "build": "electron-builder",
-    "build-installer": "electron-builder --win"
+    "build-installer": "electron-builder --win",
+    "start-update-server": "node update-server.js",
+    "publish": "electron-builder --publish=always"
   },
   "keywords": [
     "rfid",
@@ -64,7 +67,8 @@
   },
   "devDependencies": {
     "electron": "^37.2.3",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "electron-updater": "^6.1.7"
   },
   "build": {
     "appId": "com.rfid.ndc123.client",
@@ -88,13 +92,20 @@
         }
       ]
     },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Darwin"
-    },
+      "nsis": {
+        "oneClick": false,
+        "allowToChangeInstallationDirectory": true,
+        "createDesktopShortcut": true,
+        "createStartMenuShortcut": true,
+        "shortcutName": "Darwin",
+        "installerIcon": "client/assets/icon.ico",
+        "uninstallerIcon": "client/assets/icon.ico"
+      },
+      "publish": {
+        "provider": "github",
+        "owner": "yourusername",
+        "repo": "your-repo"
+      },
     "asarUnpack": [
       "client/pc-logger.js",
       "client/config.js",

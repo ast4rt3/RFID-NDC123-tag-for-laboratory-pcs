@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Monitor - Licensing & Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 30px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #4f46e5;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        .section h3 {
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .section p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #4b5563;
+        }
+
+        .section ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .section li {
+            line-height: 1.6;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        .license-info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4f46e5;
+            margin-bottom: 20px;
+        }
+
+        .license-info h3 {
+            color: #4f46e5;
+            margin-bottom: 10px;
+        }
+
+        .contact-info {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 20px;
+        }
+
+        .contact-info h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .version-info {
+            background: #ecfdf5;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #10b981;
+            margin-bottom: 20px;
+        }
+
+        .version-info h3 {
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ef4444;
+            margin: 15px 0;
+        }
+
+        .warning strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Licensing & Documentation</h1>
+            <p>RFID Laboratory Monitoring System</p>
+        </div>
+
+        <div class="content">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
+                <button class="tab-button" onclick="switchTab('license')">License</button>
+                <button class="tab-button" onclick="switchTab('privacy')">Privacy</button>
+                <button class="tab-button" onclick="switchTab('support')">Support</button>
+            </div>
+
+            <div id="overview" class="tab-content active">
+                <div class="section">
+                    <h2>🔍 System Overview</h2>
+                    <p>The RFID Laboratory Monitoring System is designed to track and monitor PC usage in laboratory environments for research and educational purposes.</p>
+                    
+                    <h3>Key Features:</h3>
+                    <ul>
+                        <li>Real-time application usage monitoring</li>
+                        <li>Browser activity tracking and search query capture</li>
+                        <li>System resource monitoring (CPU, Memory, GPU)</li>
+                        <li>Centralized data collection and reporting</li>
+                        <li>Web-based dashboard for data visualization</li>
+                        <li>Secure data transmission and storage</li>
+                    </ul>
+                </div>
+
+                <div class="version-info">
+                    <h3>📋 Version Information</h3>
+                    <p><strong>Application Version:</strong> 1.0.0</p>
+                    <p><strong>Build Date:</strong> <span id="buildDate"></span></p>
+                    <p><strong>Node.js Version:</strong> <span id="nodeVersion"></span></p>
+                    <p><strong>Electron Version:</strong> <span id="electronVersion"></span></p>
+                </div>
+            </div>
+
+            <div id="license" class="tab-content">
+                <div class="section">
+                    <h2>📜 Software License</h2>
+                    
+                    <div class="license-info">
+                        <h3>MIT License</h3>
+                        <p>Copyright (c) 2024 RFID Laboratory Monitoring System</p>
+                        
+                        <p>Permission is hereby granted, free of charge, to any person obtaining a copy
+                        of this software and associated documentation files (the "Software"), to deal
+                        in the Software without restriction, including without limitation the rights
+                        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                        copies of the Software, and to permit persons to whom the Software is
+                        furnished to do so, subject to the following conditions:</p>
+                        
+                        <p>The above copyright notice and this permission notice shall be included in all
+                        copies or substantial portions of the Software.</p>
+                        
+                        <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+                        SOFTWARE.</p>
+                    </div>
+
+                    <h3>Third-Party Licenses</h3>
+                    <p>This software uses the following open-source libraries:</p>
+                    <ul>
+                        <li><strong>Electron</strong> - MIT License</li>
+                        <li><strong>Node.js</strong> - Various licenses</li>
+                        <li><strong>active-win</strong> - MIT License</li>
+                        <li><strong>pidusage</strong> - MIT License</li>
+                        <li><strong>sqlite3</strong> - BSD License</li>
+                        <li><strong>ws</strong> - MIT License</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="privacy" class="tab-content">
+                <div class="section">
+                    <h2>🔒 Privacy Policy</h2>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Important Privacy Notice</strong>
+                        This software is designed for laboratory monitoring and research purposes only. It collects usage data for educational and research analysis.
+                    </div>
+
+                    <h3>Data Collection</h3>
+                    <p>The system collects the following types of data:</p>
+                    <ul>
+                        <li>Application usage statistics (name, duration, resource usage)</li>
+                        <li>Browser activity and search queries</li>
+                        <li>System resource information (CPU, memory, GPU usage)</li>
+                        <li>PC identification and session information</li>
+                    </ul>
+
+                    <h3>Data Usage</h3>
+                    <p>Collected data is used for:</p>
+                    <ul>
+                        <li>Research and educational analysis</li>
+                        <li>Laboratory usage optimization</li>
+                        <li>System performance monitoring</li>
+                        <li>Academic reporting and documentation</li>
+                    </ul>
+
+                    <h3>Data Protection</h3>
+                    <p>The system implements the following security measures:</p>
+                    <ul>
+                        <li>Encrypted data transmission</li>
+                        <li>Secure database storage</li>
+                        <li>Access control and authentication</li>
+                        <li>Regular data backup procedures</li>
+                    </ul>
+
+                    <h3>Data Retention</h3>
+                    <p>Data is retained for research purposes as specified in your institutional policies. Contact your system administrator for specific retention periods.</p>
+                </div>
+            </div>
+
+            <div id="support" class="tab-content">
+                <div class="section">
+                    <h2>🆘 Support & Documentation</h2>
+                    
+                    <div class="contact-info">
+                        <h3>📞 Contact Information</h3>
+                        <p><strong>System Administrator:</strong> [Your Contact Information]</p>
+                        <p><strong>IT Support:</strong> [IT Support Contact]</p>
+                        <p><strong>Project Lead:</strong> [Project Lead Contact]</p>
+                        <p><strong>Email:</strong> [Support Email]</p>
+                        <p><strong>Phone:</strong> [Support Phone]</p>
+                    </div>
+
+                    <h3>📚 Documentation</h3>
+                    <ul>
+                        <li><strong>User Manual:</strong> Complete guide for using the system</li>
+                        <li><strong>Installation Guide:</strong> Step-by-step installation instructions</li>
+                        <li><strong>Troubleshooting Guide:</strong> Common issues and solutions</li>
+                        <li><strong>API Documentation:</strong> Technical API reference</li>
+                        <li><strong>Deployment Guide:</strong> Multi-PC deployment instructions</li>
+                    </ul>
+
+                    <h3>🔧 Troubleshooting</h3>
+                    <p>Common issues and solutions:</p>
+                    <ul>
+                        <li><strong>Connection Issues:</strong> Check network connectivity and server status</li>
+                        <li><strong>No Data Collection:</strong> Verify client is running and has proper permissions</li>
+                        <li><strong>Dashboard Not Loading:</strong> Check server status and browser compatibility</li>
+                        <li><strong>Performance Issues:</strong> Monitor system resources and restart services</li>
+                    </ul>
+
+                    <h3>📊 System Requirements</h3>
+                    <ul>
+                        <li><strong>Operating System:</strong> Windows 10/11</li>
+                        <li><strong>RAM:</strong> Minimum 4GB, Recommended 8GB</li>
+                        <li><strong>Storage:</strong> 50MB for client, 100GB+ for server</li>
+                        <li><strong>Network:</strong> Stable LAN connection</li>
+                        <li><strong>Permissions:</strong> Administrator access for installation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>RFID Laboratory Monitoring System v1.0.0</p>
+            <p>© 2024 All rights reserved. Licensed under MIT License.</p>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Set build date
+        document.getElementById('buildDate').textContent = new Date().toLocaleDateString();
+
+        // Get system information
+        async function loadSystemInfo() {
+            try {
+                const status = await ipcRenderer.invoke('get-status');
+                
+                // Set versions
+                document.getElementById('nodeVersion').textContent = process.versions.node;
+                document.getElementById('electronVersion').textContent = process.versions.electron;
+            } catch (error) {
+                console.error('Error loading system info:', error);
+            }
+        }
+
+        // Initialize
+        loadSystemInfo();
+    </script>
+</body>
+</html>
