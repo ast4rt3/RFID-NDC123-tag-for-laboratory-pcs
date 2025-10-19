@@ -8,19 +8,31 @@ class Config {
       serverPort: 8080
     };
 
-    // Always use the asar.unpacked/client directory for config.json in production
-    let baseDir;
+    // Determine possible config locations for both dev and packaged builds
+    const possiblePaths = [];
+
+    // 1) Packaged: alongside resources (where main writes it)
     if (process.resourcesPath) {
-      baseDir = path.join(process.resourcesPath, 'app.asar.unpacked', 'client');
-    } else {
-      // For development, use the local client directory
-      baseDir = __dirname;
+      possiblePaths.push(path.join(path.dirname(process.resourcesPath), 'config.json'));
+      // 2) Packaged (legacy): app.asar.unpacked/client/config.json
+      possiblePaths.push(path.join(process.resourcesPath, 'app.asar.unpacked', 'client', 'config.json'));
     }
-    this.configPath = path.join(baseDir, 'config.json');
+
+    // 3) Development: local client directory
+    possiblePaths.push(path.join(__dirname, 'config.json'));
+
+    // Pick the first existing config file
+    this.configPath = possiblePaths.find(p => {
+      try {
+        return fs.existsSync(p);
+      } catch (_) {
+        return false;
+      }
+    }) || possiblePaths[0];
 
     console.log('Reading config from:', this.configPath);
 
-    if (fs.existsSync(this.configPath)) {
+    if (this.configPath && fs.existsSync(this.configPath)) {
       try {
         const data = fs.readFileSync(this.configPath, 'utf-8');
         this.config = JSON.parse(data);
