@@ -17,14 +17,203 @@ A cross-platform application for tracking laboratory PC usage and application ac
 ---
 
 ## Features
+# 🖥️ System Monitoring and Management Tool
 
-- **Tracks PC session times** (start/stop) for each laboratory computer.
-- **Monitors active application usage** (app name, duration, memory, CPU).
-- **Logs data to a MySQL database via a Node.js/Express server.**
-- **WebSocket-based real-time communication** between clients and server.
-- **Electron-based client** background logger.
-- **Configurable server IP and port** for flexible deployment.
-- **Local log file** for each client for redundancy and debugging.
+A comprehensive **PC monitoring, analytics, and reporting system** designed for real-time tracking of application usage, browser activity, system resources, and cloud-based data management.
+
+---
+
+## 🖥️ Core Monitoring Features
+
+### 📊 Application Usage Tracking
+- Real-time active window monitoring  
+- Application session tracking (start/end times)  
+- Duration calculation for precise usage  
+- Application name and process ID detection  
+- Memory, CPU, and GPU usage tracking  
+- Configurable monitoring intervals for optimization  
+
+### 🌐 Browser Activity Monitoring
+- Multi-browser support (Chrome, Firefox, Edge, Brave, Opera)  
+- Real-time browser activity tracking  
+- Search query extraction from URLs  
+- Search engine identification (Google, Bing, Yahoo, DuckDuckGo, YouTube, etc.)  
+- URL and window title analysis  
+- Browser history access (SQLite integration)  
+- Regex-based search pattern recognition  
+
+### ⏱️ Session Management
+- PC session start/stop tracking  
+- Session duration calculation  
+- Session-based resource usage tracking  
+- Automatic session detection  
+
+---
+
+## 🗄️ Database & Storage Features
+
+### 📋 Data Storage
+- MySQL/MariaDB local database integration  
+- Supabase PostgreSQL cloud support  
+- Multi-provider compatibility (AWS RDS, Google Cloud SQL, PlanetScale)  
+- Database migration, backup, and restore tools  
+
+### 📊 Database Tables
+- `time_logs` – Session start/end and duration  
+- `app_usage_logs` – Application usage and metrics  
+- `browser_search_logs` – Browser activity and search queries  
+- Indexed tables, unique constraints, and auto-incrementing IDs  
+
+### 🔍 Database Views & Reporting
+- `app_daily_summary` – Daily app usage summaries  
+- `pc_session_resource_avg` – Average session resource usage  
+- `pc_session_resource_summary` – Total session resource summary  
+- Real-time data queries for live reporting  
+
+---
+
+## 🌐 Web Dashboard Features
+
+### 📱 Dashboard Interface
+- Modern, responsive UI (mobile-friendly)  
+- Real-time data visualization (Chart.js integration)  
+- Tabbed interface for apps and search activity  
+- Professional gradient styling and Font Awesome icons  
+
+### 📊 Data Visualization
+- Application and search engine distribution charts  
+- Summary statistics cards and key metrics  
+- Interactive date and PC filters  
+- Real-time data fetching from the database  
+
+### 📈 Reporting Features
+- App session count and total usage time  
+- Search query and search engine analysis  
+- Detailed tabular data display  
+- Export and reporting functionality  
+
+---
+
+## 🔧 Client Application Features
+
+### 🎯 System Tray Integration
+- Runs silently in the background  
+- Right-click context menu for easy access  
+- Custom tray icon with tooltip information  
+
+### ⚙️ Configuration Management
+- Server IP and port configuration  
+- Auto reconnection and retry settings  
+- Persistent configuration across restarts  
+- Real-time connection status display  
+
+### 🔄 Auto-Update System
+- Automatic update detection and background download  
+- Tray notifications when updates are ready  
+- One-click installation and rollback capability  
+
+### 📊 Status Monitoring
+- Real-time system health display  
+- Connection and uptime tracking  
+- Logger and version monitoring  
+
+---
+
+## 🔌 Communication & Networking
+
+### 🌐 Real-time Communication
+- WebSocket integration for bidirectional communication  
+- Automatic reconnection with retry logic  
+- Secure and reliable data transmission  
+
+### 📡 Server Features
+- Express.js REST API endpoints  
+- WebSocket server for real-time events  
+- CORS and environment configuration support  
+- Logging system for debugging and monitoring  
+
+---
+
+## 🚀 Deployment & Installation
+
+### 📦 Installation Features
+- Electron + NSIS installer  
+- Automatic startup and shortcut creation  
+- Start menu integration  
+
+### 🔄 Update Management
+- Manual and automatic update support  
+- Local or remote update servers  
+- Version control and installation logs  
+
+---
+
+## 🔒 Security & Privacy
+
+### 🛡️ Data Security
+- Encrypted communication channels  
+- Secure database connections  
+- Row-level access control (Supabase RLS)  
+- GDPR-compliant data handling  
+
+### 🔐 Authentication & Authorization
+- Administrator privileges required for installation  
+- Encrypted configuration storage  
+- Windows user permission management  
+
+---
+
+## 📱 User Interface Features
+
+### 🎨 Interface Design
+- Modern and responsive UI design  
+- Dark mode and accessibility support  
+- Works on desktop and mobile  
+
+### 📋 Documentation & Help
+- Built-in documentation and troubleshooting  
+- MIT license and privacy policy  
+- Support and contact information  
+
+---
+
+## 🔧 Advanced Features
+
+### ⚡ Performance Optimization
+- Resource monitoring (CPU, memory, GPU)  
+- Performance thresholds and alerts  
+- Optimized background processing  
+
+### 🔍 Debugging & Logging
+- Comprehensive logs for debugging  
+- Error tracking and reporting  
+- Automatic log rotation and remote debugging  
+
+### 🌐 Cloud Integration
+- Supabase cloud database integration  
+- Web-based monitoring dashboard  
+- Netlify-ready cloud deployment  
+- REST API integration for external access  
+
+---
+
+## 📊 Analytics & Reporting
+
+### 📈 Data Analytics
+- Application usage pattern analysis  
+- Search behavior and trend tracking  
+- System resource utilization reports  
+- Session-based analytics  
+
+### 📋 Report Generation
+- Daily usage reports  
+- Custom date range selection  
+- Exportable charts and summary statistics  
+
+---
+
+**🧾 License:** MIT  
+**💡 Technologies Used:** Electron, Express.js, Supabase, Chart.js, MySQL, WebSocket
 
 ---
 
