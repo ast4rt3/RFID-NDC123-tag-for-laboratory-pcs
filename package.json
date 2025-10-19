@@ -1,6 +1,6 @@
 {
   "name": "rfid-ndc123-tag-for-laboratory-pc",
-  "version": "Alpha-1.2.0",
+  "version": "1.2.0",
   "description": "RFID NDC123 Tag for Laboratory PC - Client Application",
   "main": "client/main.js",
   "scripts": {
