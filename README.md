@@ -17,180 +17,203 @@ A cross-platform application for tracking laboratory PC usage and application ac
 ---
 
 ## Features
+# 🖥️ System Monitoring and Management Tool
 
-🖥️ CORE MONITORING FEATURES
-📊 Application Usage Tracking
-✅ Real-time active window monitoring - Tracks currently active applications
-✅ Application session tracking - Start/end times for each app usage
-✅ Duration calculation - Precise timing of application usage
-✅ Application name detection - Identifies specific applications being used
-✅ Process ID tracking - Monitors individual processes
-✅ Memory usage monitoring - Tracks RAM consumption per application
-✅ CPU usage tracking - Monitors CPU percentage per application
-✅ GPU usage monitoring - Tracks graphics card usage
-✅ System resource optimization - Configurable monitoring intervals
-🌐 Browser Activity Monitoring
-✅ Multi-browser support - Chrome, Firefox, Edge, Brave, Opera
-✅ Real-time browser activity tracking - Active browser window detection
-✅ Search query extraction - Captures search terms from URLs
-✅ Search engine identification - Google, Bing, Yahoo, DuckDuckGo, YouTube, Brave, Startpage
-✅ URL monitoring - Tracks visited websites and pages
-✅ Window title analysis - Extracts information from browser window titles
-✅ Browser history database access - SQLite database integration
-✅ Search pattern recognition - Advanced regex patterns for query extraction
-⏱️ Session Management
-✅ PC session tracking - Start/stop times for each PC session
-✅ Session duration calculation - Total time spent on each PC
-✅ Session-based resource monitoring - Resource usage per session
-✅ Automatic session detection - Detects when users start/stop using PCs
-🗄️ DATABASE & STORAGE FEATURES
-📋 Data Storage
-✅ MySQL database support - Local MySQL/MariaDB integration
-✅ Supabase PostgreSQL support - Cloud database integration
-✅ Multiple database providers - AWS RDS, Google Cloud SQL, PlanetScale
-✅ Database migration tools - Easy switching between database providers
-✅ Data backup and restore - Comprehensive backup capabilities
-📊 Database Tables
-✅ time_logs table - PC session start/end times and durations
-✅ app_usage_logs table - Application usage with resource metrics
-✅ browser_search_logs table - Browser activity and search queries
-✅ Database indexes - Optimized performance with proper indexing
-✅ Unique constraints - Prevents duplicate data entries
-✅ Auto-incrementing IDs - Sequential primary keys
-🔍 Database Views & Reporting
-✅ app_daily_summary view - Daily application usage summaries
-✅ pc_session_resource_avg view - Average resource usage per session
-✅ pc_session_resource_summary view - Total resource usage per session
-✅ Real-time data queries - Live data access and reporting
-🌐 WEB DASHBOARD FEATURES
-📱 Dashboard Interface
-✅ Modern responsive design - Mobile-friendly interface
-✅ Real-time data visualization - Live charts and graphs
-✅ Interactive charts - Chart.js integration for data visualization
-✅ Tabbed interface - Separate views for apps and search activity
-✅ Professional UI design - Gradient backgrounds and modern styling
-✅ Font Awesome icons - Professional iconography throughout
-📊 Data Visualization
-✅ App usage distribution charts - Bar charts showing application usage
-✅ Search engine distribution charts - Pie charts showing search engine usage
-✅ Summary statistics cards - Key metrics display
-✅ Interactive date selection - Choose specific dates for analysis
-✅ PC name selection - Filter data by specific laboratory PC
-✅ Real-time data loading - Dynamic data fetching from database
-📈 Reporting Features
-✅ App sessions count - Number of application sessions per day
-✅ Total usage time - Hours spent using applications
-✅ Search query tracking - Number of search queries performed
-✅ Search engine analysis - Breakdown by search engine used
-✅ Detailed data tables - Comprehensive tabular data display
-✅ Export capabilities - Data export functionality
-🔧 CLIENT APPLICATION FEATURES
-🎯 System Tray Integration
-✅ Background operation - Runs silently in system tray
-✅ No visible windows - Completely unobtrusive operation
-✅ Right-click context menu - Easy access to all features
-✅ Professional tray icon - Custom RFID monitor icon
-✅ Tooltip information - Helpful hover information
-⚙️ Configuration Management
-✅ Server IP configuration - Easy server address setup
-✅ WebSocket port settings - Configurable communication ports
-✅ Reconnection settings - Automatic retry configuration
-✅ Settings persistence - Configuration saved across restarts
-✅ Real-time status monitoring - Live connection status display
-🔄 Auto-Update System
-✅ Automatic update detection - Checks for updates on startup
-✅ Background download - Downloads updates silently
-✅ Update notifications - Tray notifications when updates ready
-✅ One-click installation - Easy update installation
-✅ Version management - Automatic version tracking
-✅ Rollback capability - Can revert to previous versions
-📊 Status Monitoring
-✅ Real-time status display - Live system health monitoring
-✅ Connection status tracking - Server connectivity monitoring
-✅ Uptime tracking - Application runtime monitoring
-✅ Version information - Current software version display
-✅ Logger status monitoring - Background process status
-🔌 COMMUNICATION & NETWORKING
-🌐 Real-time Communication
-✅ WebSocket integration - Real-time bidirectional communication
-✅ Automatic reconnection - Handles connection drops gracefully
-✅ Connection retry logic - Configurable retry attempts
-✅ Network error handling - Robust error management
-✅ Data transmission security - Secure data transmission
-📡 Server Features
-✅ Express.js REST API - RESTful API endpoints
-✅ WebSocket server - Real-time communication server
-✅ CORS support - Cross-origin resource sharing
-✅ Environment configuration - Flexible environment setup
-✅ Logging system - Comprehensive logging capabilities
-🚀 DEPLOYMENT & INSTALLATION
-📦 Installation Features
-✅ Electron installer - Professional Windows installer
-✅ NSIS installer - Advanced installation options
-✅ Automatic startup - Starts with Windows
-✅ Desktop shortcuts - Easy access shortcuts
-✅ Start menu integration - Windows Start menu integration
-🔄 Update Management
-✅ Manual deployment support - Flash drive installation
-✅ Automatic update system - Background updates
-✅ Update server support - Local or remote update servers
-✅ Version control - Semantic versioning support
-✅ Installation logging - Detailed installation logs
-🔒 SECURITY & PRIVACY
-🛡️ Data Security
-✅ Secure data transmission - Encrypted communication
-✅ Database security - Secure database connections
-✅ Access control - Row-level security (Supabase)
-✅ Privacy compliance - GDPR-compliant data handling
-✅ Local data storage - Secure local configuration storage
-🔐 Authentication & Authorization
-✅ Administrator privileges - Requires admin access for installation
-✅ User permissions - Proper Windows permission handling
-✅ Secure configuration - Encrypted configuration storage
-📱 USER INTERFACE FEATURES
-🎨 Interface Design
-✅ Modern UI design - Professional, clean interface
-✅ Responsive layout - Works on all screen sizes
-✅ Dark mode support - Automatic dark mode detection
-✅ Mobile compatibility - Works on mobile devices
-✅ Accessibility features - Screen reader compatible
-📋 Documentation & Help
-✅ Built-in documentation - Comprehensive help system
-✅ Licensing information - MIT license details
-✅ Privacy policy - Detailed privacy information
-✅ Support information - Contact details and support
-✅ Troubleshooting guide - Built-in troubleshooting help
-🔧 ADVANCED FEATURES
-⚡ Performance Optimization
-✅ Resource monitoring - CPU, memory, GPU tracking
-✅ Performance thresholds - Configurable performance limits
-✅ Background processing - Efficient background operation
-✅ Memory optimization - Optimized memory usage
-✅ Process management - Intelligent process handling
-🔍 Debugging & Logging
-✅ Comprehensive logging - Detailed application logs
-✅ Error tracking - Error logging and reporting
-✅ Debug mode - Development debugging capabilities
-✅ Log file management - Automatic log rotation
-✅ Remote debugging - Remote troubleshooting capabilities
-🌐 Cloud Integration
-✅ Supabase integration - Full cloud database support
-✅ Online dashboard - Web-based monitoring interface
-✅ Cloud deployment - Netlify deployment ready
-✅ API integration - REST API for external access
-📊 ANALYTICS & REPORTING
-📈 Data Analytics
-✅ Usage pattern analysis - Application usage patterns
-✅ Search behavior tracking - Search query analysis
-✅ Resource utilization - System resource usage analysis
-✅ Session analytics - PC session analysis
-✅ Trend analysis - Usage trends over time
-📋 Report Generation
-✅ Daily reports - Daily usage summaries
-✅ Custom date ranges - Flexible reporting periods
-✅ Export capabilities - Data export functionality
-✅ Chart generation - Automatic chart creation
-✅ Summary statistics - Key performance indicators
+A comprehensive **PC monitoring, analytics, and reporting system** designed for real-time tracking of application usage, browser activity, system resources, and cloud-based data management.
+
+---
+
+## 🖥️ Core Monitoring Features
+
+### 📊 Application Usage Tracking
+- Real-time active window monitoring  
+- Application session tracking (start/end times)  
+- Duration calculation for precise usage  
+- Application name and process ID detection  
+- Memory, CPU, and GPU usage tracking  
+- Configurable monitoring intervals for optimization  
+
+### 🌐 Browser Activity Monitoring
+- Multi-browser support (Chrome, Firefox, Edge, Brave, Opera)  
+- Real-time browser activity tracking  
+- Search query extraction from URLs  
+- Search engine identification (Google, Bing, Yahoo, DuckDuckGo, YouTube, etc.)  
+- URL and window title analysis  
+- Browser history access (SQLite integration)  
+- Regex-based search pattern recognition  
+
+### ⏱️ Session Management
+- PC session start/stop tracking  
+- Session duration calculation  
+- Session-based resource usage tracking  
+- Automatic session detection  
+
+---
+
+## 🗄️ Database & Storage Features
+
+### 📋 Data Storage
+- MySQL/MariaDB local database integration  
+- Supabase PostgreSQL cloud support  
+- Multi-provider compatibility (AWS RDS, Google Cloud SQL, PlanetScale)  
+- Database migration, backup, and restore tools  
+
+### 📊 Database Tables
+- `time_logs` – Session start/end and duration  
+- `app_usage_logs` – Application usage and metrics  
+- `browser_search_logs` – Browser activity and search queries  
+- Indexed tables, unique constraints, and auto-incrementing IDs  
+
+### 🔍 Database Views & Reporting
+- `app_daily_summary` – Daily app usage summaries  
+- `pc_session_resource_avg` – Average session resource usage  
+- `pc_session_resource_summary` – Total session resource summary  
+- Real-time data queries for live reporting  
+
+---
+
+## 🌐 Web Dashboard Features
+
+### 📱 Dashboard Interface
+- Modern, responsive UI (mobile-friendly)  
+- Real-time data visualization (Chart.js integration)  
+- Tabbed interface for apps and search activity  
+- Professional gradient styling and Font Awesome icons  
+
+### 📊 Data Visualization
+- Application and search engine distribution charts  
+- Summary statistics cards and key metrics  
+- Interactive date and PC filters  
+- Real-time data fetching from the database  
+
+### 📈 Reporting Features
+- App session count and total usage time  
+- Search query and search engine analysis  
+- Detailed tabular data display  
+- Export and reporting functionality  
+
+---
+
+## 🔧 Client Application Features
+
+### 🎯 System Tray Integration
+- Runs silently in the background  
+- Right-click context menu for easy access  
+- Custom tray icon with tooltip information  
+
+### ⚙️ Configuration Management
+- Server IP and port configuration  
+- Auto reconnection and retry settings  
+- Persistent configuration across restarts  
+- Real-time connection status display  
+
+### 🔄 Auto-Update System
+- Automatic update detection and background download  
+- Tray notifications when updates are ready  
+- One-click installation and rollback capability  
+
+### 📊 Status Monitoring
+- Real-time system health display  
+- Connection and uptime tracking  
+- Logger and version monitoring  
+
+---
+
+## 🔌 Communication & Networking
+
+### 🌐 Real-time Communication
+- WebSocket integration for bidirectional communication  
+- Automatic reconnection with retry logic  
+- Secure and reliable data transmission  
+
+### 📡 Server Features
+- Express.js REST API endpoints  
+- WebSocket server for real-time events  
+- CORS and environment configuration support  
+- Logging system for debugging and monitoring  
+
+---
+
+## 🚀 Deployment & Installation
+
+### 📦 Installation Features
+- Electron + NSIS installer  
+- Automatic startup and shortcut creation  
+- Start menu integration  
+
+### 🔄 Update Management
+- Manual and automatic update support  
+- Local or remote update servers  
+- Version control and installation logs  
+
+---
+
+## 🔒 Security & Privacy
+
+### 🛡️ Data Security
+- Encrypted communication channels  
+- Secure database connections  
+- Row-level access control (Supabase RLS)  
+- GDPR-compliant data handling  
+
+### 🔐 Authentication & Authorization
+- Administrator privileges required for installation  
+- Encrypted configuration storage  
+- Windows user permission management  
+
+---
+
+## 📱 User Interface Features
+
+### 🎨 Interface Design
+- Modern and responsive UI design  
+- Dark mode and accessibility support  
+- Works on desktop and mobile  
+
+### 📋 Documentation & Help
+- Built-in documentation and troubleshooting  
+- MIT license and privacy policy  
+- Support and contact information  
+
+---
+
+## 🔧 Advanced Features
+
+### ⚡ Performance Optimization
+- Resource monitoring (CPU, memory, GPU)  
+- Performance thresholds and alerts  
+- Optimized background processing  
+
+### 🔍 Debugging & Logging
+- Comprehensive logs for debugging  
+- Error tracking and reporting  
+- Automatic log rotation and remote debugging  
+
+### 🌐 Cloud Integration
+- Supabase cloud database integration  
+- Web-based monitoring dashboard  
+- Netlify-ready cloud deployment  
+- REST API integration for external access  
+
+---
+
+## 📊 Analytics & Reporting
+
+### 📈 Data Analytics
+- Application usage pattern analysis  
+- Search behavior and trend tracking  
+- System resource utilization reports  
+- Session-based analytics  
+
+### 📋 Report Generation
+- Daily usage reports  
+- Custom date range selection  
+- Exportable charts and summary statistics  
+
+---
+
+**🧾 License:** MIT  
+**💡 Technologies Used:** Electron, Express.js, Supabase, Chart.js, MySQL, WebSocket
 
 ---
 
