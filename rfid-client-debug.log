@@ -1700,3 +1700,1229 @@ Sent app_usage_start for Brave Browser
 🔍 Extracted browser data: [object Object]
 🔍 Sent browser activity to server
 Sent app_usage_update for Brave Browser
+PC Name: i3S
+Loading configuration...
+WebSocket URL: ws://127.0.0.1:8080
+[ERROR] WebSocket error: Error: connect ECONNREFUSED 127.0.0.1:8080
+[ERROR] Failed to connect to: ws://127.0.0.1:8080
+[ERROR] Please check:
+[ERROR] 1. Server is running on the correct IP and port
+[ERROR] 2. Firewall allows connections on port 8080
+[ERROR] 3. Config file has the correct server IP
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+[ERROR] WebSocket error: Error: connect ECONNREFUSED 127.0.0.1:8080
+[ERROR] Failed to connect to: ws://127.0.0.1:8080
+[ERROR] Please check:
+[ERROR] 1. Server is running on the correct IP and port
+[ERROR] 2. Firewall allows connections on port 8080
+[ERROR] 3. Config file has the correct server IP
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+Reconnecting...
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+Collecting browser history...
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Collecting browser history...
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: ast4rt3/RFID-NDC123-tag-for-laboratory-pcs: This repository presents the development of the monitoring system based on RFID that is capable of automatically capturing and displaying data regarding computer usage. Among these are the period of usage, hours spent, frequency of access and the apps being used. - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: ast4rt3/RFID-NDC123-tag-for-laboratory-pcs: This repository presents the development of the monitoring system based on RFID that is capable of automatically capturing and displaying data regarding computer usage. Among these are the period of usage, hours spent, frequency of access and the apps being used. - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Cursor
+Sent app_usage_start for Brave Browser
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_end for Cursor
+Sent app_usage_start for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Laboratory Monitor - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Laboratory Monitor - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...

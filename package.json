@@ -1,11 +1,12 @@
 {
-  "name": "rfid-ndc123-tag-for-laboratory-pc",
+  "name": "juglone",
   "version": "1.2.0",
   "description": "RFID NDC123 Tag for Laboratory PC - Client Application",
   "main": "client/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/server.js",
+    "start": "node start-server.js",
+    "start-server": "node server/server.js",
     "start-client": "electron client/main.js",
     "dev": "electron client/main.js --dev",
     "build": "electron-builder",
@@ -34,6 +35,7 @@
     "cors": "^2.8.5",
     "delegates": "^1.0.0",
     "dotenv": "^16.4.5",
+    "electron-updater": "^6.1.7",
     "emoji-regex": "^10.4.0",
     "express": "^5.1.0",
     "has-unicode": "^2.0.1",
@@ -63,8 +65,7 @@
     "yargs": "^18.0.0",
     "yargs-parser": "^22.0.0",
     "yauzl": "^3.2.0",
-    "zip-stream": "^7.0.2",
-    "electron-updater": "^6.1.7"
+    "zip-stream": "^7.0.2"
   },
   "devDependencies": {
     "electron": "^37.2.3",
@@ -92,20 +93,19 @@
         }
       ]
     },
-      "nsis": {
-        "oneClick": false,
-        "allowToChangeInstallationDirectory": true,
-        "createDesktopShortcut": true,
-        "createStartMenuShortcut": true,
-        "shortcutName": "Darwin",
-        "installerIcon": "client/assets/icon.ico",
-        "uninstallerIcon": "client/assets/icon.ico"
-      },
-      "publish": {
-        "provider": "github",
-        "owner": "yourusername",
-        "repo": "your-repo"
-      },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Darwin",
+      "installerIcon": "client/assets/icon.ico",
+      "uninstallerIcon": "client/assets/icon.ico"
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "http://localhost:8081"
+    },
     "asarUnpack": [
       "client/pc-logger.js",
       "client/config.js",
@@ -138,7 +138,6 @@
       "node_modules/signal-exit/**",
       "node_modules/console-control-strings/**",
       "node_modules/set-blocking/**",
-      "node_modules/sqlite3/**",
       "node_modules/readable-stream/**",
       "node_modules/inherits/**",
       "node_modules/util-deprecate/**",

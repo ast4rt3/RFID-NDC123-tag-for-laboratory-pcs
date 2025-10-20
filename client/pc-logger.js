@@ -5,7 +5,7 @@ const pidusage = require('pidusage');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+// const sqlite3 = require('sqlite3').verbose(); // Temporarily disabled
 
 
 const config = require('./config');
@@ -26,8 +26,17 @@ console.log('PC Name:', pcName);
 
 // Load config and log details
 console.log('Loading configuration...');
-const wsUrl = config.getWebSocketURL(); // Use config instead of hardcoded localhost
-console.log('WebSocket URL:', wsUrl);
+let wsUrl;
+try {
+  console.log('Config object:', config);
+  console.log('Config serverIP:', config.config?.serverIP);
+  wsUrl = config.getWebSocketURL(); // Use config
+  console.log('WebSocket URL:', wsUrl);
+} catch (error) {
+  console.error('Error loading config:', error);
+  wsUrl = 'ws://127.0.0.1:8080'; // Fallback
+  console.log('Using fallback WebSocket URL:', wsUrl);
+}
 
 const ws = new WebSocket(wsUrl);
 
@@ -200,28 +209,30 @@ ws.on('open', () => {
   setInterval(async () => {
     try {
       console.log('Collecting browser history...');
-      const historyEntries = await collectBrowserHistory();
+      // Browser history collection temporarily disabled
+      // const historyEntries = await collectBrowserHistory();
       
-      if (historyEntries.length > 0) {
-        console.log(`Found ${historyEntries.length} search entries in browser history`);
-        
-        // Send each history entry to server
-        for (const entry of historyEntries) {
-          ws.send(JSON.stringify({
-            type: 'browser_history',
-            pc_name: pcName,
-            browser: entry.browser,
-            window_title: entry.title,
-            url: entry.url,
-            search_query: entry.searchQuery,
-            search_engine: entry.searchEngine,
-            timestamp: entry.timestamp
-          }));
-        }
-        console.log(`Sent ${historyEntries.length} browser history entries`);
-      } else {
-        console.log('No recent search entries found in browser history');
-      }
+      // Browser history processing temporarily disabled
+      // if (historyEntries.length > 0) {
+      //   console.log(`Found ${historyEntries.length} search entries in browser history`);
+      //   
+      //   // Send each history entry to server
+      //   for (const entry of historyEntries) {
+      //     ws.send(JSON.stringify({
+      //       type: 'browser_history',
+      //       pc_name: pcName,
+      //       browser: entry.browser,
+      //       window_title: entry.title,
+      //       url: entry.url,
+      //       search_query: entry.searchQuery,
+      //       search_engine: entry.searchEngine,
+      //       timestamp: entry.timestamp
+      //     }));
+      //   }
+      //   console.log(`Sent ${historyEntries.length} browser history entries`);
+      // } else {
+      //   console.log('No recent search entries found in browser history');
+      // }
     } catch (error) {
       console.error('Error collecting browser history:', error);
     }
@@ -394,142 +405,143 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
 }
 
 // Browser history database access functions
-function getBrowserHistoryPaths() {
-  const homeDir = os.homedir();
-  const browserPaths = {
-    chrome: [
-      path.join(homeDir, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Default', 'History'),
-      path.join(homeDir, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Profile 1', 'History')
-    ],
-    edge: [
-      path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Default', 'History'),
-      path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Profile 1', 'History')
-    ],
-    firefox: [
-      path.join(homeDir, 'AppData', 'Roaming', 'Mozilla', 'Firefox', 'Profiles')
-    ]
-  };
-  
-  const availablePaths = {};
-  
-  // Check Chrome/Edge paths
-  for (const [browser, paths] of Object.entries(browserPaths)) {
-    if (browser === 'firefox') continue; // Handle Firefox separately
-    
-    for (const dbPath of paths) {
-      if (fs.existsSync(dbPath)) {
-        if (!availablePaths[browser]) availablePaths[browser] = [];
-        availablePaths[browser].push(dbPath);
-      }
-    }
-  }
-  
-  // Check Firefox paths
-  if (fs.existsSync(browserPaths.firefox[0])) {
-    const firefoxProfiles = fs.readdirSync(browserPaths.firefox[0])
-      .filter(dir => dir.endsWith('.default-release') || dir.endsWith('.default'))
-      .map(dir => path.join(browserPaths.firefox[0], dir, 'places.sqlite'));
-    
-    availablePaths.firefox = firefoxProfiles.filter(dbPath => fs.existsSync(dbPath));
-  }
-  
-  return availablePaths;
-}
+// Browser history functions temporarily disabled
+// function getBrowserHistoryPaths() {
+//   const homeDir = os.homedir();
+//   const browserPaths = {
+//     chrome: [
+//       path.join(homeDir, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Default', 'History'),
+//       path.join(homeDir, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Profile 1', 'History')
+//     ],
+//     edge: [
+//       path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Default', 'History'),
+//       path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Profile 1', 'History')
+//     ],
+//     firefox: [
+//       path.join(homeDir, 'AppData', 'Roaming', 'Mozilla', 'Firefox', 'Profiles')
+//     ]
+//   };
+//   
+//   const availablePaths = {};
+//   
+//   // Check Chrome/Edge paths
+//   for (const [browser, paths] of Object.entries(browserPaths)) {
+//     if (browser === 'firefox') continue; // Handle Firefox separately
+//     
+//     for (const dbPath of paths) {
+//       if (fs.existsSync(dbPath)) {
+//         if (!availablePaths[browser]) availablePaths[browser] = [];
+//         availablePaths[browser].push(dbPath);
+//       }
+//     }
+//   }
+//   
+//   // Check Firefox paths
+//   if (fs.existsSync(browserPaths.firefox[0])) {
+//     const firefoxProfiles = fs.readdirSync(browserPaths.firefox[0])
+//       .filter(dir => dir.endsWith('.default-release') || dir.endsWith('.default'))
+//       .map(dir => path.join(browserPaths.firefox[0], dir, 'places.sqlite'));
+//     
+//     availablePaths.firefox = firefoxProfiles.filter(dbPath => fs.existsSync(dbPath));
+//   }
+//   
+//   return availablePaths;
+// }
 
-function extractSearchFromHistory(browser, dbPath, limit = 50) {
-  return new Promise((resolve) => {
-    const searchEntries = [];
-    
-    try {
-      const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY);
-      
-      if (browser === 'chrome' || browser === 'edge') {
-        // Chrome/Edge SQLite query
-        const query = `
-          SELECT url, title, last_visit_time 
-          FROM urls 
-          WHERE (url LIKE '%google.com/search%' OR 
-                 url LIKE '%bing.com/search%' OR 
-                 url LIKE '%yahoo.com/search%' OR 
-                 url LIKE '%duckduckgo.com/%' OR 
-                 url LIKE '%youtube.com/results%') 
-          AND last_visit_time > ${Date.now() * 1000 - (24 * 60 * 60 * 1000)} -- Last 24 hours
-          ORDER BY last_visit_time DESC 
-          LIMIT ?
-        `;
-        
-        db.all(query, [limit], (err, rows) => {
-          if (err) {
-            console.error(`Error reading ${browser} history:`, err);
-            resolve([]);
-            return;
-          }
-          
-          rows.forEach(row => {
-            const searchData = extractSearchFromURL(row.url);
-            if (searchData.searchQuery) {
-              searchEntries.push({
-                browser: browser,
-                searchQuery: searchData.searchQuery,
-                searchEngine: searchData.searchEngine,
-                url: row.url,
-                title: row.title,
-                timestamp: new Date((row.last_visit_time / 1000) - 11644473600).toISOString() // Convert Chrome timestamp
-              });
-            }
-          });
-          
-          db.close();
-          resolve(searchEntries);
-        });
-        
-      } else if (browser === 'firefox') {
-        // Firefox SQLite query
-        const query = `
-          SELECT url, title, last_visit_date 
-          FROM moz_places 
-          WHERE (url LIKE '%google.com/search%' OR 
-                 url LIKE '%bing.com/search%' OR 
-                 url LIKE '%yahoo.com/search%' OR 
-                 url LIKE '%duckduckgo.com/%' OR 
-                 url LIKE '%youtube.com/results%') 
-          AND last_visit_date > ${Date.now() * 1000} -- Last 24 hours in microseconds
-          ORDER BY last_visit_date DESC 
-          LIMIT ?
-        `;
-        
-        db.all(query, [limit], (err, rows) => {
-          if (err) {
-            console.error(`Error reading ${browser} history:`, err);
-            resolve([]);
-            return;
-          }
-          
-          rows.forEach(row => {
-            const searchData = extractSearchFromURL(row.url);
-            if (searchData.searchQuery) {
-              searchEntries.push({
-                browser: browser,
-                searchQuery: searchData.searchQuery,
-                searchEngine: searchData.searchEngine,
-                url: row.url,
-                title: row.title,
-                timestamp: new Date(row.last_visit_date / 1000).toISOString() // Convert Firefox timestamp
-              });
-            }
-          });
-          
-          db.close();
-          resolve(searchEntries);
-        });
-      }
-      
-    } catch (error) {
-      console.error(`Error accessing ${browser} history database:`, error);
-      resolve([]);
-    }
-  });
-}
+// function extractSearchFromHistory(browser, dbPath, limit = 50) {
+//   return new Promise((resolve) => {
+//     const searchEntries = [];
+//     
+//     try {
+//       const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY);
+//       
+//       if (browser === 'chrome' || browser === 'edge') {
+//         // Chrome/Edge SQLite query
+//         const query = `
+//           SELECT url, title, last_visit_time 
+//           FROM urls 
+//           WHERE (url LIKE '%google.com/search%' OR 
+//                  url LIKE '%bing.com/search%' OR 
+//                  url LIKE '%yahoo.com/search%' OR 
+//                  url LIKE '%duckduckgo.com/%' OR 
+//                  url LIKE '%youtube.com/results%') 
+//           AND last_visit_time > ${Date.now() * 1000 - (24 * 60 * 60 * 1000)} -- Last 24 hours
+//           ORDER BY last_visit_time DESC 
+//           LIMIT ?
+//         `;
+//         
+//         db.all(query, [limit], (err, rows) => {
+//           if (err) {
+//             console.error(`Error reading ${browser} history:`, err);
+//             resolve([]);
+//             return;
+//           }
+//           
+//           rows.forEach(row => {
+//             const searchData = extractSearchFromURL(row.url);
+//             if (searchData.searchQuery) {
+//               searchEntries.push({
+//                 browser: browser,
+//                 searchQuery: searchData.searchQuery,
+//                 searchEngine: searchData.searchEngine,
+//                 url: row.url,
+//                 title: row.title,
+//                 timestamp: new Date((row.last_visit_time / 1000) - 11644473600).toISOString() // Convert Chrome timestamp
+//               });
+//             }
+//           });
+//           
+//           db.close();
+//           resolve(searchEntries);
+//         });
+//         
+//       } else if (browser === 'firefox') {
+//         // Firefox SQLite query
+//         const query = `
+//           SELECT url, title, last_visit_date 
+//           FROM moz_places 
+//           WHERE (url LIKE '%google.com/search%' OR 
+//                  url LIKE '%bing.com/search%' OR 
+//                  url LIKE '%yahoo.com/search%' OR 
+//                  url LIKE '%duckduckgo.com/%' OR 
+//                  url LIKE '%youtube.com/results%') 
+//           AND last_visit_date > ${Date.now() * 1000} -- Last 24 hours in microseconds
+//           ORDER BY last_visit_date DESC 
+//           LIMIT ?
+//         `;
+//         
+//         db.all(query, [limit], (err, rows) => {
+//           if (err) {
+//             console.error(`Error reading ${browser} history:`, err);
+//             resolve([]);
+//             return;
+//           }
+//           
+//           rows.forEach(row => {
+//             const searchData = extractSearchFromURL(row.url);
+//             if (searchData.searchQuery) {
+//               searchEntries.push({
+//                 browser: browser,
+//                 searchQuery: searchData.searchQuery,
+//                 searchEngine: searchData.searchEngine,
+//                 url: row.url,
+//                 title: row.title,
+//                 timestamp: new Date(row.last_visit_date / 1000).toISOString() // Convert Firefox timestamp
+//               });
+//             }
+//           });
+//           
+//           db.close();
+//           resolve(searchEntries);
+//         });
+//       }
+//       
+//     } catch (error) {
+//       console.error(`Error accessing ${browser} history database:`, error);
+//       resolve([]);
+//     }
+//   });
+// }
 
 function extractSearchFromURL(url) {
   try {
@@ -560,22 +572,23 @@ function extractSearchFromURL(url) {
   }
 }
 
-async function collectBrowserHistory() {
-  const browserPaths = getBrowserHistoryPaths();
-  const allHistoryEntries = [];
-  
-  console.log('Available browser history paths:', browserPaths);
-  
-  for (const [browser, paths] of Object.entries(browserPaths)) {
-    for (const dbPath of paths) {
-      console.log(`Reading ${browser} history from: ${dbPath}`);
-      const entries = await extractSearchFromHistory(browser, dbPath, 20); // Get last 20 searches per browser
-      allHistoryEntries.push(...entries);
-    }
-  }
-  
-  return allHistoryEntries;
-}
+// Browser history collection function temporarily disabled
+// async function collectBrowserHistory() {
+//   const browserPaths = getBrowserHistoryPaths();
+//   const allHistoryEntries = [];
+//   
+//   console.log('Available browser history paths:', browserPaths);
+//   
+//   for (const [browser, paths] of Object.entries(browserPaths)) {
+//     for (const dbPath of paths) {
+//       console.log(`Reading ${browser} history from: ${dbPath}`);
+//       const entries = await extractSearchFromHistory(browser, dbPath, 20); // Get last 20 searches per browser
+//       allHistoryEntries.push(...entries);
+//     }
+//   }
+//   
+//   return allHistoryEntries;
+// }
 
 // Robust helper to format date in Philippine Standard Time (UTC+8) in 24-hour format
 function toPhilippineTimeString(date) {

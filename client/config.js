@@ -31,12 +31,14 @@ class Config {
     }) || possiblePaths[0];
 
     console.log('Reading config from:', this.configPath);
+    console.log('Config file exists:', fs.existsSync(this.configPath));
 
     if (this.configPath && fs.existsSync(this.configPath)) {
       try {
         const data = fs.readFileSync(this.configPath, 'utf-8');
         this.config = JSON.parse(data);
         console.log('Loaded config:', this.config);
+        console.log('Server IP from config:', this.config.serverIP);
       } catch (err) {
         console.error('Failed to parse config.json, using default:', err);
         this.config = this.defaultConfig;

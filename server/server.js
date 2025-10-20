@@ -2,7 +2,7 @@ const express = require('express');
 const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const SupabaseDB = require('./supabase-client');
+const Database = require('./database');
 
 // Load environment variables
 require('dotenv').config();
@@ -15,14 +15,15 @@ const wsPort = process.env.WS_PORT || 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Initialize Supabase database client
-const db = new SupabaseDB();
+// Initialize database (supports both SQLite and Supabase)
+const db = new Database();
 
-// Test database connection
+// Test database connection (non-blocking)
 db.testConnection().then(connected => {
-  if (!connected) {
-    console.error('❌ Failed to connect to Supabase. Exiting...');
-    process.exit(1);
+  if (connected) {
+    console.log('✅ Database connection successful');
+  } else {
+    console.warn('⚠️ Database connection failed, but server will continue running');
   }
 });
 
@@ -30,9 +31,11 @@ db.testConnection().then(connected => {
 const activeSessions = {}; // { clientId: { pc_name, start_time } }
 const appActiveSessions = {}; // { clientId: { app_name, start_time } }
 
-// WebSocket server
+// WebSocket server - bind to all interfaces for remote connections
 const wss = new WebSocket.Server({ port: wsPort, host: '0.0.0.0' });
 console.log(`✅ WebSocket listening on ws://0.0.0.0:${wsPort}`);
+console.log(`✅ Local connections: ws://127.0.0.1:${wsPort}`);
+console.log(`✅ Remote connections: ws://192.168.141.106:${wsPort}`);
 
 // On connection
 wss.on('connection', ws => {

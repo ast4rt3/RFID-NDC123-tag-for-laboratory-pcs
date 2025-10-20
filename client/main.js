@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } = require('electr
 const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
-const AutoUpdater = require('./auto-updater');
+// const AutoUpdater = require('./auto-updater'); // Disabled for now
 
 let loggerProcess;
 let tray;
@@ -69,38 +69,38 @@ function updateTrayMenu() {
     }
   ];
 
-  // Add update options if available
-  if (autoUpdater) {
-    const updateStatus = autoUpdater.getUpdateStatus();
-    
-    if (updateStatus.updateAvailable || updateStatus.updateDownloaded) {
-      menuItems.push({ type: 'separator' });
-      
-      if (updateStatus.updateDownloaded) {
-        menuItems.push({
-          label: '🔄 Restart to Update',
-          click: () => {
-            autoUpdater.quitAndInstall();
-          }
-        });
-      } else if (updateStatus.updateAvailable) {
-        menuItems.push({
-          label: '⬇️ Download Update',
-          click: () => {
-            autoUpdater.checkForUpdates();
-          }
-        });
-      }
-    } else {
-      menuItems.push({ type: 'separator' });
-      menuItems.push({
-        label: '🔍 Check for Updates',
-        click: () => {
-          autoUpdater.checkForUpdates();
-        }
-      });
-    }
-  }
+  // Add update options if available - DISABLED for now
+  // if (autoUpdater) {
+  //   const updateStatus = autoUpdater.getUpdateStatus();
+  //   
+  //   if (updateStatus.updateAvailable || updateStatus.updateDownloaded) {
+  //     menuItems.push({ type: 'separator' });
+  //     
+  //     if (updateStatus.updateDownloaded) {
+  //       menuItems.push({
+  //         label: '🔄 Restart to Update',
+  //         click: () => {
+  //           autoUpdater.quitAndInstall();
+  //         }
+  //       });
+  //     } else if (updateStatus.updateAvailable) {
+  //       menuItems.push({
+  //         label: '⬇️ Download Update',
+  //         click: () => {
+  //           autoUpdater.checkForUpdates();
+  //         }
+  //       });
+  //     }
+  //   } else {
+  //     menuItems.push({ type: 'separator' });
+  //     menuItems.push({
+  //       label: '🔍 Check for Updates',
+  //       click: () => {
+  //         autoUpdater.checkForUpdates();
+  //       }
+  //     });
+  //   }
+  // }
 
   menuItems.push(
     { type: 'separator' },
@@ -295,7 +295,7 @@ app.whenReady().then(async () => {
   createTray();
   
   // Initialize auto-updater
-  autoUpdater = new AutoUpdater({ tray, updateTrayMenu });
+  // autoUpdater = new AutoUpdater({ tray, updateTrayMenu }); // Disabled for now
   
   // Start the logger process
   startLoggerProcess();

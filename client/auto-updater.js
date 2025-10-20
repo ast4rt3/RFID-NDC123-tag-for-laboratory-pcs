@@ -9,8 +9,8 @@ class AutoUpdater {
         this.updateAvailable = false;
         this.updateDownloaded = false;
         
-        // Configure auto-updater
-        autoUpdater.checkForUpdatesAndNotify();
+        // Configure auto-updater - DISABLED for now
+        // autoUpdater.checkForUpdatesAndNotify();
         
         // Set update server (you can host updates on GitHub, S3, or your own server)
         // autoUpdater.setFeedURL({
@@ -23,8 +23,8 @@ class AutoUpdater {
     }
     
     setupEventListeners() {
-        // Check for updates on startup
-        autoUpdater.checkForUpdates();
+        // Check for updates on startup - DISABLED for now
+        // autoUpdater.checkForUpdates();
         
         // Update available
         autoUpdater.on('update-available', (info) => {
