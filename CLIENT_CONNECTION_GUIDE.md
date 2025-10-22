@@ -95,3 +95,5 @@ npm start
 - Settings → Server IP: `192.168.1.100`, Port: `8080`
 
 All clients will send data to the same server.
+
+

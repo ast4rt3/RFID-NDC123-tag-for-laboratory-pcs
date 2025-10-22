@@ -2926,3 +2926,301 @@ WebSocket connected to ws://127.0.0.1:8080
 Session started
 Connecting to WebSocket at: ws://127.0.0.1:8080
 App usage interval running...
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Session stopped
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+[object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+[object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+[object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+[object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+[object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+[object Object]
+Sent app_usage_update for Cursor
+🔍 Browser detected: Brave Browser
+🔍 Window title: Fix schema for Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: Fix schema for Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_end for Cursor
+Sent app_usage_start for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Temperature data sent: [object Object]
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+Sent app_usage_update for Cursor
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+[object Object]
+Sent app_usage_update for Cursor
+Sent app_usage_end for Cursor
+Sent app_usage_start for Windows Explorer
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Windows Explorer
+[object Object]
+Sent app_usage_update for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Windows Explorer
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_start for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: RFID Server Status - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: RFID Server Status - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Temperature data sent: [object Object]
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+Sent app_usage_update for Brave Browser
+[object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Windows Terminal Host
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Reconnecting...
+Sent app_usage_update for Windows Terminal Host
+[object Object]
+Sent app_usage_update for Windows Terminal Host
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Windows Terminal Host
+Sent app_usage_start for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]

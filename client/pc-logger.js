@@ -9,6 +9,8 @@ const path = require('path');
 
 
 const config = require('./config');
+const TemperatureMonitor = require('./temperature-monitor');
+const OverclockingDetector = require('./overclocking-detector');
 const logStream = fs.createWriteStream('rfid-client-debug.log', { flags: 'a' });
 const origLog = console.log;
 console.log = function(...args) {
@@ -23,6 +25,10 @@ console.error = function(...args) {
 
 const pcName = os.hostname();
 console.log('PC Name:', pcName);
+
+// Initialize monitoring modules
+const temperatureMonitor = new TemperatureMonitor();
+const overclockingDetector = new OverclockingDetector();
 
 // Load config and log details
 console.log('Loading configuration...');
@@ -188,22 +194,131 @@ ws.on('open', () => {
         lastStart = now;
       } else {
         // App is still active, update
-        ws.send(JSON.stringify({
-          type: 'app_usage_update',
-          pc_name: pcName,
-          app_name: appName,
-          start_time: toPhilippineTimeString(lastStart),
-          end_time: toPhilippineTimeString(now),
-          duration_seconds: Math.floor((now - lastStart) / 1000),
-          memory_usage_bytes: memoryUsage,
-          cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
-        }));
+        // Get temperature and overclocking data
+        (async () => {
+          const temperatures = await temperatureMonitor.getAllTemperatures();
+          console.log(temperatures);
+        })();
+        (async () => {
+          try {
+            const temperatures = await temperatureMonitor.getAllTemperatures();
+            const overclockingData = await overclockingDetector.detectAllOverclocking();
+        
+            ws.send(JSON.stringify({
+              type: 'app_usage_update',
+              pc_name: pcName,
+              app_name: appName,
+              start_time: toPhilippineTimeString(lastStart),
+              end_time: toPhilippineTimeString(now),
+              duration_seconds: Math.floor((now - lastStart) / 1000),
+              memory_usage_bytes: memoryUsage,
+              cpu_percent: cpuPercent,
+              cpu_temperature: temperatures.cpu,
+              is_cpu_overclocked: overclockingData.cpu.isOverclocked,
+              is_ram_overclocked: overclockingData.ram.isOverclocked
+            }));
+        
+            console.log('Sent app_usage_update for', appName);
+          } catch (err) {
+            console.error('Error during app_usage_update:', err);
+          }
+        })();
+        
         console.log('Sent app_usage_update for', appName);
       }
     });
   }, 3000); // 3 seconds
   // --- End app usage tracking ---
+
+  // --- Temperature monitoring (every 30 seconds) ---
+  setInterval(async () => {
+    try {
+      const temperatures = await temperatureMonitor.getAllTemperatures();
+      
+      // Check for critical temperatures
+      const isCritical = temperatures.cpu && temperatureMonitor.isTemperatureCritical(temperatures.cpu, 'cpu') ||
+                         temperatures.gpu && temperatureMonitor.isTemperatureCritical(temperatures.gpu, 'gpu') ||
+                         temperatures.system && temperatureMonitor.isTemperatureCritical(temperatures.system, 'system');
+      
+      // Send temperature data
+      ws.send(JSON.stringify({
+        type: 'temperature_log',
+        pc_name: pcName,
+        cpu_temperature: temperatures.cpu,
+        gpu_temperature: temperatures.gpu,
+        motherboard_temperature: temperatures.system,
+        ambient_temperature: temperatures.ambient,
+        is_critical: isCritical,
+        timestamp: new Date().toISOString()
+      }));
+      
+      console.log('Temperature data sent:', temperatures);
+    } catch (error) {
+      console.error('Error collecting temperature data:', error);
+    }
+  }, 30000); // 30 seconds
+  // --- End temperature monitoring ---
+
+  // --- Overclocking detection (every 60 seconds) ---
+  setInterval(async () => {
+    try {
+      const overclockingData = await overclockingDetector.detectAllOverclocking();
+      
+      // Send overclocking alerts if detected
+      if (overclockingData.cpu.isOverclocked) {
+        const alert = overclockingDetector.generateAlert(
+          pcName, 
+          'CPU', 
+          overclockingData.cpu, 
+          overclockingDetector.calculateTemperatureImpact(overclockingData.cpu.overclockPercent, await temperatureMonitor.getCPUTemperature())
+        );
+        
+        ws.send(JSON.stringify({
+          type: 'overclocking_alert',
+          ...alert
+        }));
+        
+        console.log('CPU overclocking detected:', overclockingData.cpu);
+      }
+      
+      if (overclockingData.ram.isOverclocked) {
+        const alert = overclockingDetector.generateAlert(
+          pcName, 
+          'RAM', 
+          overclockingData.ram, 
+          overclockingDetector.calculateTemperatureImpact(overclockingData.ram.overclockPercent, await temperatureMonitor.getSystemTemperature())
+        );
+        
+        ws.send(JSON.stringify({
+          type: 'overclocking_alert',
+          ...alert
+        }));
+        
+        console.log('RAM overclocking detected:', overclockingData.ram);
+      }
+      
+      // Send system metrics
+      const temperatures = await temperatureMonitor.getAllTemperatures();
+      ws.send(JSON.stringify({
+        type: 'system_metrics',
+        pc_name: pcName,
+        cpu_usage_percent: 0, // Will be filled by server
+        memory_usage_percent: 0, // Will be filled by server
+        cpu_temperature: temperatures.cpu,
+        gpu_temperature: temperatures.gpu,
+        cpu_frequency: overclockingData.cpu.currentFreq,
+        memory_frequency: overclockingData.ram.currentFreq,
+        is_cpu_overclocked: overclockingData.cpu.isOverclocked,
+        is_ram_overclocked: overclockingData.ram.isOverclocked,
+        is_gpu_overclocked: false, // GPU tracking removed
+        timestamp: new Date().toISOString()
+      }));
+      
+    } catch (error) {
+      console.error('Error detecting overclocking:', error);
+    }
+  }, 60000); // 60 seconds
+  // --- End overclocking detection ---
 
   // --- Browser history collection (every 5 minutes) ---
   setInterval(async () => {

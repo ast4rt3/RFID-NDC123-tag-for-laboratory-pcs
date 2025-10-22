@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Laboratory Monitor - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .status-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-active {
+            background-color: #4CAF50;
+        }
+
+        .status-inactive {
+            background-color: #f44336;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0./.5; }
+            100% { opacity: 1; }
+        }
+
+        .pc-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .pc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .pc-item.inactive {
+            border-left-color: #f44336;
+            background: #ffeaea;
+        }
+
+        .pc-name {
+            font-weight: bold;
+        }
+
+        .pc-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-activity {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .search-item.incognito {
+            border-left-color: #6c757d;
+            background: #e9ecef;
+        }
+
+        .browser-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+
+        .chrome { background: #4285f4; }
+        .firefox { background: #ff9500; }
+        .edge { background: #0078d4; }
+        .safari { background: #007aff; }
+        .incognito { background: #6c757d; }
+
+        .search-query {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .search-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .refresh-btn:hover {
+            background: #5a67d8;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 RFID Laboratory Monitor</h1>
+            <p>Real-time PC Activity & Search Monitoring Dashboard</p>
+        </div>
+
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>🖥️ Server Status</h3>
+                <div class="server-status">
+                    <div class="status-indicator status-active" id="serverIndicator"></div>
+                    <span id="serverStatus">Server Online</span>
+                </div>
+                <p><strong>Uptime:</strong> <span id="serverUptime">Loading...</span></p>
+                <p><strong>Connected PCs:</strong> <span id="connectedPcs">0</span></p>
+                <p><strong>Total Sessions:</strong> <span id="totalSessions">0</span></p>
+                <p><strong>Last Activity:</strong> <span id="lastActivity">Never</span></p>
+            </div>
+
+            <div class="status-card">
+                <h3>💻 Active PCs</h3>
+                <div class="pc-list" id="pcList">
+                    <p>No active PCs detected</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>📊 PC Usage Time</h3>
+                <canvas id="usageChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h3>🔍 Search Activity</h3>
+                <div class="search-activity" id="searchActivity">
+                    <p>No search activity detected</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+        <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+    </div>
+
+    <script>
+        let usageChart;
+        let serverStatusInterval;
+        let dataRefreshInterval;
+
+        // Initialize Chart.js
+        function initChart() {
+            const ctx = document.getElementById('usageChart').getContext('2d');
+            usageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Usage Time (hours)',
+                        data: [],
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + 'h';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Format time duration
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${minutes}m`;
+        }
+
+        // Format browser name with icon
+        function getBrowserIcon(browser) {
+            const icons = {
+                'chrome': 'chrome',
+                'firefox': 'firefox', 
+                'edge': 'edge',
+                'safari': 'safari'
+            };
+            return icons[browser.toLowerCase()] || 'chrome';
+        }
+
+        // Check if URL is incognito/private
+        function isIncognito(url) {
+            return url && (
+                url.includes('incognito') || 
+                url.includes('private') || 
+                url.includes('guest') ||
+                url.includes('tor')
+            );
+        }
+
+        // Update server status
+        async function updateServerStatus() {
+            try {
+                const response = await fetch('/status');
+                const status = await response.json();
+                
+                document.getElementById('serverUptime').textContent = status.uptimeFormatted;
+                document.getElementById('connectedPcs').textContent = status.connectedClients;
+                document.getElementById('totalSessions').textContent = status.totalSessions;
+                document.getElementById('lastActivity').textContent = 
+                    status.lastActivity ? new Date(status.lastActivity).toLocaleString() : 'Never';
+                
+                // Update server indicator
+                const indicator = document.getElementById('serverIndicator');
+                const statusText = document.getElementById('serverStatus');
+                if (status.isActive) {
+                    indicator.className = 'status-indicator status-active';
+                    statusText.textContent = 'Server Online';
+                } else {
+                    indicator.className = 'status-indicator status-inactive';
+                    statusText.textContent = 'Server Offline';
+                }
+            } catch (error) {
+                console.error('Error fetching server status:', error);
+                document.getElementById('serverIndicator').className = 'status-indicator status-inactive';
+                document.getElementById('serverStatus').textContent = 'Server Offline';
+            }
+        }
+
+        // Update PC list
+        async function updatePcList() {
+            try {
+                const response = await fetch('/debug');
+                const debug = await response.json();
+                
+                const pcList = document.getElementById('pcList');
+                if (debug.activeSessions === 0) {
+                    pcList.innerHTML = '<p>No active PCs detected</p>';
+                    return;
+                }
+
+                // This would need to be enhanced to show actual PC names
+                // For now, showing connection count
+                pcList.innerHTML = `
+                    <div class="pc-item">
+                        <span class="pc-name">Connected PCs</span>
+                        <span class="pc-status status-online">${debug.activeSessions} Active</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error fetching PC list:', error);
+            }
+        }
+
+        // Update search activity
+        async function updateSearchActivity() {
+            try {
+                const response = await fetch('/browser-logs?limit=50');
+                const logs = await response.json();
+                
+                const searchActivity = document.getElementById('searchActivity');
+                if (logs.length === 0) {
+                    searchActivity.innerHTML = '<p>No search activity detected</p>';
+                    return;
+                }
+
+                searchActivity.innerHTML = logs.map(log => {
+                    const browserIcon = getBrowserIcon(log.browser);
+                    const isIncognitoMode = isIncognito(log.url);
+                    const query = log.search_query || 'Unknown search';
+                    const time = new Date(log.timestamp).toLocaleString();
+                    
+                    return `
+                        <div class="search-item ${isIncognitoMode ? 'incognito' : ''}">
+                            <div class="browser-icon ${browserIcon}"></div>
+                            <div class="search-query">${query}</div>
+                            <div class="search-time">${time}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error fetching search activity:', error);
+            }
+        }
+
+        // Update usage chart
+        async function updateUsageChart() {
+            try {
+                const response = await fetch('/logs');
+                const logs = await response.json();
+                
+                if (logs.length === 0) {
+                    usageChart.data.labels = ['No Data'];
+                    usageChart.data.datasets[0].data = [0];
+                    usageChart.update();
+                    return;
+                }
+
+                // Group by PC name and calculate total usage
+                const pcUsage = {};
+                logs.forEach(log => {
+                    if (!pcUsage[log.pc_name]) {
+                        pcUsage[log.pc_name] = 0;
+                    }
+                    pcUsage[log.pc_name] += log.duration_seconds;
+                });
+
+                // Convert to hours and update chart
+                const pcNames = Object.keys(pcUsage);
+                const usageHours = pcNames.map(pc => pcUsage[pc] / 3600);
+
+                usageChart.data.labels = pcNames;
+                usageChart.data.datasets[0].data = usageHours;
+                usageChart.update();
+            } catch (error) {
+                console.error('Error fetching usage data:', error);
+            }
+        }
+
+        // Refresh all data
+        async function refreshData() {
+            await Promise.all([
+                updateServerStatus(),
+                updatePcList(),
+                updateSearchActivity(),
+                updateUsageChart()
+            ]);
+            
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${new Date().toLocaleString()}`;
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            initChart();
+            refreshData();
+            
+            // Set up auto-refresh
+            serverStatusInterval = setInterval(updateServerStatus, 5000); // Every 5 seconds
+            dataRefreshInterval = setInterval(refreshData, 30000); // Every 30 seconds
+        }
+
+        // Start dashboard when page loads
+        window.addEventListener('load', initDashboard);
+    </script>
+</body>
+</html>
+
