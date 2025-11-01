@@ -1,34 +1,49 @@
 const fs = require('fs');
 const path = require('path');
 
+// Load environment variables
+require('dotenv').config();
+
 // Database abstraction layer that supports both local SQLite and Supabase
 class Database {
   constructor() {
-    this.type = process.env.DB_TYPE || 'sqlite'; // 'sqlite' or 'supabase'
+    this.type = process.env.DB_TYPE || 'sqlite';
     this.db = null;
     this.init();
   }
 
   async init() {
+    // Check if we should use Supabase
     if (this.type === 'supabase') {
-      const SupabaseDB = require('./supabase-client');
-      this.db = new SupabaseDB();
-      const connected = await this.db.testConnection();
-      if (!connected) {
-        console.warn('⚠️ Supabase connection failed, using memory storage');
-        this.type = 'memory';
-        this.init();
+      try {
+        const SupabaseDB = require('./supabase-client');
+        this.db = new SupabaseDB();
+        console.log('✅ Using Supabase database');
         return;
+      } catch (err) {
+        console.error('❌ Supabase initialization failed:', err.message);
+        console.log('⚠️ Falling back to SQLite...');
+        this.type = 'sqlite';
       }
-      console.log('✅ Using Supabase database');
-    } else {
-      // Use in-memory storage for now (no sqlite3 dependency)
-      this.db = {
-        timeLogs: [],
-        appUsageLogs: [],
-        browserSearchLogs: []
-      };
-      console.log('✅ Using in-memory storage');
+    }
+
+    // Use SQLite as default or fallback
+    if (this.type === 'sqlite') {
+      try {
+        const sqlite3 = require('sqlite3').verbose();
+        const dbPath = path.join(__dirname, 'local.db');
+        this.db = new sqlite3.Database(dbPath);
+        await this.initLocalTables();
+        console.log('✅ Using SQLite database at:', dbPath);
+      } catch (err) {
+        console.warn('⚠️ SQLite initialization failed, using memory storage:', err);
+        this.type = 'memory';
+        this.db = {
+          timeLogs: [],
+          appUsageLogs: []
+        };
+        console.log('✅ Using in-memory storage');
+      }
     }
   }
 
@@ -54,28 +69,13 @@ class Database {
           memory_usage_bytes INTEGER,
           cpu_percent REAL,
           gpu_percent REAL,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          UNIQUE(pc_name, app_name, start_time)
-        );
-
-        CREATE TABLE IF NOT EXISTS browser_search_logs (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          pc_name TEXT NOT NULL,
-          browser TEXT NOT NULL,
-          url TEXT,
-          search_query TEXT,
-          search_engine TEXT,
-          timestamp DATETIME NOT NULL,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          UNIQUE(pc_name, browser, url, timestamp)
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE INDEX IF NOT EXISTS idx_time_logs_pc_name ON time_logs(pc_name);
         CREATE INDEX IF NOT EXISTS idx_time_logs_start_time ON time_logs(start_time);
         CREATE INDEX IF NOT EXISTS idx_app_usage_logs_pc_name ON app_usage_logs(pc_name);
         CREATE INDEX IF NOT EXISTS idx_app_usage_logs_start_time ON app_usage_logs(start_time);
-        CREATE INDEX IF NOT EXISTS idx_browser_search_logs_pc_name ON browser_search_logs(pc_name);
-        CREATE INDEX IF NOT EXISTS idx_browser_search_logs_timestamp ON browser_search_logs(timestamp);
       `;
 
       this.db.exec(createTables, (err) => {
@@ -100,10 +100,28 @@ class Database {
   }
 
   async insertTimeLog(pcName, startTime, endTime, duration) {
-    if (this.type === 'supabase') {
+    if (this.type === 'sqlite') {
+      return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO time_logs 
+          (pc_name, start_time, end_time, duration_seconds) 
+          VALUES (?, ?, ?, ?)`;
+        this.db.run(sql, [pcName, startTime, endTime, duration], (err) => {
+          if (err) {
+            console.error('Error inserting time log:', err);
+            reject(err);
+          } else {
+            console.log(`💾 Log saved for ${pcName}`);
+            resolve();
+          }
+        });
+      });
+    } else if (this.type === 'supabase') {
       return await this.db.insertTimeLog(pcName, startTime, endTime, duration);
     } else {
       // In-memory storage
+      if (!this.db.timeLogs) {
+        this.db.timeLogs = [];
+      }
       const log = {
         id: this.db.timeLogs.length + 1,
         pc_name: pcName,
@@ -119,10 +137,29 @@ class Database {
   }
 
   async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent) {
-    if (this.type === 'supabase') {
+    if (this.type === 'sqlite') {
+      return new Promise((resolve, reject) => {
+        // Use INSERT OR REPLACE to handle duplicate entries (based on UNIQUE constraint)
+        const sql = `INSERT OR REPLACE INTO app_usage_logs
+          (pc_name, app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        this.db.run(sql, [pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent], (err) => {
+          if (err) {
+            console.error('Error inserting app usage log:', err);
+            reject(err);
+          } else {
+            console.log('✅ App usage log saved');
+            resolve();
+          }
+        });
+      });
+    } else if (this.type === 'supabase') {
       return await this.db.insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent);
     } else {
-      // In-memory storage
+      // Memory storage fallback
+      if (!this.db.appUsageLogs) {
+        this.db.appUsageLogs = [];
+      }
       const log = {
         id: this.db.appUsageLogs.length + 1,
         pc_name: pcName,
@@ -136,62 +173,27 @@ class Database {
         created_at: new Date().toISOString()
       };
       this.db.appUsageLogs.push(log);
-      console.log('App usage log saved');
-      return Promise.resolve();
-    }
-  }
-
-  async insertBrowserSearchLog(pcName, browser, url, searchQuery, searchEngine, timestamp) {
-    if (this.type === 'supabase') {
-      return await this.db.insertBrowserSearchLog(pcName, browser, url, searchQuery, searchEngine, timestamp);
-    } else {
-      // In-memory storage
-      const log = {
-        id: this.db.browserSearchLogs.length + 1,
-        pc_name: pcName,
-        browser: browser,
-        url: url,
-        search_query: searchQuery,
-        search_engine: searchEngine,
-        timestamp: timestamp,
-        created_at: new Date().toISOString()
-      };
-      this.db.browserSearchLogs.push(log);
-      console.log('✅ Browser activity saved to database');
+      console.log('✅ App usage log saved (memory)');
       return Promise.resolve();
     }
   }
 
   async getTimeLogs() {
-    if (this.type === 'supabase') {
+    if (this.type === 'sqlite') {
+      return new Promise((resolve, reject) => {
+        this.db.all(
+          'SELECT * FROM time_logs ORDER BY start_time DESC',
+          (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+          }
+        );
+      });
+    } else if (this.type === 'supabase') {
       return await this.db.getTimeLogs();
     } else {
       // In-memory storage
       return Promise.resolve(this.db.timeLogs.sort((a, b) => new Date(b.start_time) - new Date(a.start_time)));
-    }
-  }
-
-  async getBrowserLogs(pcName, searchEngine, limit) {
-    if (this.type === 'supabase') {
-      return await this.db.getBrowserLogs(pcName, searchEngine, limit);
-    } else {
-      // In-memory storage
-      let logs = this.db.browserSearchLogs;
-      
-      if (pcName) {
-        logs = logs.filter(log => log.pc_name === pcName);
-      }
-      if (searchEngine) {
-        logs = logs.filter(log => log.search_engine === searchEngine);
-      }
-      
-      logs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      
-      if (limit) {
-        logs = logs.slice(0, limit);
-      }
-      
-      return Promise.resolve(logs);
     }
   }
 }

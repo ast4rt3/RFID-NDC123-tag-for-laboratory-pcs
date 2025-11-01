@@ -112,49 +112,7 @@ wss.on('connection', ws => {
       }
     }
     
-    // Handle browser activity messages
-    else if (data.type === 'browser_activity') {
-      console.log('🔍 Browser activity logged:', data);
-      db.insertBrowserSearchLog(
-        data.pc_name,
-        data.browser,
-        data.url,
-        data.search_query,
-        data.search_engine,
-        data.timestamp
-      );
-    }
-    
-    // Handle browser history messages
-    else if (data.type === 'browser_history') {
-      console.log('📚 Browser history logged:', data.entries?.length || 0, 'entries');
-      if (data.entries && data.entries.length > 0) {
-        data.entries.forEach(entry => {
-          db.insertBrowserSearchLog(
-            data.pc_name,
-            entry.browser,
-            entry.url,
-            entry.searchQuery,
-            entry.searchEngine,
-            entry.timestamp
-          );
-        });
-        console.log('✅ Browser history saved to database');
-      }
-    }
-    
-    // Handle browser extension search messages
-    else if (data.type === 'browser_extension_search') {
-      console.log('🔌 Extension search logged:', data);
-      db.insertBrowserSearchLog(
-        data.pc_name,
-        data.browser,
-        data.url,
-        data.search_query,
-        data.search_engine,
-        data.timestamp
-      );
-    }
+    // Browser activity handling has been removed
   });
 
   ws.on('close', () => {
@@ -183,18 +141,7 @@ app.get('/logs', async (req, res) => {
   }
 });
 
-// Browser logs API endpoint
-app.get('/browser-logs', async (req, res) => {
-  const { pc_name, search_engine, limit = 100 } = req.query;
-  
-  try {
-    const logs = await db.getBrowserLogs(pc_name, search_engine, limit);
-    res.json(logs);
-  } catch (error) {
-    console.error('Error fetching browser logs:', error);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
+// Browser logs endpoint has been removed
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`✅ API listening on http://0.0.0.0:${port}`);

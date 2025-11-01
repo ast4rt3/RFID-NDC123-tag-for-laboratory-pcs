@@ -2926,3 +2926,369 @@ WebSocket connected to ws://127.0.0.1:8080
 Session started
 Connecting to WebSocket at: ws://127.0.0.1:8080
 App usage interval running...
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Electron
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Electron
+Sent app_usage_start for Windows Explorer
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Reconnecting...
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Visual Studio Code
+Sent app_usage_start for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Windows Explorer
+Sent app_usage_start for Visual Studio Code
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Windows Explorer
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Reconnecting...
+Sent app_usage_update for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Windows Explorer
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+Sent app_usage_start for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Reconnecting...
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Windows Terminal Host
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Windows Terminal Host
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Windows Terminal Host
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_start for Windows Explorer
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Windows Explorer
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_end for Visual Studio Code
+Sent app_usage_start for Brave Browser
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Reconnecting...
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_end for Visual Studio Code
+Sent app_usage_start for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+🔍 Browser detected: Brave Browser
+🔍 Window title: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Window URL: 
+🔍 Extracting browser data from: [object Object]
+🔍 Trying title extraction for: rfid-monitoring | Heras_org | Supabase - Brave
+🔍 Title extraction match: [object Object]
+🔍 Final extraction result: [object Object]
+🔍 Extracted browser data: [object Object]
+🔍 Sent browser activity to server
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+🔍 Extracted data: [object Object]
+Sent app_usage_update for Visual Studio Code
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]

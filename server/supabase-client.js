@@ -65,18 +65,25 @@ class SupabaseDB {
 
   // Insert app usage log
   async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent) {
+    // Build the data object, conditionally including gpu_percent
+    const logData = {
+      pc_name: pcName,
+      app_name: appName,
+      start_time: startTime,
+      end_time: endTime,
+      duration_seconds: duration,
+      memory_usage_bytes: memoryUsage,
+      cpu_percent: cpuPercent
+    };
+
+    // Only include gpu_percent if it's provided (for backward compatibility)
+    if (gpuPercent !== null && gpuPercent !== undefined) {
+      logData.gpu_percent = gpuPercent;
+    }
+
     const { data, error } = await this.client
       .from('app_usage_logs')
-      .upsert({
-        pc_name: pcName,
-        app_name: appName,
-        start_time: startTime,
-        end_time: endTime,
-        duration_seconds: duration,
-        memory_usage_bytes: memoryUsage,
-        cpu_percent: cpuPercent,
-        gpu_percent: gpuPercent
-      }, {
+      .upsert(logData, {
         onConflict: 'pc_name,app_name,start_time'
       })
       .select();
@@ -85,7 +92,7 @@ class SupabaseDB {
       console.error('❌ Error inserting app usage log:', error.message);
       return false;
     }
-    
+
     console.log('✅ App usage log saved:', data[0]);
     return true;
   }
