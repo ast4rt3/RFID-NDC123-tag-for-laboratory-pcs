@@ -2,6 +2,8 @@ const WebSocket = require('ws');
 const os = require('os');
 const activeWin = require('active-win'); // <--- Add this
 const pidusage = require('pidusage');
+const si = require('systeminformation'); // For CPU temperature monitoring
+const WindowsHardwareMonitor = require('./windows-hardware-monitor'); // Windows-specific monitoring
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -9,6 +11,7 @@ const path = require('path');
 
 
 const config = require('./config');
+const windowsMonitor = new WindowsHardwareMonitor(); // Initialize Windows hardware monitor
 const logStream = fs.createWriteStream('rfid-client-debug.log', { flags: 'a' });
 const origLog = console.log;
 console.log = function(...args) {
@@ -40,11 +43,56 @@ try {
 
 const ws = new WebSocket(wsUrl);
 
+// Function to collect and send system information (once on startup)
+async function sendSystemInfo() {
+  try {
+    console.log('Collecting system information...');
+
+    // Get CPU information
+    const cpuInfo = await si.cpu();
+    const cpuModel = cpuInfo.brand || 'Unknown';
+    const cpuCores = cpuInfo.cores || os.cpus().length;
+    const cpuSpeedGhz = cpuInfo.speed || (os.cpus()[0]?.speed / 1000) || 0;
+
+    // Get memory information
+    const memInfo = await si.mem();
+    const totalMemoryGb = (memInfo.total / (1024 ** 3)).toFixed(2);
+
+    // Get OS information
+    const osInfo = await si.osInfo();
+    const osPlatform = os.platform();
+    const osVersion = osInfo.distro || os.release();
+    const hostname = os.hostname();
+
+    const systemInfo = {
+      type: 'system_info',
+      pc_name: pcName,
+      cpu_model: cpuModel,
+      cpu_cores: cpuCores,
+      cpu_speed_ghz: cpuSpeedGhz,
+      total_memory_gb: parseFloat(totalMemoryGb),
+      os_platform: osPlatform,
+      os_version: osVersion,
+      hostname: hostname
+    };
+
+    console.log('System Information:', systemInfo);
+    ws.send(JSON.stringify(systemInfo));
+    console.log('✅ System information sent to server');
+
+  } catch (err) {
+    console.error('Error collecting system information:', err.message);
+  }
+}
+
 // Add explicit logging for connection, error, and close events
-ws.on('open', () => {
+ws.on('open', async () => {
   console.log('WebSocket connected to', wsUrl);
   ws.send(JSON.stringify({ type: 'start', pc_name: pcName }));
   console.log('Session started');
+
+  // Send system information once on startup
+  await sendSystemInfo();
 
   // --- App usage tracking ---
   let lastApp = null;
@@ -74,6 +122,55 @@ ws.on('open', () => {
       callback(avgUsage);
     });
   }
+
+  // Function to get CPU temperature (Windows-optimized)
+  async function getCpuTemperature() {
+    try {
+      // On Windows, use our custom Windows monitor
+      if (os.platform() === 'win32') {
+        const temp = await windowsMonitor.getCpuTemperature();
+        if (temp !== null) {
+          return temp;
+        }
+      }
+
+      // Fallback to systeminformation for Linux/macOS
+      const temp = await si.cpuTemperature();
+      if (temp && temp.main && temp.main !== -1) {
+        return temp.main;
+      }
+      return null;
+    } catch (err) {
+      console.error('Error getting CPU temperature:', err.message);
+      return null;
+    }
+  }
+
+  // Function to get hardware monitoring data (temperature + overclocking)
+  async function getHardwareData() {
+    try {
+      // On Windows, get all data at once for efficiency
+      if (os.platform() === 'win32') {
+        return await windowsMonitor.getAllData();
+      }
+
+      // On other platforms, just get temperature
+      const temp = await getCpuTemperature();
+      return {
+        cpuTemperature: temp,
+        isCpuOverclocked: null,
+        isRamOverclocked: null
+      };
+    } catch (err) {
+      console.error('Error getting hardware data:', err.message);
+      return {
+        cpuTemperature: null,
+        isCpuOverclocked: null,
+        isRamOverclocked: null
+      };
+    }
+  }
+
   console.log("Connecting to WebSocket at:", wsUrl);
 
   setInterval(async () => {
@@ -85,7 +182,7 @@ ws.on('open', () => {
     const appName = result.owner.name;
     const processId = result.owner.processId;
     const memoryUsage = result.memoryUsage;
-    
+
     let cpuPercent = null;
     try {
       const stats = await pidusage(processId);
@@ -98,6 +195,9 @@ ws.on('open', () => {
       return;
     }
     const now = new Date();
+
+    // Get hardware monitoring data (temperature + overclocking status)
+    const hardwareData = await getHardwareData();
 
     // Get GPU usage and send the log inside the callback
     getSystemGpuUsage((gpuPercent) => {
@@ -112,7 +212,10 @@ ws.on('open', () => {
           duration_seconds: 0,
           memory_usage_bytes: memoryUsage,
           cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
+          gpu_percent: gpuPercent,
+          cpu_temperature: hardwareData.cpuTemperature,
+          is_cpu_overclocked: hardwareData.isCpuOverclocked,
+          is_ram_overclocked: hardwareData.isRamOverclocked
         }));
         console.log('Sent app_usage_start for', appName);
         lastApp = appName;
@@ -129,7 +232,10 @@ ws.on('open', () => {
           duration_seconds: Math.floor((now - lastStart) / 1000),
           memory_usage_bytes: memoryUsage,
           cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
+          gpu_percent: gpuPercent,
+          cpu_temperature: hardwareData.cpuTemperature,
+          is_cpu_overclocked: hardwareData.isCpuOverclocked,
+          is_ram_overclocked: hardwareData.isRamOverclocked
         }));
         console.log('Sent app_usage_end for', lastApp);
 
@@ -142,7 +248,10 @@ ws.on('open', () => {
           duration_seconds: 0,
           memory_usage_bytes: memoryUsage,
           cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
+          gpu_percent: gpuPercent,
+          cpu_temperature: hardwareData.cpuTemperature,
+          is_cpu_overclocked: hardwareData.isCpuOverclocked,
+          is_ram_overclocked: hardwareData.isRamOverclocked
         }));
         console.log('Sent app_usage_start for', appName);
 
@@ -159,7 +268,10 @@ ws.on('open', () => {
           duration_seconds: Math.floor((now - lastStart) / 1000),
           memory_usage_bytes: memoryUsage,
           cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
+          gpu_percent: gpuPercent,
+          cpu_temperature: hardwareData.cpuTemperature,
+          is_cpu_overclocked: hardwareData.isCpuOverclocked,
+          is_ram_overclocked: hardwareData.isRamOverclocked
         }));
         console.log('Sent app_usage_update for', appName);
       }

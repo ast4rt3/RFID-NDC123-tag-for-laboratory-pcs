@@ -52,6 +52,21 @@ wss.on('connection', ws => {
       activeSessions[clientId] = { start_time: startTime };
       appActiveSessions[clientId] = {}; // Initialize app session tracking
       console.log(`▶ Started session for ${clientId} at ${startTime}`);
+    } else if (data.type === 'system_info') {
+      // Receive and store system information (one-time)
+      console.log(`📊 Received system info from ${data.pc_name}`);
+      db.upsertSystemInfo(
+        data.pc_name,
+        data.cpu_model,
+        data.cpu_cores,
+        data.cpu_speed_ghz,
+        data.total_memory_gb,
+        data.os_platform,
+        data.os_version,
+        data.hostname
+      ).catch(err => {
+        console.error('Error saving system info:', err);
+      });
     } else if (data.type === 'stop') {
       // PC stops
       if (activeSessions[data.pc_name]) {
@@ -87,7 +102,10 @@ wss.on('connection', ws => {
           duration,
           data.memory_usage_bytes,
           data.cpu_percent,
-          data.gpu_percent
+          data.gpu_percent,
+          data.cpu_temperature,
+          data.is_cpu_overclocked,
+          data.is_ram_overclocked
         );
         delete appActiveSessions[clientId][data.app_name];
       }
@@ -107,7 +125,10 @@ wss.on('connection', ws => {
           duration,
           data.memory_usage_bytes,
           data.cpu_percent,
-          data.gpu_percent
+          data.gpu_percent,
+          data.cpu_temperature,
+          data.is_cpu_overclocked,
+          data.is_ram_overclocked
         );
       }
     }

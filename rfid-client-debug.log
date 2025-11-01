@@ -3292,3 +3292,78 @@ App usage interval running...
 Sent app_usage_update for Visual Studio Code
 App usage interval running...
 🔍 Active window result: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_end for Visual Studio Code
+Sent app_usage_start for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_end for Visual Studio Code
+Sent app_usage_start for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Brave Browser
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_end for Brave Browser
+Sent app_usage_start for Visual Studio Code
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_end for Visual Studio Code
+Sent app_usage_start for Windows Terminal Host
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_end for Windows Terminal Host
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code

@@ -9,6 +9,7 @@
     "start-server": "node server/server.js",
     "start-client": "electron client/main.js",
     "dev": "electron client/main.js --dev",
+    "prebuild": "node download-librehardwaremonitor.js",
     "build": "electron-builder",
     "build-installer": "electron-builder --win",
     "start-update-server": "node update-server.js",
@@ -49,6 +50,7 @@
     "string-width": "^7.2.0",
     "strip-ansi": "^7.1.0",
     "supabase": "^2.39.0",
+    "systeminformation": "^5.27.11",
     "util-deprecate": "^1.0.2",
     "vary": "^1.1.2",
     "verror": "^1.10.1",
@@ -68,6 +70,7 @@
     "zip-stream": "^7.0.2"
   },
   "devDependencies": {
+    "adm-zip": "^0.5.16",
     "electron": "^37.2.3",
     "electron-builder": "^24.9.1"
   },
@@ -81,6 +84,15 @@
       "client/**/*",
       "node_modules/**/*",
       "config.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/LibreHardwareMonitor",
+        "to": "LibreHardwareMonitor",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "win": {
       "icon": "client/assets/icon.ico",
@@ -114,6 +126,7 @@
       "node_modules/**",
       "node_modules/pidusage/**",
       "node_modules/active-win/**",
+      "node_modules/systeminformation/**",
       "node_modules/ws/**",
       "node_modules/@mapbox/**",
       "node_modules/node-addon-api/**",
