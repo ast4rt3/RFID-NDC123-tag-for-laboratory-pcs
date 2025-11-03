@@ -2,10 +2,25 @@ const express = require('express');
 const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const os = require('os');
 const Database = require('./database');
 
 // Load environment variables
 require('dotenv').config();
+
+// Helper function to get IPv4 address
+function getIPv4Address() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      // Skip internal (loopback) and non-IPv4 addresses
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return '0.0.0.0';
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -33,9 +48,10 @@ const appActiveSessions = {}; // { clientId: { app_name, start_time } }
 
 // WebSocket server - bind to all interfaces for remote connections
 const wss = new WebSocket.Server({ port: wsPort, host: '0.0.0.0' });
+const ipv4Address = getIPv4Address();
 console.log(`✅ WebSocket listening on ws://0.0.0.0:${wsPort}`);
 console.log(`✅ Local connections: ws://127.0.0.1:${wsPort}`);
-console.log(`✅ Remote connections: ws://192.168.141.106:${wsPort}`);
+console.log(`✅ Remote connections: ws://${ipv4Address}:${wsPort}`);
 
 // On connection
 wss.on('connection', ws => {
@@ -166,4 +182,5 @@ app.get('/logs', async (req, res) => {
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`✅ API listening on http://0.0.0.0:${port}`);
+  console.log(`✅ API remote access: http://${ipv4Address}:${port}`);
 });

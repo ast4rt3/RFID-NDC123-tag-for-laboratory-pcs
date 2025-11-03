@@ -3367,3 +3367,123 @@ Sent app_usage_start for Visual Studio Code
 App usage interval running...
 🔍 Active window result: [object Object]
 Sent app_usage_update for Visual Studio Code
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Collecting system information...
+System Information: [object Object]
+✅ System information sent to server
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_start for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_update for Visual Studio Code
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Collecting system information...
+System Information: [object Object]
+✅ System information sent to server
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+[ERROR] WebSocket error: Error: connect ECONNREFUSED 127.0.0.1:8080
+[ERROR] Failed to connect to: ws://127.0.0.1:8080
+[ERROR] Please check:
+[ERROR] 1. Server is running on the correct IP and port
+[ERROR] 2. Firewall allows connections on port 8080
+[ERROR] 3. Config file has the correct server IP
+WebSocket closed
+Attempting to reconnect in 5 seconds...
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Collecting system information...
+System Information: [object Object]
+✅ System information sent to server
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
+Sent app_usage_start for Visual Studio Code
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Collecting system information...
+System Information: [object Object]
+✅ System information sent to server
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Collecting system information...
+System Information: [object Object]
+✅ System information sent to server
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Collecting system information...
+System Information: [object Object]
+✅ System information sent to server
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+PC Name: i3S
+Loading configuration...
+Config object: [object Object]
+Config serverIP: 127.0.0.1
+WebSocket URL: ws://127.0.0.1:8080
+WebSocket connected to ws://127.0.0.1:8080
+Session started
+Collecting system information...
+System Information: [object Object]
+✅ System information sent to server
+Connecting to WebSocket at: ws://127.0.0.1:8080
+App usage interval running...
+🔍 Active window result: [object Object]
+App usage interval running...
+🔍 Active window result: [object Object]
