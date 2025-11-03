@@ -69,11 +69,12 @@ class HardwareMonitorManager {
       }
 
       // Start LibreHardwareMonitor minimized
-      this.lhmProcess = spawn(this.lhmPath, ['-minimized'], {
-        detached: true,
-        stdio: 'ignore',
-        windowsHide: false // We want it in system tray
+      this.lhmProcess = spawn('cmd.exe', ['/c', `"${this.lhmPath}" -minimized`], {
+  detached: true,
+  stdio: 'ignore',
+  windowsHide: true
       });
+
 
       // Don't wait for the process to exit
       this.lhmProcess.unref();
@@ -92,6 +93,8 @@ class HardwareMonitorManager {
     }
   }
 
+
+  
   /**
    * Check if LibreHardwareMonitor is already running
    */

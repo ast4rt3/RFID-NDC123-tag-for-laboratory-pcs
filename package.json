@@ -121,6 +121,7 @@
     "asarUnpack": [
       "client/pc-logger.js",
       "client/config.js",
+      "client/windows-hardware-monitor.js",
       "client/*.node",
       "config.json",
       "node_modules/**",
