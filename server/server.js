@@ -2,25 +2,11 @@ const express = require('express');
 const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const os = require('os');
 const Database = require('./database');
+const { to12HourFormat } = require('./database');
 
 // Load environment variables
 require('dotenv').config();
-
-// Helper function to get IPv4 address
-function getIPv4Address() {
-  const interfaces = os.networkInterfaces();
-  for (const name of Object.keys(interfaces)) {
-    for (const iface of interfaces[name]) {
-      // Skip internal (loopback) and non-IPv4 addresses
-      if (iface.family === 'IPv4' && !iface.internal) {
-        return iface.address;
-      }
-    }
-  }
-  return '0.0.0.0';
-}
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -48,51 +34,43 @@ const appActiveSessions = {}; // { clientId: { app_name, start_time } }
 
 // WebSocket server - bind to all interfaces for remote connections
 const wss = new WebSocket.Server({ port: wsPort, host: '0.0.0.0' });
-const ipv4Address = getIPv4Address();
 console.log(`✅ WebSocket listening on ws://0.0.0.0:${wsPort}`);
 console.log(`✅ Local connections: ws://127.0.0.1:${wsPort}`);
-console.log(`✅ Remote connections: ws://${ipv4Address}:${wsPort}`);
+console.log(`✅ Remote connections: ws://192.168.141.106:${wsPort}`);
 
 // On connection
 wss.on('connection', ws => {
   console.log('💻 PC connected');
   let clientId = null;
 
-  ws.on('message', msg => {
+  ws.on('message', async (msg) => {
     const data = JSON.parse(msg);
 
     if (data.type === 'start') {
       // PC starts
       clientId = data.pc_name;
       const startTime = new Date();
-      activeSessions[clientId] = { start_time: startTime };
+      const formattedStart = to12HourFormat(startTime);
+      activeSessions[clientId] = { start_time: formattedStart };
       appActiveSessions[clientId] = {}; // Initialize app session tracking
-      console.log(`▶ Started session for ${clientId} at ${startTime}`);
-    } else if (data.type === 'system_info') {
-      // Receive and store system information (one-time)
-      console.log(`📊 Received system info from ${data.pc_name}`);
-      db.upsertSystemInfo(
-        data.pc_name,
-        data.cpu_model,
-        data.cpu_cores,
-        data.cpu_speed_ghz,
-        data.total_memory_gb,
-        data.os_platform,
-        data.os_version,
-        data.hostname
-      ).catch(err => {
-        console.error('Error saving system info:', err);
-      });
+      try {
+        await db.updatePCStatus(clientId, true, formattedStart, formattedStart);
+      } catch (error) {
+        console.warn('Failed to update PC status:', error);
+      }
+      console.log(`▶ Started session for ${clientId} at ${formattedStart}`);
     } else if (data.type === 'stop') {
       // PC stops
       if (activeSessions[data.pc_name]) {
         const endTime = new Date();
+        const formattedEnd = to12HourFormat(endTime);
         const startTime = activeSessions[data.pc_name].start_time;
-        const duration = Math.floor((endTime - startTime) / 1000);
-
+        // Duration calculation is not accurate if using formatted strings, so recalc from Date
+        const startDate = new Date(startTime);
+        const duration = Math.floor((endTime - startDate) / 1000);
         // Save to database
-        db.insertTimeLog(data.pc_name, startTime, endTime, duration);
-
+        db.insertTimeLog(data.pc_name, startTime, formattedEnd, duration);
+        db.updatePCStatus(data.pc_name, false, formattedEnd, formattedEnd);
         delete activeSessions[data.pc_name];
         delete appActiveSessions[data.pc_name];
       }
@@ -101,7 +79,10 @@ wss.on('connection', ws => {
     ) {
       // Start tracking a new app session for this client
       if (!appActiveSessions[clientId]) appActiveSessions[clientId] = {};
-      appActiveSessions[clientId][data.app_name] = { start_time: new Date() };
+      const now = new Date();
+      const formattedNow = to12HourFormat(now);
+      appActiveSessions[clientId][data.app_name] = { start_time: formattedNow };
+      db.updatePCStatus(clientId, true, formattedNow, formattedNow);
     } else if (
       data.type === 'app_usage_end'
     ) {
@@ -109,20 +90,20 @@ wss.on('connection', ws => {
       if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
         const startTime = appActiveSessions[clientId][data.app_name].start_time;
         const endTime = new Date();
-        const duration = Math.floor((endTime - startTime) / 1000);
+        const formattedEnd = to12HourFormat(endTime);
+        const startDate = new Date(startTime);
+        const duration = Math.floor((endTime - startDate) / 1000);
         db.insertAppUsageLog(
           data.pc_name,
           data.app_name,
           startTime,
-          endTime,
+          formattedEnd,
           duration,
           data.memory_usage_bytes,
           data.cpu_percent,
-          data.gpu_percent,
-          data.cpu_temperature,
-          data.is_cpu_overclocked,
-          data.is_ram_overclocked
+          data.gpu_percent
         );
+        db.updatePCStatus(clientId, true, formattedEnd, formattedEnd);
         delete appActiveSessions[clientId][data.app_name];
       }
     } else if (
@@ -132,34 +113,77 @@ wss.on('connection', ws => {
       if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
         const startTime = appActiveSessions[clientId][data.app_name].start_time;
         const endTime = new Date();
-        const duration = Math.floor((endTime - startTime) / 1000);
+        const formattedEnd = to12HourFormat(endTime);
+        const startDate = new Date(startTime);
+        const duration = Math.floor((endTime - startDate) / 1000);
         db.insertAppUsageLog(
           data.pc_name,
           data.app_name,
           startTime,
-          endTime,
+          formattedEnd,
           duration,
           data.memory_usage_bytes,
           data.cpu_percent,
-          data.gpu_percent,
-          data.cpu_temperature,
-          data.is_cpu_overclocked,
-          data.is_ram_overclocked
+          data.gpu_percent
         );
+        db.updatePCStatus(clientId, true, formattedEnd, formattedEnd);
       }
     }
     
-    // Browser activity handling has been removed
+    // Handle browser activity messages
+    else if (data.type === 'browser_activity') {
+      console.log('🔍 Browser activity logged:', data);
+      db.insertBrowserSearchLog(
+        data.pc_name,
+        data.browser,
+        data.url,
+        data.search_query,
+        data.search_engine,
+        data.timestamp
+      );
+    }
+    
+    // Handle browser history messages
+    else if (data.type === 'browser_history') {
+      console.log('📚 Browser history logged:', data.entries?.length || 0, 'entries');
+      if (data.entries && data.entries.length > 0) {
+        data.entries.forEach(entry => {
+          db.insertBrowserSearchLog(
+            data.pc_name,
+            entry.browser,
+            entry.url,
+            entry.searchQuery,
+            entry.searchEngine,
+            entry.timestamp
+          );
+        });
+        console.log('✅ Browser history saved to database');
+      }
+    }
+    
+    // Handle browser extension search messages
+    else if (data.type === 'browser_extension_search') {
+      console.log('🔌 Extension search logged:', data);
+      db.insertBrowserSearchLog(
+        data.pc_name,
+        data.browser,
+        data.url,
+        data.search_query,
+        data.search_engine,
+        data.timestamp
+      );
+    }
   });
 
   ws.on('close', () => {
     if (clientId && activeSessions[clientId]) {
       const endTime = new Date();
+      const formattedEnd = to12HourFormat(endTime);
       const startTime = activeSessions[clientId].start_time;
-      const duration = Math.floor((endTime - startTime) / 1000);
-
-      db.insertTimeLog(clientId, startTime, endTime, duration);
-
+      const startDate = new Date(startTime);
+      const duration = Math.floor((endTime - startDate) / 1000);
+      db.insertTimeLog(clientId, startTime, formattedEnd, duration);
+      db.updatePCStatus(clientId, false, formattedEnd, formattedEnd);
       delete activeSessions[clientId];
     }
   });
@@ -178,9 +202,19 @@ app.get('/logs', async (req, res) => {
   }
 });
 
-// Browser logs endpoint has been removed
+// Browser logs API endpoint
+app.get('/browser-logs', async (req, res) => {
+  const { pc_name, search_engine, limit = 100 } = req.query;
+  
+  try {
+    const logs = await db.getBrowserLogs(pc_name, search_engine, limit);
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching browser logs:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`✅ API listening on http://0.0.0.0:${port}`);
-  console.log(`✅ API remote access: http://${ipv4Address}:${port}`);
 });

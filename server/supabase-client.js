@@ -272,6 +272,39 @@ class SupabaseDB {
     console.log(`✅ System info upserted for ${pcName}`);
     return data;
   }
+
+  // Update PC status
+  async updatePCStatus(pcStatus) {
+    const { data, error } = await this.client
+      .from('pc_status')
+      .upsert(pcStatus, {
+        onConflict: 'pc_name'
+      })
+      .select();
+
+    if (error) {
+      console.error('❌ Error updating PC status:', error.message);
+      throw error;
+    }
+
+    console.log(`✅ PC status updated for ${pcStatus.pc_name}`);
+    return data;
+  }
+
+  // Get all PC statuses
+  async getAllPCStatus() {
+    const { data, error } = await this.client
+      .from('pc_status')
+      .select('*')
+      .order('pc_name');
+
+    if (error) {
+      console.error('❌ Error fetching PC statuses:', error.message);
+      return [];
+    }
+
+    return data;
+  }
 }
 
 module.exports = SupabaseDB;

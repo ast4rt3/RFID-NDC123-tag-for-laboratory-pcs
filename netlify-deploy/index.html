@@ -57,7 +57,7 @@
 
         .control-group {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             gap: 20px;
             flex-wrap: wrap;
         }
@@ -103,6 +103,10 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn:hover {
@@ -110,9 +114,138 @@
             box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
         }
 
-        .stats-grid {
+        .pc-status-container {
+            padding: 30px 40px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .pc-status-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .pc-status-card:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .pc-status-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .status-indicator-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #22c55e;
+            position: relative;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+        }
+
+        .status-indicator.offline {
+            background: #ef4444;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+        }
+
+        .status-indicator::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.6;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline::after {
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            70% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        .pc-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .pc-info .status-text {
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pc-info .status-text i {
+            font-size: 0.9rem;
+        }
+
+        .system-info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .system-info-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .system-info-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .system-info-item .value {
+            font-size: 1rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             padding: 30px 40px;
             background: #f8fafc;
@@ -154,38 +287,9 @@
             color: #64748b;
         }
 
-        .tabs {
-            display: flex;
-            background: #f1f5f9;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            background: none;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #64748b;
-        }
-
-        .tab.active {
-            background: white;
-            color: #4f46e5;
-            border-bottom: 3px solid #4f46e5;
-        }
-
-        .tab:hover:not(.active) {
-            background: #e2e8f0;
-            color: #374151;
-        }
-
         .tab-content {
             padding: 30px 40px;
+            display: none;
         }
 
         .chart-container {
@@ -194,7 +298,6 @@
             border-radius: 15px;
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            position: relative;
         }
 
         .chart-wrapper {
@@ -252,32 +355,6 @@
             background: #f8fafc;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-google { background: #4285f4; color: white; }
-        .badge-bing { background: #0078d4; color: white; }
-        .badge-yahoo { background: #6001d2; color: white; }
-        .badge-duckduckgo { background: #de5833; color: white; }
-        .badge-youtube { background: #ff0000; color: white; }
-        .badge-chrome { background: #4285f4; color: white; }
-        .badge-firefox { background: #ff7139; color: white; }
-        .badge-edge { background: #0078d4; color: white; }
-        .badge-brave { background: #fb542b; color: white; }
-
-        .search-query {
-            max-width: 400px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
 
         .empty-state {
             text-align: center;
@@ -297,20 +374,6 @@
             color: #374151;
         }
 
-        .info-box {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #4f46e5;
-        }
-
-        .info-box p {
-            margin: 0;
-            color: #374151;
-            font-size: 0.9rem;
-        }
-
         .loading {
             text-align: center;
             padding: 50px;
@@ -318,159 +381,96 @@
         }
 
         .error {
-            background: #e74c3c;
+            background: #ef4444;
             color: white;
             padding: 15px;
             border-radius: 8px;
             margin: 20px 0;
         }
 
-        /* Mobile-first responsive design */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-            
+
             .container {
                 border-radius: 15px;
             }
-            
+
             .header {
                 padding: 20px 15px;
             }
-            
+
             .header h1 {
                 font-size: 1.8rem;
                 margin-bottom: 8px;
             }
-            
+
             .header .subtitle {
                 font-size: 0.9rem;
             }
-            
+
             .controls {
                 padding: 20px 15px;
             }
-            
+
             .control-group {
                 flex-direction: column;
                 align-items: stretch;
                 gap: 15px;
             }
-            
+
             .form-group label {
                 font-size: 0.85rem;
             }
-            
-            select {
-                min-width: auto;
+
+            .form-group input, .form-group select {
                 width: 100%;
                 padding: 15px;
                 font-size: 1.1rem;
             }
-            
+
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
                 padding: 20px 15px;
             }
-            
+
             .stat-card {
                 padding: 20px 15px;
             }
-            
+
             .stat-card i {
                 font-size: 2rem;
             }
-            
+
             .stat-card .number {
                 font-size: 1.8rem;
             }
-            
+
             .tab-content {
                 padding: 20px 15px;
             }
-            
+
             .chart-container {
                 padding: 20px 15px;
             }
-            
+
             .chart-wrapper {
                 height: 300px;
             }
-            
+
             .data-table {
                 overflow-x: auto;
             }
-            
+
             table {
                 min-width: 600px;
             }
-            
+
             th, td {
                 padding: 12px 8px;
                 font-size: 0.85rem;
-            }
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .container {
-                background: #1f2937;
-                color: #f9fafb;
-            }
-            
-            .controls {
-                background: #374151;
-                border-bottom-color: #4a5568;
-            }
-            
-            .form-group input, .form-group select {
-                background: #374151;
-                border-color: #4a5568;
-                color: #f9fafb;
-            }
-            
-            .stats-grid {
-                background: #374151;
-            }
-            
-            .stat-card {
-                background: #374151;
-                border-color: #4a5568;
-            }
-            
-            .stat-card .number {
-                color: #f9fafb;
-            }
-            
-            .tabs {
-                background: #374151;
-                border-bottom-color: #4a5568;
-            }
-            
-            .tab-content {
-                background: #1f2937;
-            }
-            
-            .chart-container, .data-table {
-                background: #374151;
-            }
-            
-            .chart-title {
-                color: #f9fafb;
-            }
-            
-            th {
-                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            }
-            
-            td {
-                border-bottom-color: #4a5568;
-                color: #f9fafb;
-            }
-            
-            tr:hover {
-                background: #4a5568;
             }
         }
     </style>
@@ -486,53 +486,77 @@
             <div class="control-group">
                 <div class="form-group">
                     <label for="pcName"><i class="fas fa-desktop"></i> PC Name</label>
-                    <input type="text" id="pcName" placeholder="Enter PC name (e.g., DESKTOP-7MUAVV6)">
+                    <input type="text" id="pcName" placeholder="Enter PC name (e.g., i3S)">
                 </div>
                 <div class="form-group">
-                    <label for="selectedDate"><i class="fas fa-calendar"></i> Select Date</label>
+                    <label for="selectedDate"><i class="fas fa-calendar"></i> Date</label>
                     <input type="date" id="selectedDate">
                 </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button class="btn" onclick="loadData()">
-                        <i class="fas fa-search"></i> Load Data
-                    </button>
+                <button class="btn" onclick="loadData()">
+                    <i class="fas fa-search"></i>
+                    Load Data
+                </button>
+            </div>
+        </div>
+
+        <!-- PC Status Card -->
+        <div class="pc-status-container" id="pcStatusContainer" style="display:none;">
+            <div class="pc-status-card">
+                <div class="pc-status-header">
+                    <div class="status-indicator-wrapper">
+                        <div class="status-indicator" id="statusIndicator"></div>
+                    </div>
+                    <div class="pc-info">
+                        <h2 id="pcDisplayName"></h2>
+                        <div class="status-text" id="pcStatusText">
+                            <i class="fas fa-circle"></i>
+                            <span>Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="system-info-grid" id="systemInfoGrid">
+                    <!-- System info will be populated here -->
+                </div>
+                <!-- Shareable Link Section -->
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <label style="font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-link"></i> Direct Link:
+                        </label>
+                        <input type="text" id="shareableLink" readonly 
+                            style="flex: 1; min-width: 200px; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; background: #f8fafc; color: #374151;"
+                            value="">
+                        <button onclick="copyLink()" 
+                            style="padding: 8px 16px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <p style="margin-top: 8px; font-size: 0.75rem; color: #64748b; font-style: italic;">
+                        <i class="fas fa-info-circle"></i> Use this link for RFID tags or QR codes
+                    </p>
                 </div>
             </div>
         </div>
 
-        <div id="statsGrid" class="stats-grid" style="display: none;">
-            <!-- Stats will be populated here -->
-        </div>
-
-        <div class="tabs" id="tabsContainer" style="display: none;">
-            <button class="tab active" onclick="switchTab('apps')">
-                <i class="fas fa-desktop"></i> App Usage
-            </button>
-            <button class="tab" onclick="switchTab('searches')">
-                <i class="fas fa-search"></i> Search Activity
-            </button>
-        </div>
+        <div id="statsGrid" class="stats-grid" style="display: none;"></div>
 
         <div id="apps-tab" class="tab-content" style="display: none;">
             <div class="chart-container">
-                <div class="chart-title"><i class="fas fa-chart-bar"></i> App Usage Distribution</div>
+                <div class="chart-title">App Usage Distribution</div>
                 <div class="chart-wrapper">
                     <canvas id="appUsageChart"></canvas>
                 </div>
             </div>
-
             <div class="data-table">
                 <table>
                     <thead>
                         <tr>
-                            <th><i class="fas fa-desktop"></i> Application</th>
-                            <th><i class="fas fa-play"></i> Start Time</th>
-                            <th><i class="fas fa-stop"></i> End Time</th>
-                            <th><i class="fas fa-clock"></i> Duration</th>
-                            <th><i class="fas fa-memory"></i> Memory</th>
-                            <th><i class="fas fa-microchip"></i> CPU</th>
-                            <th><i class="fas fa-video"></i> GPU</th>
+                            <th>Application</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Duration</th>
+                            <th>Memory</th>
+                            <th>CPU</th>
                         </tr>
                     </thead>
                     <tbody id="appTableBody">
@@ -542,386 +566,482 @@
             </div>
         </div>
 
-        <div id="searches-tab" class="tab-content" style="display: none;">
-            <div class="chart-container">
-                <div class="chart-title"><i class="fas fa-chart-pie"></i> Search Engine Distribution</div>
-                <div class="chart-wrapper">
-                    <canvas id="searchChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="info-box">
-                <p>
-                    <i class="fas fa-info-circle"></i> 
-                    <strong>Search Query</strong> field contains extracted search terms or browser window titles when search queries are detected.
-                </p>
-            </div>
-
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-globe"></i> Browser</th>
-                            <th><i class="fas fa-search"></i> Search Query</th>
-                            <th><i class="fas fa-external-link-alt"></i> Search Engine</th>
-                            <th><i class="fas fa-clock"></i> Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="searchTableBody">
-                        <!-- Search data will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
         <div id="loadingMessage" class="loading">
-            <i class="fas fa-spinner fa-spin"></i> Enter PC name and click "Load Data" to get started
+            Enter PC name and date to view activity data
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Supabase configuration
         const SUPABASE_URL = 'https://uxhefdybgjluzkbodryd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4aGVmZHliZ2psdXprYm9kcnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDExMzAsImV4cCI6MjA3NjM3NzEzMH0.jvFSOUUNiWvLFdPHplVuRgvKkvt2zlet6NA_x3mLaJM';
-
-        let currentTab = 'apps';
-        let appChart = null;
-        let searchChart = null;
-        let currentData = { appData: [], searchData: [] };
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Set today's date as default
         document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
 
+        let appChart = null;
+
+        // Get URL parameters
+        function getURLParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                pc: params.get('pc') || '',
+                date: params.get('date') || ''
+            };
+        }
+
+        // Update URL without reloading page
+        function updateURL(pcName, date) {
+            const url = new URL(window.location);
+            if (pcName) {
+                url.searchParams.set('pc', pcName);
+            }
+            if (date) {
+                url.searchParams.set('date', date);
+            }
+            window.history.pushState({}, '', url);
+        }
+
+        // Check for URL parameters on page load
+        function checkURLParams() {
+            const params = getURLParams();
+            if (params.pc) {
+                document.getElementById('pcName').value = params.pc;
+                if (params.date) {
+                    document.getElementById('selectedDate').value = params.date;
+                } else {
+                    // If no date in URL, use today's date
+                    document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+                }
+                // Auto-load data
+                loadData();
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkURLParams();
+        });
+
         async function loadData() {
             const pcName = document.getElementById('pcName').value.trim();
-            const selectedDate = document.getElementById('selectedDate').value;
+            let selectedDate = document.getElementById('selectedDate').value;
 
             if (!pcName) {
                 alert('Please enter a PC name');
                 return;
             }
 
-            // Update header
-            document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
+            // If no date selected, use today's date
+            if (!selectedDate) {
+                selectedDate = new Date().toISOString().split('T')[0];
+                document.getElementById('selectedDate').value = selectedDate;
+            }
 
+            // Update URL with current parameters
+            updateURL(pcName, selectedDate);
+
+            // Update header and show loading state
+            document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
             document.getElementById('loadingMessage').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
             document.getElementById('loadingMessage').style.display = 'block';
             document.getElementById('statsGrid').style.display = 'none';
-            document.getElementById('tabsContainer').style.display = 'none';
+            document.getElementById('pcStatusContainer').style.display = 'none';
+            document.getElementById('apps-tab').style.display = 'none';
 
             try {
-                // Fetch data from Supabase
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/app_usage_logs?pc_name=eq.${pcName}&start_time=gte.${selectedDate}T00:00:00&start_time=lte.${selectedDate}T23:59:59`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                // Fetch PC status (handle case where table might not exist)
+                let isOnline = false;
+                let statusData = null;
+                try {
+                    const { data: statusDataResult, error: statusError } = await supabase
+                        .from('pc_status')
+                        .select('*')
+                        .eq('pc_name', pcName)
+                        .single();
+
+                    if (!statusError && statusDataResult) {
+                        statusData = statusDataResult;
+                        isOnline = statusData.is_online || false;
                     }
-                });
+                } catch (err) {
+                    // Table might not exist, use default offline status
+                    console.warn('Could not fetch PC status:', err);
+                }
 
-                const appData = await response.json();
+                // Fetch system info
+                let systemInfo = null;
+                try {
+                    const { data: systemInfoData, error: systemInfoError } = await supabase
+                        .from('system_info')
+                        .select('*')
+                        .eq('pc_name', pcName)
+                        .single();
 
-                const searchResponse = await fetch(`${SUPABASE_URL}/rest/v1/browser_search_logs?pc_name=eq.${pcName}&timestamp=gte.${selectedDate}T00:00:00&timestamp=lte.${selectedDate}T23:59:59`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    if (!systemInfoError && systemInfoData) {
+                        systemInfo = systemInfoData;
                     }
-                });
+                } catch (err) {
+                    console.warn('Could not fetch system info:', err);
+                }
 
-                const searchData = await searchResponse.json();
+                updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
 
-                // Store data globally
-                currentData = { appData, searchData };
+                // Fetch app usage data
+                const startDate = `${selectedDate}T00:00:00`;
+                const endDate = `${selectedDate}T23:59:59`;
 
-                // Process data
-                processData(appData, searchData, pcName, selectedDate);
+                const { data: appData, error: appError } = await supabase
+                    .from('app_usage_logs')
+                    .select('*')
+                    .eq('pc_name', pcName)
+                    .gte('start_time', startDate)
+                    .lte('end_time', endDate)
+                    .order('start_time', { ascending: false });
+
+                if (appError) {
+                    console.error('App data error:', appError);
+                    throw appError;
+                }
+
+                // Process and display data
+                processData(appData || []);
 
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('loadingMessage').innerHTML = '<div class="error">Error loading data. Please check your Supabase configuration.</div>';
+                document.getElementById('loadingMessage').innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Error loading data. Please check your connection and try again.
+                    </div>`;
             }
         }
 
-        function processData(appData, searchData, pcName, selectedDate) {
-            // Calculate summary stats
+        function processData(appData) {
+            // Calculate stats
             const totalAppSessions = appData.length;
             const totalAppTime = appData.reduce((sum, row) => sum + (row.duration_seconds || 0), 0);
-            const totalSearches = searchData.length;
-            const actualQueries = searchData.filter(row => row.search_query && row.search_query.trim() !== '' && row.search_query !== 'N/A').length;
-            const uniqueEngines = new Set(searchData.map(row => row.search_engine).filter(engine => engine)).size;
 
-            // Display stats
-            displayStats(totalAppSessions, totalAppTime, totalSearches, actualQueries, uniqueEngines);
-
-            // Process chart data
-            const appChartData = processAppChartData(appData);
-            const searchChartData = processSearchChartData(searchData);
-
-            // Create charts
-            createAppChart(appChartData);
-            createSearchChart(searchChartData);
-
-            // Populate tables
-            populateAppTable(appData);
-            populateSearchTable(searchData);
-
-            // Show results
-            document.getElementById('loadingMessage').style.display = 'none';
-            document.getElementById('statsGrid').style.display = 'grid';
-            document.getElementById('tabsContainer').style.display = 'flex';
-            document.getElementById('apps-tab').style.display = 'block';
-        }
-
-        function displayStats(appSessions, appTime, searches, queries, uniqueEngines) {
-            const statsGrid = document.getElementById('statsGrid');
-            statsGrid.innerHTML = `
+            // Update stats grid
+            document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card">
                     <i class="fas fa-desktop"></i>
-                    <div class="number">${appSessions}</div>
+                    <div class="number">${totalAppSessions}</div>
                     <div class="label">App Sessions</div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-clock"></i>
-                    <div class="number">${Math.round(appTime / 3600 * 10) / 10}h</div>
+                    <div class="number">${formatDuration(totalAppTime)}</div>
                     <div class="label">Total Usage</div>
                 </div>
-                <div class="stat-card" title="Actual search queries detected (${searches} total browser activities)">
-                    <i class="fas fa-search"></i>
-                    <div class="number">${queries}</div>
-                    <div class="label">Search Queries</div>
-                    <div style="font-size: 0.7rem; opacity: 0.8; margin-top: 5px;">
-                        (${searches} browser activities)
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-globe"></i>
-                    <div class="number">${uniqueEngines}</div>
-                    <div class="label">Search Engines</div>
-                </div>
             `;
+
+            // Populate tables
+            populateAppTable(appData);
+
+            // Create charts
+            createAppChart(appData);
+
+            // Show content
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('statsGrid').style.display = 'grid';
+            document.getElementById('apps-tab').style.display = 'block';
         }
 
-        function processAppChartData(appData) {
-            const appUsageByApp = {};
-            appData.forEach(row => {
-                const appName = row.app_name;
-                if (!appUsageByApp[appName]) {
-                    appUsageByApp[appName] = 0;
-                }
-                appUsageByApp[appName] += row.duration_seconds || 0;
-            });
+        function populateAppTable(appData) {
+            const tbody = document.getElementById('appTableBody');
 
-            return Object.entries(appUsageByApp).map(([app, duration]) => ({
-                app,
-                duration
-            }));
-        }
-
-        function processSearchChartData(searchData) {
-            const searchByEngine = {};
-            searchData.forEach(row => {
-                const engine = row.search_engine || 'Unknown';
-                if (!searchByEngine[engine]) {
-                    searchByEngine[engine] = 0;
-                }
-                searchByEngine[engine]++;
-            });
-
-            return Object.entries(searchByEngine).map(([engine, count]) => ({
-                engine,
-                count
-            }));
-        }
-
-        function createAppChart(data) {
-            const ctx = document.getElementById('appUsageChart').getContext('2d');
-            
-            if (appChart) {
-                appChart.destroy();
+            if (appData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <i class="fas fa-desktop"></i>
+                            <h3>No App Usage Data</h3>
+                            <p>No application usage recorded for this date</p>
+                        </td>
+                    </tr>`;
+                return;
             }
 
-            if (data.length === 0) {
-                ctx.font = '16px Arial';
-                ctx.fillStyle = '#64748b';
-                ctx.textAlign = 'center';
-                ctx.fillText('No app usage data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                return;
+            tbody.innerHTML = appData.map(entry => {
+                const duration = formatDuration(entry.duration_seconds || 0);
+                const memory = entry.memory_usage_bytes ? formatBytes(entry.memory_usage_bytes) : 'N/A';
+                const cpu = entry.cpu_percent ? `${Math.round(entry.cpu_percent)}%` : 'N/A';
+
+                return `
+                    <tr>
+                        <td>${escapeHtml(entry.app_name)}</td>
+                        <td>${formatTime(entry.start_time)}</td>
+                        <td>${formatTime(entry.end_time)}</td>
+                        <td>${duration}</td>
+                        <td>${memory}</td>
+                        <td>${cpu}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+
+        function createAppChart(appData) {
+            const ctx = document.getElementById('appUsageChart').getContext('2d');
+            const appUsage = {};
+
+            appData.forEach(entry => {
+                if (!appUsage[entry.app_name]) {
+                    appUsage[entry.app_name] = 0;
+                }
+                appUsage[entry.app_name] += entry.duration_seconds || 0;
+            });
+
+            if (appChart) {
+                appChart.destroy();
             }
 
             appChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(item => item.app),
+                    labels: Object.keys(appUsage),
                     datasets: [{
-                        label: 'Usage Time (seconds)',
-                        data: data.map(item => item.duration),
-                        backgroundColor: 'rgba(79, 70, 229, 0.8)',
-                        borderColor: 'rgba(79, 70, 229, 1)',
-                        borderWidth: 1
+                        label: 'Usage Time (minutes)',
+                        data: Object.values(appUsage).map(seconds => Math.round(seconds / 60)),
+                        backgroundColor: '#4f46e5'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    devicePixelRatio: 1,
-                    plugins: {
-                        legend: {
-                            display: false
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }
             });
         }
 
-        function createSearchChart(data) {
-            const ctx = document.getElementById('searchChart').getContext('2d');
+
+        function updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const pcDisplayName = document.getElementById('pcDisplayName');
+            const pcStatusText = document.getElementById('pcStatusText');
+            const systemInfoGrid = document.getElementById('systemInfoGrid');
+
+            pcDisplayName.textContent = pcName;
             
-            if (searchChart) {
-                searchChart.destroy();
+            const statusIcon = isOnline ? 'fa-check-circle' : 'fa-times-circle';
+            const statusLabel = isOnline ? 'Online' : 'Offline';
+            const statusColor = isOnline ? '#22c55e' : '#ef4444';
+            
+            pcStatusText.innerHTML = `
+                <i class="fas ${statusIcon}" style="color: ${statusColor}"></i>
+                <span>${statusLabel}</span>
+            `;
+
+            if (isOnline) {
+                statusIndicator.classList.remove('offline');
+            } else {
+                statusIndicator.classList.add('offline');
             }
 
-            if (data.length === 0) {
-                ctx.font = '16px Arial';
-                ctx.fillStyle = '#64748b';
-                ctx.textAlign = 'center';
-                ctx.fillText('No search data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                return;
+            // Display system info
+            if (systemInfo) {
+                systemInfoGrid.innerHTML = `
+                    ${systemInfo.cpu_model ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-microchip"></i> CPU</div>
+                            <div class="value">${escapeHtml(systemInfo.cpu_model)}</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.cpu_cores ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-layer-group"></i> Cores</div>
+                            <div class="value">${systemInfo.cpu_cores}</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.cpu_speed_ghz ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-tachometer-alt"></i> CPU Speed</div>
+                            <div class="value">${systemInfo.cpu_speed_ghz} GHz</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.total_memory_gb ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-memory"></i> RAM</div>
+                            <div class="value">${systemInfo.total_memory_gb} GB</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.os_platform ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-desktop"></i> OS</div>
+                            <div class="value">${escapeHtml(systemInfo.os_platform)}</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.os_version ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-code-branch"></i> OS Version</div>
+                            <div class="value">${escapeHtml(systemInfo.os_version)}</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.hostname ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-network-wired"></i> Hostname</div>
+                            <div class="value">${escapeHtml(systemInfo.hostname)}</div>
+                        </div>
+                    ` : ''}
+                    ${statusData && statusData.last_seen ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-clock"></i> Last Seen</div>
+                            <div class="value">${formatDateTime(statusData.last_seen)}</div>
+                        </div>
+                    ` : ''}
+                `;
+            } else {
+                // Show basic info if system_info not available
+                systemInfoGrid.innerHTML = `
+                    ${statusData && statusData.last_seen ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-clock"></i> Last Seen</div>
+                            <div class="value">${formatDateTime(statusData.last_seen)}</div>
+                        </div>
+                    ` : ''}
+                    ${!systemInfo ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-info-circle"></i> System Info</div>
+                            <div class="value">Not Available</div>
+                        </div>
+                    ` : ''}
+                `;
             }
 
-            const colors = [
-                'rgba(79, 70, 229, 0.8)',
-                'rgba(124, 58, 237, 0.8)',
-                'rgba(66, 133, 244, 0.8)',
-                'rgba(0, 120, 212, 0.8)',
-                'rgba(96, 1, 210, 0.8)',
-                'rgba(222, 88, 51, 0.8)'
-            ];
+            document.getElementById('pcStatusContainer').style.display = 'block';
+            
+            // Update shareable link (use the selectedDate from the function parameter)
+            updateShareableLink(pcName, selectedDate);
+        }
 
-            searchChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.map(item => item.engine),
-                    datasets: [{
-                        data: data.map(item => item.count),
-                        backgroundColor: colors.slice(0, data.length),
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    devicePixelRatio: 1,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
+        function updateShareableLink(pcName, date) {
+            // Use current page URL
+            const currentURL = window.location.origin + window.location.pathname;
+            const url = new URL(currentURL);
+            url.searchParams.set('pc', pcName);
+            if (date) {
+                url.searchParams.set('date', date);
+            }
+            const shareableLink = document.getElementById('shareableLink');
+            if (shareableLink) {
+                shareableLink.value = url.toString();
+            }
+        }
+
+        function copyLink(event) {
+            const linkInput = document.getElementById('shareableLink');
+            if (!linkInput.value) return;
+            
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); // For mobile devices
+            
+            const copyToClipboard = () => {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(linkInput.value).then(() => {
+                            showCopyFeedback(event);
+                        }).catch(() => {
+                            // Fallback to execCommand
+                            document.execCommand('copy');
+                            showCopyFeedback(event);
+                        });
+                    } else {
+                        // Fallback for older browsers
+                        document.execCommand('copy');
+                        showCopyFeedback(event);
                     }
+                } catch (err) {
+                    console.error('Failed to copy:', err);
                 }
-            });
-        }
-
-        function populateAppTable(appData) {
-            const tbody = document.getElementById('appTableBody');
+            };
             
-            if (appData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="empty-state">
-                            <i class="fas fa-desktop"></i>
-                            <h3>No App Usage Data</h3>
-                            <p>No application usage recorded for this date.</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = appData.map(entry => `
-                <tr>
-                    <td><strong>${escapeHtml(entry.app_name)}</strong></td>
-                    <td>${formatTime(entry.start_time)}</td>
-                    <td>${formatTime(entry.end_time)}</td>
-                    <td>${Math.round(entry.duration_seconds / 60 * 10) / 10} min</td>
-                    <td>${Math.round(entry.memory_usage_bytes / 1048576 * 10) / 10} MB</td>
-                    <td>${Math.round(entry.cpu_percent * 10) / 10}%</td>
-                    <td>${entry.gpu_percent ? Math.round(entry.gpu_percent * 10) / 10 + '%' : 'N/A'}</td>
-                </tr>
-            `).join('');
+            copyToClipboard();
         }
 
-        function populateSearchTable(searchData) {
-            const tbody = document.getElementById('searchTableBody');
+        function showCopyFeedback(event) {
+            const button = event ? event.target.closest('button') : document.querySelector('button[onclick="copyLink()"]');
+            if (!button) return;
             
-            if (searchData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <h3>No Search Activity</h3>
-                            <p>No search queries or browser activities recorded for this date.</p>
-                            <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px;">
-                                <i class="fas fa-info-circle"></i> 
-                                Make sure the client application is running and browsers are being used.
-                            </p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = searchData.map(entry => `
-                <tr>
-                    <td>
-                        <span class="badge badge-${entry.browser.toLowerCase()}">
-                            ${escapeHtml(entry.browser)}
-                        </span>
-                    </td>
-                    <td class="search-query" title="${escapeHtml(entry.search_query || '')}">
-                        ${formatSearchQuery(entry.search_query)}
-                    </td>
-                    <td>
-                        ${entry.search_engine ? 
-                            `<span class="badge badge-${entry.search_engine.toLowerCase()}">${escapeHtml(entry.search_engine)}</span>` : 
-                            '<span style="color: #64748b;">N/A</span>'
-                        }
-                    </td>
-                    <td>${formatTime(entry.timestamp)}</td>
-                </tr>
-            `).join('');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            button.style.background = '#22c55e';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#4f46e5';
+            }, 2000);
         }
+
 
         function formatTime(timeString) {
-            return new Date(timeString).toLocaleTimeString('en-US', { 
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
-
-        function formatSearchQuery(query) {
-            if (!query || query === 'N/A') {
-                return '<span style="color: #64748b;">No search query detected</span>';
+            if (!timeString) return 'N/A';
+            try {
+                const date = new Date(timeString);
+                if (isNaN(date.getTime())) {
+                    // If it's not a valid date, try to parse as-is
+                    return timeString;
+                }
+                return date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true 
+                });
+            } catch (e) {
+                return timeString;
             }
-            return escapeHtml(query);
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return 'N/A';
+            try {
+                const date = new Date(dateTimeString);
+                if (isNaN(date.getTime())) {
+                    return dateTimeString;
+                }
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            } catch (e) {
+                return dateTimeString;
+            }
         }
 
-        function switchTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        function formatDuration(seconds) {
+            if (!seconds) return '0m';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            }
+            return `${minutes}m`;
+        }
 
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-            document.getElementById(`${tabName}-tab`).style.display = 'block';
+        function formatBytes(bytes) {
+            if (!bytes) return '0 B';
+            const mb = bytes / (1024 * 1024);
+            return `${Math.round(mb * 10) / 10} MB`;
+        }
 
-            currentTab = tabName;
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
     </script>
 </body>

@@ -2,19 +2,37 @@
 
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 console.log('🚀 Starting RFID Monitoring Server...');
 console.log('📋 Configuration:');
-console.log('   - Database: Local SQLite (no XAMPP required)');
-console.log('   - WebSocket: Port 8080 (accepts connections from any IP)');
-console.log('   - HTTP API: Port 3000 (accepts connections from any IP)');
-console.log('   - Auto-fallback: Will use Supabase if configured');
+
+// Load server-config.env if it exists
+const envFile = path.join(__dirname, 'server-config.env');
+if (fs.existsSync(envFile)) {
+  require('dotenv').config({ path: envFile });
+  console.log('   - Config file: server-config.env');
+} else if (fs.existsSync(path.join(__dirname, '.env'))) {
+  require('dotenv').config();
+  console.log('   - Config file: .env');
+} else {
+  console.log('   - Config file: Using defaults (no config file found)');
+}
+
+const dbType = process.env.DB_TYPE || 'memory';
+const port = process.env.PORT || 3000;
+const wsPort = process.env.WS_PORT || 8080;
+
+console.log(`   - Database: ${dbType}`);
+console.log(`   - WebSocket: Port ${wsPort} (accepts connections from any IP)`);
+console.log(`   - HTTP API: Port ${port} (accepts connections from any IP)`);
 console.log('');
 
 // Start the server
 const serverProcess = spawn('node', ['server/server.js'], {
   stdio: 'inherit',
-  cwd: __dirname
+  cwd: __dirname,
+  env: { ...process.env }
 });
 
 serverProcess.on('close', (code) => {

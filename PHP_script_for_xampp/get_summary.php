@@ -763,7 +763,7 @@ if ($pcName) {
                             </tr>
                         <?php else: ?>
                             <?php foreach ($searchData as $entry): ?>
-                                <tr>
+                <tr>
                                     <td>
                                         <span class="badge badge-<?= strtolower($entry['browser']) ?>">
                                             <?= htmlspecialchars($entry['browser']) ?>
