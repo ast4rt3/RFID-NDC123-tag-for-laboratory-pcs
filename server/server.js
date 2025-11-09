@@ -2,11 +2,26 @@ const express = require('express');
 const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const os = require('os');
 const Database = require('./database');
 const { to12HourFormat } = require('./database');
 
 // Load environment variables
 require('dotenv').config();
+
+// Get IPv4 address
+function getIPv4Address() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      // Skip internal (loopback) and non-IPv4 addresses
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return '127.0.0.1'; // Fallback to localhost
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,9 +36,7 @@ const db = new Database();
 
 // Test database connection (non-blocking)
 db.testConnection().then(connected => {
-  if (connected) {
-    console.log('✅ Database connection successful');
-  } else {
+  if (!connected) {
     console.warn('⚠️ Database connection failed, but server will continue running');
   }
 });
@@ -32,15 +45,15 @@ db.testConnection().then(connected => {
 const activeSessions = {}; // { clientId: { pc_name, start_time } }
 const appActiveSessions = {}; // { clientId: { app_name, start_time } }
 
+// Get IPv4 address
+const ipv4Address = getIPv4Address();
+
 // WebSocket server - bind to all interfaces for remote connections
 const wss = new WebSocket.Server({ port: wsPort, host: '0.0.0.0' });
-console.log(`✅ WebSocket listening on ws://0.0.0.0:${wsPort}`);
-console.log(`✅ Local connections: ws://127.0.0.1:${wsPort}`);
-console.log(`✅ Remote connections: ws://192.168.141.106:${wsPort}`);
+console.log(`✅ Server started - ipv4Address: ws://${ipv4Address}:${wsPort}`);
 
 // On connection
 wss.on('connection', ws => {
-  console.log('💻 PC connected');
   let clientId = null;
 
   ws.on('message', async (msg) => {
@@ -48,7 +61,12 @@ wss.on('connection', ws => {
 
     if (data.type === 'start') {
       // PC starts
-      clientId = data.pc_name;
+      if (!clientId) {
+        clientId = data.pc_name;
+        console.log(`💻 PC connected: ${clientId}`);
+      } else {
+        clientId = data.pc_name;
+      }
       const startTime = new Date();
       const formattedStart = to12HourFormat(startTime);
       activeSessions[clientId] = { start_time: formattedStart };
@@ -56,9 +74,8 @@ wss.on('connection', ws => {
       try {
         await db.updatePCStatus(clientId, true, formattedStart, formattedStart);
       } catch (error) {
-        console.warn('Failed to update PC status:', error);
+        console.error(`[${clientId}] Failed to update PC status:`, error.message);
       }
-      console.log(`▶ Started session for ${clientId} at ${formattedStart}`);
     } else if (data.type === 'stop') {
       // PC stops
       if (activeSessions[data.pc_name]) {
@@ -132,7 +149,6 @@ wss.on('connection', ws => {
     
     // Handle browser activity messages
     else if (data.type === 'browser_activity') {
-      console.log('🔍 Browser activity logged:', data);
       db.insertBrowserSearchLog(
         data.pc_name,
         data.browser,
@@ -145,7 +161,6 @@ wss.on('connection', ws => {
     
     // Handle browser history messages
     else if (data.type === 'browser_history') {
-      console.log('📚 Browser history logged:', data.entries?.length || 0, 'entries');
       if (data.entries && data.entries.length > 0) {
         data.entries.forEach(entry => {
           db.insertBrowserSearchLog(
@@ -157,13 +172,11 @@ wss.on('connection', ws => {
             entry.timestamp
           );
         });
-        console.log('✅ Browser history saved to database');
       }
     }
     
     // Handle browser extension search messages
     else if (data.type === 'browser_extension_search') {
-      console.log('🔌 Extension search logged:', data);
       db.insertBrowserSearchLog(
         data.pc_name,
         data.browser,
@@ -177,15 +190,24 @@ wss.on('connection', ws => {
 
   ws.on('close', () => {
     if (clientId && activeSessions[clientId]) {
+      console.log(`💻 PC disconnected: ${clientId}`);
       const endTime = new Date();
       const formattedEnd = to12HourFormat(endTime);
       const startTime = activeSessions[clientId].start_time;
       const startDate = new Date(startTime);
       const duration = Math.floor((endTime - startDate) / 1000);
-      db.insertTimeLog(clientId, startTime, formattedEnd, duration);
-      db.updatePCStatus(clientId, false, formattedEnd, formattedEnd);
+      db.insertTimeLog(clientId, startTime, formattedEnd, duration).catch(err => {
+        console.error(`[${clientId}] Error on disconnect:`, err.message);
+      });
+      db.updatePCStatus(clientId, false, formattedEnd, formattedEnd).catch(err => {
+        console.error(`[${clientId}] Error updating status on disconnect:`, err.message);
+      });
       delete activeSessions[clientId];
     }
+  });
+
+  ws.on('error', (error) => {
+    console.error(`[${clientId || 'unknown'}] WebSocket error:`, error.message);
   });
 });
 
@@ -216,5 +238,14 @@ app.get('/browser-logs', async (req, res) => {
 });
 
 app.listen(port, '0.0.0.0', () => {
-  console.log(`✅ API listening on http://0.0.0.0:${port}`);
+  // Server startup message already logged above
+});
+
+// Handle uncaught errors gracefully
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error.message);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });

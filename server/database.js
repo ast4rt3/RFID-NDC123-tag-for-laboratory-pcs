@@ -81,7 +81,7 @@ class Database {
         this.init();
         return;
       }
-      console.log('✅ Using Supabase database');
+      // Using Supabase database
     } else {
       // Use in-memory storage for now (no sqlite3 dependency)
       this.db = {
@@ -90,7 +90,7 @@ class Database {
         browserSearchLogs: [],
         pcStatus: {}  // Initialize pcStatus storage
       };
-      console.log('✅ Using in-memory storage');
+      // Using in-memory storage
     }
   }
 
@@ -153,7 +153,6 @@ class Database {
           console.error('Error creating local tables:', err);
           reject(err);
         } else {
-          console.log('✅ Local database tables initialized');
           resolve();
         }
       });
@@ -187,7 +186,7 @@ class Database {
         created_at: to12HourFormat(new Date())
       };
       this.db.timeLogs.push(log);
-      console.log(`💾 Log saved for ${pcName}`);
+      // Log saved silently
       return Promise.resolve();
     }
   }
@@ -214,7 +213,7 @@ class Database {
         created_at: to12HourFormat(new Date())
       };
       this.db.appUsageLogs.push(log);
-      console.log('App usage log saved');
+      // App usage log saved silently
       return Promise.resolve();
     }
   }
@@ -238,7 +237,7 @@ class Database {
         created_at: to12HourFormat(new Date())
       };
       this.db.browserSearchLogs.push(log);
-      console.log('✅ Browser activity saved to database');
+      // Browser activity saved silently
       return Promise.resolve();
     }
   }
@@ -299,7 +298,7 @@ class Database {
         if (!this.db.pcStatus) this.db.pcStatus = {};
         this.db.pcStatus[pcName] = pcStatus;
       }
-      console.log(`PC status updated for ${pcName}: ${isOnline ? 'online' : 'offline'}`);
+      // PC status updated silently
       return Promise.resolve();
     } catch (error) {
       console.error('Error updating PC status:', error);

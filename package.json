@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node start-server.js",
     "start-server": "node server/server.js",
+    "start-server-tray": "electron server-tray/main.js",
     "start-client": "electron client/main.js",
     "dev": "electron client/main.js --dev",
     "prebuild": "node download-librehardwaremonitor.js",
