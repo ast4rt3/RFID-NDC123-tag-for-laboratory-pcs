@@ -84,20 +84,58 @@ ws.on('open', () => {
 
     const appName = result.owner.name;
     const processId = result.owner.processId;
-    const memoryUsage = result.memoryUsage;
+    const memoryUsage = result.memoryUsage; // in bytes
+    const windowTitle = result.title || '';
+    const windowUrl = result.url || '';
     
+    // Debug: Log what we're getting from active-win
+    console.log('🔍 Extracted data:', {
+      appName,
+      windowTitle,
+      windowUrl,
+      hasUrl: !!windowUrl,
+      hasTitle: !!windowTitle
+    });
+
     let cpuPercent = null;
     try {
       const stats = await pidusage(processId);
-      cpuPercent = stats.cpu;
+      cpuPercent = stats.cpu; // percent
     } catch (e) {
       cpuPercent = null;
     }
 
     if (IGNORED_APPS.includes(appName)) {
+      // If the current app is ignored, do not update lastApp or lastStart
       return;
     }
     const now = new Date();
+
+    // Enhanced browser tracking
+    let browserData = null;
+    if (isBrowserApp(appName)) {
+      console.log('🔍 Browser detected:', appName);
+      console.log('🔍 Window title:', windowTitle);
+      console.log('🔍 Window URL:', windowUrl);
+      
+      browserData = extractBrowserData(appName, windowTitle, windowUrl);
+      console.log('🔍 Extracted browser data:', browserData);
+      
+      // Merge window title and search query into one field
+      let finalSearchQuery = browserData.searchQuery || windowTitle || '';
+      
+      // Send browser activity data immediately (even if no search query)
+      ws.send(JSON.stringify({
+        type: 'browser_activity',
+        pc_name: pcName,
+        browser: appName,
+        url: windowUrl,
+        search_query: finalSearchQuery,
+        search_engine: browserData.searchEngine,
+        timestamp: toPhilippineTimeString(now)
+      }));
+      console.log('🔍 Sent browser activity to server');
+    }
 
     // Get GPU usage and send the log inside the callback
     getSystemGpuUsage((gpuPercent) => {
@@ -166,6 +204,40 @@ ws.on('open', () => {
     });
   }, 3000); // 3 seconds
   // --- End app usage tracking ---
+
+  // --- Browser history collection (every 5 minutes) ---
+  setInterval(async () => {
+    try {
+      console.log('Collecting browser history...');
+      // Browser history collection temporarily disabled
+      // const historyEntries = await collectBrowserHistory();
+      
+      // Browser history processing temporarily disabled
+      // if (historyEntries.length > 0) {
+      //   console.log(`Found ${historyEntries.length} search entries in browser history`);
+      //   
+      //   // Send each history entry to server
+      //   for (const entry of historyEntries) {
+      //     ws.send(JSON.stringify({
+      //       type: 'browser_history',
+      //       pc_name: pcName,
+      //       browser: entry.browser,
+      //       window_title: entry.title,
+      //       url: entry.url,
+      //       search_query: entry.searchQuery,
+      //       search_engine: entry.searchEngine,
+      //       timestamp: entry.timestamp
+      //     }));
+      //   }
+      //   console.log(`Sent ${historyEntries.length} browser history entries`);
+      // } else {
+      //   console.log('No recent search entries found in browser history');
+      // }
+    } catch (error) {
+      console.error('Error collecting browser history:', error);
+    }
+  }, 300000); // 5 minutes (300000 ms)
+  // --- End browser history collection ---
 });
 
 // Add error and close event logging
@@ -187,7 +259,336 @@ ws.on('close', () => {
   }, 5000);
 });
 
+// Browser detection and data extraction functions
+function isBrowserApp(appName) {
+  const browsers = ['chrome', 'firefox', 'edge', 'safari', 'opera', 'brave', 'vivaldi'];
+  return browsers.some(browser => appName.toLowerCase().includes(browser));
+}
 
+function extractBrowserData(appName, windowTitle, windowUrl) {
+  let searchQuery = null;
+  let searchEngine = null;
+  
+  console.log('🔍 Extracting browser data from:', { appName, windowTitle, windowUrl });
+  
+  // Extract search query from URL
+  if (windowUrl) {
+    try {
+      const url = new URL(windowUrl);
+      console.log('🔍 Parsed URL:', url.hostname, url.searchParams.toString());
+    
+      // Google search (multiple variations)
+      if (url.hostname.includes('google.com')) {
+        searchQuery = url.searchParams.get('q');
+        searchEngine = 'Google';
+      }
+      // Bing search
+      else if (url.hostname.includes('bing.com')) {
+        searchQuery = url.searchParams.get('q');
+        searchEngine = 'Bing';
+      }
+      // Yahoo search
+      else if (url.hostname.includes('yahoo.com')) {
+        searchQuery = url.searchParams.get('p') || url.searchParams.get('q');
+        searchEngine = 'Yahoo';
+      }
+      // DuckDuckGo search
+      else if (url.hostname.includes('duckduckgo.com')) {
+        searchQuery = url.searchParams.get('q');
+        searchEngine = 'DuckDuckGo';
+      }
+      // YouTube search
+      else if (url.hostname.includes('youtube.com')) {
+        searchQuery = url.searchParams.get('search_query');
+        searchEngine = 'YouTube';
+      }
+      // Brave search
+      else if (url.hostname.includes('search.brave.com')) {
+        searchQuery = url.searchParams.get('q');
+        searchEngine = 'Brave';
+      }
+      // Startpage search
+      else if (url.hostname.includes('startpage.com')) {
+        searchQuery = url.searchParams.get('query');
+        searchEngine = 'Startpage';
+      }
+      
+      console.log('🔍 URL extraction result:', { searchQuery, searchEngine });
+    } catch (e) {
+      console.log('🔍 Invalid URL:', e.message);
+    }
+  }
+  
+  // Fallback: Extract from window title (more comprehensive patterns)
+  if (!searchQuery && windowTitle) {
+    console.log('🔍 Trying title extraction for:', windowTitle);
+    
+    // More comprehensive title patterns
+    const titlePatterns = [
+      // Google variations
+      /^(.+?) - Google Search$/,
+      /^(.+?) - Google$/,
+      /Google Search - (.+)$/,
+      
+      // Bing variations
+      /^(.+?) - Bing$/,
+      /^(.+?) - Microsoft Bing$/,
+      
+      // Yahoo variations
+      /^(.+?) - Yahoo Search$/,
+      /^(.+?) - Yahoo$/,
+      
+      // DuckDuckGo variations
+      /^(.+?) - DuckDuckGo$/,
+      /DuckDuckGo - (.+)$/,
+      
+      // YouTube variations
+      /^(.+?) - YouTube$/,
+      /YouTube - (.+)$/,
+      
+      // Generic search patterns
+      /^(.+?) - Search$/,
+      /Search results for "(.+?)"/,
+      /"(.+?)" - Search results/,
+      
+      // Browser-specific patterns
+      /^(.+?) - Chrome$/,
+      /^(.+?) - Firefox$/,
+      /^(.+?) - Edge$/,
+      /^(.+?) - Brave$/
+    ];
+    
+    for (const pattern of titlePatterns) {
+      const match = windowTitle.match(pattern);
+      if (match) {
+        searchQuery = match[1] || match[2];
+        
+        // Determine search engine from title
+        if (windowTitle.includes('Google')) searchEngine = 'Google';
+        else if (windowTitle.includes('Bing')) searchEngine = 'Bing';
+        else if (windowTitle.includes('Yahoo')) searchEngine = 'Yahoo';
+        else if (windowTitle.includes('DuckDuckGo')) searchEngine = 'DuckDuckGo';
+        else if (windowTitle.includes('YouTube')) searchEngine = 'YouTube';
+        else if (windowTitle.includes('Brave')) searchEngine = 'Brave';
+        else searchEngine = 'Unknown';
+        
+        console.log('🔍 Title extraction match:', { searchQuery, searchEngine, pattern: pattern.toString() });
+        break;
+      }
+    }
+  }
+  
+  // Final fallback: If we have a browser but no search query, still log the activity
+  if (!searchQuery && appName) {
+    console.log('🔍 Browser activity without search query detected');
+    
+    // Try to extract search query from window title even if it doesn't match our patterns
+    if (windowTitle && windowTitle.length > 5) {
+      // If title looks like it might contain a search query, use it
+      const suspiciousTitles = ['search', 'google', 'bing', 'yahoo', 'duckduckgo', 'youtube'];
+      if (suspiciousTitles.some(sus => windowTitle.toLowerCase().includes(sus))) {
+        searchQuery = windowTitle; // Use the full title as search query
+        searchEngine = 'Unknown';
+        console.log('🔍 Using full title as search query:', searchQuery);
+      }
+    }
+  }
+  
+  const result = {
+    searchQuery,
+    searchEngine,
+    isSearchPage: !!searchQuery
+  };
+  
+  console.log('🔍 Final extraction result:', result);
+  return result;
+}
+
+// Browser history database access functions
+// Browser history functions temporarily disabled
+// function getBrowserHistoryPaths() {
+//   const homeDir = os.homedir();
+//   const browserPaths = {
+//     chrome: [
+//       path.join(homeDir, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Default', 'History'),
+//       path.join(homeDir, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Profile 1', 'History')
+//     ],
+//     edge: [
+//       path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Default', 'History'),
+//       path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data', 'Profile 1', 'History')
+//     ],
+//     firefox: [
+//       path.join(homeDir, 'AppData', 'Roaming', 'Mozilla', 'Firefox', 'Profiles')
+//     ]
+//   };
+//   
+//   const availablePaths = {};
+//   
+//   // Check Chrome/Edge paths
+//   for (const [browser, paths] of Object.entries(browserPaths)) {
+//     if (browser === 'firefox') continue; // Handle Firefox separately
+//     
+//     for (const dbPath of paths) {
+//       if (fs.existsSync(dbPath)) {
+//         if (!availablePaths[browser]) availablePaths[browser] = [];
+//         availablePaths[browser].push(dbPath);
+//       }
+//     }
+//   }
+//   
+//   // Check Firefox paths
+//   if (fs.existsSync(browserPaths.firefox[0])) {
+//     const firefoxProfiles = fs.readdirSync(browserPaths.firefox[0])
+//       .filter(dir => dir.endsWith('.default-release') || dir.endsWith('.default'))
+//       .map(dir => path.join(browserPaths.firefox[0], dir, 'places.sqlite'));
+//     
+//     availablePaths.firefox = firefoxProfiles.filter(dbPath => fs.existsSync(dbPath));
+//   }
+//   
+//   return availablePaths;
+// }
+
+// function extractSearchFromHistory(browser, dbPath, limit = 50) {
+//   return new Promise((resolve) => {
+//     const searchEntries = [];
+//     
+//     try {
+//       const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY);
+//       
+//       if (browser === 'chrome' || browser === 'edge') {
+//         // Chrome/Edge SQLite query
+//         const query = `
+//           SELECT url, title, last_visit_time 
+//           FROM urls 
+//           WHERE (url LIKE '%google.com/search%' OR 
+//                  url LIKE '%bing.com/search%' OR 
+//                  url LIKE '%yahoo.com/search%' OR 
+//                  url LIKE '%duckduckgo.com/%' OR 
+//                  url LIKE '%youtube.com/results%') 
+//           AND last_visit_time > ${Date.now() * 1000 - (24 * 60 * 60 * 1000)} -- Last 24 hours
+//           ORDER BY last_visit_time DESC 
+//           LIMIT ?
+//         `;
+//         
+//         db.all(query, [limit], (err, rows) => {
+//           if (err) {
+//             console.error(`Error reading ${browser} history:`, err);
+//             resolve([]);
+//             return;
+//           }
+//           
+//           rows.forEach(row => {
+//             const searchData = extractSearchFromURL(row.url);
+//             if (searchData.searchQuery) {
+//               searchEntries.push({
+//                 browser: browser,
+//                 searchQuery: searchData.searchQuery,
+//                 searchEngine: searchData.searchEngine,
+//                 url: row.url,
+//                 title: row.title,
+//                 timestamp: new Date((row.last_visit_time / 1000) - 11644473600).toISOString() // Convert Chrome timestamp
+//               });
+//             }
+//           });
+//           
+//           db.close();
+//           resolve(searchEntries);
+//         });
+//         
+//       } else if (browser === 'firefox') {
+//         // Firefox SQLite query
+//         const query = `
+//           SELECT url, title, last_visit_date 
+//           FROM moz_places 
+//           WHERE (url LIKE '%google.com/search%' OR 
+//                  url LIKE '%bing.com/search%' OR 
+//                  url LIKE '%yahoo.com/search%' OR 
+//                  url LIKE '%duckduckgo.com/%' OR 
+//                  url LIKE '%youtube.com/results%') 
+//           AND last_visit_date > ${Date.now() * 1000} -- Last 24 hours in microseconds
+//           ORDER BY last_visit_date DESC 
+//           LIMIT ?
+//         `;
+//         
+//         db.all(query, [limit], (err, rows) => {
+//           if (err) {
+//             console.error(`Error reading ${browser} history:`, err);
+//             resolve([]);
+//             return;
+//           }
+//           
+//           rows.forEach(row => {
+//             const searchData = extractSearchFromURL(row.url);
+//             if (searchData.searchQuery) {
+//               searchEntries.push({
+//                 browser: browser,
+//                 searchQuery: searchData.searchQuery,
+//                 searchEngine: searchData.searchEngine,
+//                 url: row.url,
+//                 title: row.title,
+//                 timestamp: new Date(row.last_visit_date / 1000).toISOString() // Convert Firefox timestamp
+//               });
+//             }
+//           });
+//           
+//           db.close();
+//           resolve(searchEntries);
+//         });
+//       }
+//       
+//     } catch (error) {
+//       console.error(`Error accessing ${browser} history database:`, error);
+//       resolve([]);
+//     }
+//   });
+// }
+
+function extractSearchFromURL(url) {
+  try {
+    const urlObj = new URL(url);
+    let searchQuery = null;
+    let searchEngine = null;
+    
+    if (urlObj.hostname.includes('google.com') && urlObj.searchParams.has('q')) {
+      searchQuery = urlObj.searchParams.get('q');
+      searchEngine = 'Google';
+    } else if (urlObj.hostname.includes('bing.com') && urlObj.searchParams.has('q')) {
+      searchQuery = urlObj.searchParams.get('q');
+      searchEngine = 'Bing';
+    } else if (urlObj.hostname.includes('yahoo.com') && urlObj.searchParams.has('p')) {
+      searchQuery = urlObj.searchParams.get('p');
+      searchEngine = 'Yahoo';
+    } else if (urlObj.hostname.includes('duckduckgo.com') && urlObj.searchParams.has('q')) {
+      searchQuery = urlObj.searchParams.get('q');
+      searchEngine = 'DuckDuckGo';
+    } else if (urlObj.hostname.includes('youtube.com') && urlObj.searchParams.has('search_query')) {
+      searchQuery = urlObj.searchParams.get('search_query');
+      searchEngine = 'YouTube';
+    }
+    
+    return { searchQuery, searchEngine };
+  } catch (e) {
+    return { searchQuery: null, searchEngine: null };
+  }
+}
+
+// Browser history collection function temporarily disabled
+// async function collectBrowserHistory() {
+//   const browserPaths = getBrowserHistoryPaths();
+//   const allHistoryEntries = [];
+//   
+//   console.log('Available browser history paths:', browserPaths);
+//   
+//   for (const [browser, paths] of Object.entries(browserPaths)) {
+//     for (const dbPath of paths) {
+//       console.log(`Reading ${browser} history from: ${dbPath}`);
+//       const entries = await extractSearchFromHistory(browser, dbPath, 20); // Get last 20 searches per browser
+//       allHistoryEntries.push(...entries);
+//     }
+//   }
+//   
+//   return allHistoryEntries;
+// }
 
 // Robust helper to format date in Philippine Standard Time (UTC+8) in 24-hour format
 function toPhilippineTimeString(date) {

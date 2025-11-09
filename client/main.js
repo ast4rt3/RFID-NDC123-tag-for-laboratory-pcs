@@ -3,12 +3,14 @@ const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
 // const AutoUpdater = require('./auto-updater'); // Disabled for now
+const HardwareMonitorManager = require('./hardware-monitor-manager');
 
 let loggerProcess;
 let tray;
 let settingsWindow;
 let licensingWindow;
 let autoUpdater;
+let hardwareMonitor;
 
 // Create system tray icon
 function createTray() {
@@ -54,12 +56,13 @@ function updateTrayMenu() {
         showSettingsWindow();
       }
     },
-    {
+    /*{
       label: 'Licensing & Documentation',
       click: () => {
         showLicensingWindow();
       }
-    },
+    },*/
+    
     { type: 'separator' },
     {
       label: 'View Status',
@@ -143,7 +146,7 @@ function showSettingsWindow() {
   });
 }
 
-function showLicensingWindow() {
+/*function showLicensingWindow() {
   if (licensingWindow) {
     licensingWindow.focus();
     return;
@@ -169,6 +172,7 @@ function showLicensingWindow() {
     licensingWindow = null;
   });
 }
+*/
 
 function showStatusWindow() {
   const statusWindow = new BrowserWindow({
@@ -293,16 +297,26 @@ function startLoggerProcess() {
 app.whenReady().then(async () => {
   // Create system tray
   createTray();
-  
+
   // Initialize auto-updater
   // autoUpdater = new AutoUpdater({ tray, updateTrayMenu }); // Disabled for now
-  
+
+  // Initialize and start hardware monitor (LibreHardwareMonitor)
+  hardwareMonitor = new HardwareMonitorManager();
+  const hwMonitorStarted = await hardwareMonitor.start();
+
+  if (hwMonitorStarted) {
+    console.log('✅ LibreHardwareMonitor started successfully');
+  } else {
+    console.log('⚠️  LibreHardwareMonitor not available (CPU temperature will return null)');
+  }
+
   // Start the logger process
   startLoggerProcess();
 
   // Prevent the app from showing in the dock (macOS) or taskbar (Windows)
   app.dock?.hide();
-  
+
   // Prevent multiple instances
   const gotTheLock = app.requestSingleInstanceLock();
   if (!gotTheLock) {

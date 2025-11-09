@@ -64,8 +64,8 @@ class SupabaseDB {
   }
 
   // Insert app usage log
-  async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent) {
-    // Build the data object, conditionally including gpu_percent
+  async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent, cpuTemperature, isCpuOverclocked, isRamOverclocked) {
+    // Build the data object, conditionally including optional fields
     const logData = {
       pc_name: pcName,
       app_name: appName,
@@ -79,6 +79,21 @@ class SupabaseDB {
     // Only include gpu_percent if it's provided (for backward compatibility)
     if (gpuPercent !== null && gpuPercent !== undefined) {
       logData.gpu_percent = gpuPercent;
+    }
+
+    // Only include cpu_temperature if it's provided
+    if (cpuTemperature !== null && cpuTemperature !== undefined) {
+      logData.cpu_temperature = cpuTemperature;
+    }
+
+    // Only include is_cpu_overclocked if it's provided
+    if (isCpuOverclocked !== null && isCpuOverclocked !== undefined) {
+      logData.is_cpu_overclocked = isCpuOverclocked;
+    }
+
+    // Only include is_ram_overclocked if it's provided
+    if (isRamOverclocked !== null && isRamOverclocked !== undefined) {
+      logData.is_ram_overclocked = isRamOverclocked;
     }
 
     const { data, error } = await this.client
@@ -227,6 +242,68 @@ class SupabaseDB {
       appStats: appStats || [],
       searchStats: searchStats || []
     };
+  }
+
+  // Upsert system information (insert or update)
+  async upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname) {
+    const systemData = {
+      pc_name: pcName,
+      cpu_model: cpuModel,
+      cpu_cores: cpuCores,
+      cpu_speed_ghz: cpuSpeedGhz,
+      total_memory_gb: totalMemoryGb,
+      os_platform: osPlatform,
+      os_version: osVersion,
+      hostname: hostname
+    };
+
+    const { data, error } = await this.client
+      .from('system_info')
+      .upsert(systemData, {
+        onConflict: 'pc_name'
+      })
+      .select();
+
+    if (error) {
+      console.error('❌ Error upserting system info:', error.message);
+      throw error;
+    }
+
+    console.log(`✅ System info upserted for ${pcName}`);
+    return data;
+  }
+
+  // Update PC status
+  async updatePCStatus(pcStatus) {
+    const { data, error } = await this.client
+      .from('pc_status')
+      .upsert(pcStatus, {
+        onConflict: 'pc_name'
+      })
+      .select();
+
+    if (error) {
+      console.error('❌ Error updating PC status:', error.message);
+      throw error;
+    }
+
+    console.log(`✅ PC status updated for ${pcStatus.pc_name}`);
+    return data;
+  }
+
+  // Get all PC statuses
+  async getAllPCStatus() {
+    const { data, error } = await this.client
+      .from('pc_status')
+      .select('*')
+      .order('pc_name');
+
+    if (error) {
+      console.error('❌ Error fetching PC statuses:', error.message);
+      return [];
+    }
+
+    return data;
   }
 }
 

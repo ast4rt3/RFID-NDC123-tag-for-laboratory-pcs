@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS app_usage_logs (
     memory_usage_bytes BIGINT,
     cpu_percent REAL,
     gpu_percent REAL,
+    cpu_temperature REAL,
+    is_cpu_overclocked BOOLEAN,
+    is_ram_overclocked BOOLEAN,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT unique_app_usage UNIQUE (pc_name, app_name, start_time)
@@ -45,6 +48,21 @@ CREATE TABLE IF NOT EXISTS browser_search_logs (
     CONSTRAINT unique_browser_search UNIQUE (pc_name, browser, url, timestamp)
 );
 
+-- Create system_info table (stores one-time system information per PC)
+CREATE TABLE IF NOT EXISTS system_info (
+    id SERIAL PRIMARY KEY,
+    pc_name VARCHAR(50) NOT NULL UNIQUE,
+    cpu_model VARCHAR(200),
+    cpu_cores INTEGER,
+    cpu_speed_ghz REAL,
+    total_memory_gb REAL,
+    os_platform VARCHAR(50),
+    os_version VARCHAR(100),
+    hostname VARCHAR(100),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_time_logs_pc_name ON time_logs(pc_name);
 CREATE INDEX IF NOT EXISTS idx_time_logs_start_time ON time_logs(start_time);
@@ -56,6 +74,8 @@ CREATE INDEX IF NOT EXISTS idx_app_usage_logs_start_time ON app_usage_logs(start
 CREATE INDEX IF NOT EXISTS idx_browser_search_logs_pc_name ON browser_search_logs(pc_name);
 CREATE INDEX IF NOT EXISTS idx_browser_search_logs_timestamp ON browser_search_logs(timestamp);
 CREATE INDEX IF NOT EXISTS idx_browser_search_logs_search_engine ON browser_search_logs(search_engine);
+
+CREATE INDEX IF NOT EXISTS idx_system_info_pc_name ON system_info(pc_name);
 
 -- Create views for reporting (PostgreSQL equivalent)
 CREATE OR REPLACE VIEW app_daily_summary AS
@@ -102,11 +122,13 @@ ORDER BY t.pc_name ASC, t.start_time DESC;
 ALTER TABLE time_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE app_usage_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE browser_search_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE system_info ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for RLS (allow all operations for now - customize as needed)
 CREATE POLICY "Allow all operations on time_logs" ON time_logs FOR ALL USING (true);
 CREATE POLICY "Allow all operations on app_usage_logs" ON app_usage_logs FOR ALL USING (true);
 CREATE POLICY "Allow all operations on browser_search_logs" ON browser_search_logs FOR ALL USING (true);
+CREATE POLICY "Allow all operations on system_info" ON system_info FOR ALL USING (true);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -124,5 +146,8 @@ CREATE TRIGGER update_time_logs_updated_at BEFORE UPDATE ON time_logs
 CREATE TRIGGER update_app_usage_logs_updated_at BEFORE UPDATE ON app_usage_logs 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_browser_search_logs_updated_at BEFORE UPDATE ON browser_search_logs 
+CREATE TRIGGER update_browser_search_logs_updated_at BEFORE UPDATE ON browser_search_logs
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_system_info_updated_at BEFORE UPDATE ON system_info
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
