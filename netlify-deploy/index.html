@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RFID Laboratory Monitor</title>
+    <title>ICS Lab Monitor</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -394,6 +394,92 @@
             font-size: 1.5rem;
             margin-bottom: 10px;
             color: #374151;
+        }
+
+        /* Task Manager Styles */
+        .task-manager-header-section {
+            margin-bottom: 20px;
+        }
+
+        .task-manager-graph-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .graph-label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .graph-time-label {
+            color: #64748b;
+        }
+
+        .graph-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .task-manager-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .task-manager-stats-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .task-manager-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .task-manager-stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-manager-stat-item .stat-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .task-manager-stat-item .stat-value {
+            font-size: 0.95rem;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .task-manager-stat-item .stat-value-large {
+            font-size: 1.5rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .task-manager-memory-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
         .loading {
@@ -800,6 +886,18 @@
                 width: 100%;
             }
 
+            .task-manager-container {
+                padding: 15px;
+            }
+
+            .task-manager-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .task-manager-memory-stats {
+                grid-template-columns: 1fr;
+            }
+
             .pc-status-card > div:last-child input {
                 width: 100%;
                 min-width: auto;
@@ -814,7 +912,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-desktop"></i> RFID Laboratory Monitor</h1>
+            <h1><i class="fas fa-desktop"></i> ICS Lab Monitor</h1>
             <div class="subtitle" id="headerSubtitle">
                 <span id="headerText">Enter PC name to get started</span>
                 <span class="auto-refresh-indicator" id="refreshIndicator" style="display: none;">
@@ -867,6 +965,10 @@
                         <i class="fas fa-search"></i>
                         Load Data
                     </button>
+                    <button class="btn" onclick="toggleTaskManager()" id="taskManagerBtn" style="background: #4f46e5; color: white;">
+                        <i class="fas fa-tasks"></i>
+                        <span id="taskManagerBtnText">Show Processes</span>
+                    </button>
                 </div>
             </div>
 
@@ -888,6 +990,104 @@
                 <div class="system-info-grid" id="systemInfoGrid">
                     <!-- System info will be populated here -->
                 </div>
+                
+                <!-- Task Manager Section -->
+                <div id="taskManagerSection" style="display: none; margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+                    <div class="task-manager-header-section">
+                        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">CPU</h3>
+                        <div class="cpu-info-header" id="cpuInfoHeader" style="font-size: 0.9rem; color: #64748b;">
+                            <span id="cpuModel">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="task-manager-graph-container">
+                        <div class="graph-header">
+                            <span class="graph-label">% Utilization</span>
+                            <span class="graph-time-label">60 seconds</span>
+                        </div>
+                        <div class="graph-wrapper">
+                            <canvas id="cpuUtilizationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="task-manager-stats-grid">
+                        <div class="task-manager-stats-column">
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Utilization</div>
+                                <div class="stat-value-large" id="cpuUtilization">0%</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Speed</div>
+                                <div class="stat-value-large" id="cpuSpeed">0.00 GHz</div>
+                            </div>
+                        </div>
+                        
+                        <div class="task-manager-stats-column">
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Base speed</div>
+                                <div class="stat-value" id="baseSpeed">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Sockets</div>
+                                <div class="stat-value" id="sockets">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Cores</div>
+                                <div class="stat-value" id="cores">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Logical processors</div>
+                                <div class="stat-value" id="logicalProcessors">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Virtualization</div>
+                                <div class="stat-value" id="virtualization">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">L1 cache</div>
+                                <div class="stat-value" id="l1Cache">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">L2 cache</div>
+                                <div class="stat-value" id="l2Cache">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">L3 cache</div>
+                                <div class="stat-value" id="l3Cache">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-manager-header-section" style="margin-top: 40px;">
+                        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">Memory</h3>
+                    </div>
+                    
+                    <div class="task-manager-graph-container">
+                        <div class="graph-header">
+                            <span class="graph-label">Memory Usage (GB)</span>
+                            <span class="graph-time-label">60 seconds</span>
+                        </div>
+                        <div class="graph-wrapper">
+                            <canvas id="memoryUtilizationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="task-manager-memory-stats">
+                        <div class="task-manager-stat-item">
+                            <div class="stat-label">In use</div>
+                            <div class="stat-value-large" id="memoryInUse">0 GB</div>
+                        </div>
+                        <div class="task-manager-stat-item">
+                            <div class="stat-label">Available</div>
+                            <div class="stat-value-large" id="memoryAvailable">0 GB</div>
+                        </div>
+                        <div class="task-manager-stat-item">
+                            <div class="stat-label">Committed</div>
+                            <div class="stat-value" id="memoryCommitted">-</div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Shareable Link Section -->
                 <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -948,6 +1148,7 @@
             </div>
         </div>
 
+
         <div id="loadingMessage" class="loading">
             Enter PC name and date to view activity data
         </div>
@@ -964,11 +1165,15 @@
         document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
 
         let appChart = null;
+        let cpuChart = null;
+        let memoryChart = null;
+        let taskManagerRefreshInterval = null;
         let autoRefreshInterval = null;
         let pcStatusRefreshInterval = null;
         let lastUpdateTime = null;
         const PC_STATUS_REFRESH_INTERVAL = 5000; // 5 seconds for PC status
         const FULL_REFRESH_INTERVAL = 20000; // 20 seconds for full data reload
+        const TASK_MANAGER_REFRESH_INTERVAL = 3000; // 3 seconds for task manager
         
         // Pagination variables
         let allAppData = [];
@@ -1005,12 +1210,20 @@
             }, PC_STATUS_REFRESH_INTERVAL);
             
             // Start full data refresh interval (every 20 seconds)
+            // Skip full reload if task manager is open
             autoRefreshInterval = setInterval(() => {
                 const currentPcName = document.getElementById('pcName').value.trim();
                 if (currentPcName) {
-                    // Simply call loadData() - it will reload everything
-                    console.log('Auto-refresh: Full data reload...');
-                    loadData();
+                    // Check if task manager is open
+                    const taskManagerSection = document.getElementById('taskManagerSection');
+                    const isTaskManagerOpen = taskManagerSection && taskManagerSection.style.display !== 'none';
+                    
+                    if (!isTaskManagerOpen) {
+                        console.log('Auto-refresh: Full data reload...');
+                        loadData();
+                    } else {
+                        console.log('Auto-refresh: Skipping full reload (task manager is open)');
+                    }
                 } else {
                     stopAutoRefresh();
                 }
@@ -1354,6 +1567,7 @@
             document.getElementById('statsGrid').style.display = 'none';
             document.getElementById('pcStatusContainer').style.display = 'none';
             document.getElementById('apps-tab').style.display = 'none';
+            hideTaskManager();
 
             try {
                 // Fetch PC status (handle case where table might not exist)
@@ -1966,6 +2180,342 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+
+        // Task Manager Functions - Fetch from Supabase
+        async function loadTaskManagerData(pcName) {
+            if (!pcName) return;
+
+            try {
+                // Get recent app usage logs from the last 60 seconds
+                const now = new Date();
+                const sixtySecondsAgo = new Date(now.getTime() - 60000);
+                
+                const { data: logs, error } = await supabase
+                    .from('app_usage_logs')
+                    .select('cpu_percent, memory_usage_bytes, end_time')
+                    .eq('pc_name', pcName)
+                    .gte('end_time', sixtySecondsAgo.toISOString())
+                    .order('end_time', { ascending: true })
+                    .limit(100);
+
+                if (error) {
+                    throw error;
+                }
+
+                // Get system info
+                const { data: systemInfo } = await supabase
+                    .from('system_info')
+                    .select('*')
+                    .eq('pc_name', pcName)
+                    .single();
+
+                // Get latest stats
+                const { data: latestLog } = await supabase
+                    .from('app_usage_logs')
+                    .select('cpu_percent, memory_usage_bytes')
+                    .eq('pc_name', pcName)
+                    .order('end_time', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                // Format data for charts
+                const cpuData = (logs || []).map(log => ({
+                    time: new Date(log.end_time).getTime(),
+                    value: parseFloat(log.cpu_percent) || 0
+                }));
+
+                const memoryData = (logs || []).map(log => ({
+                    time: new Date(log.end_time).getTime(),
+                    value: parseInt(log.memory_usage_bytes) || 0
+                }));
+
+                const data = {
+                    cpu: cpuData,
+                    memory: memoryData,
+                    lastUpdate: Date.now(),
+                    systemInfo: systemInfo,
+                    latestStats: latestLog ? {
+                        cpuPercent: latestLog.cpu_percent,
+                        memoryBytes: latestLog.memory_usage_bytes
+                    } : null
+                };
+
+                updateTaskManager(data, pcName);
+            } catch (error) {
+                console.error('Error loading task manager data:', error);
+                // Show error state
+                const cpuUtilEl = document.getElementById('cpuUtilization');
+                const cpuSpeedEl = document.getElementById('cpuSpeed');
+                if (cpuUtilEl) cpuUtilEl.textContent = 'Error';
+                if (cpuSpeedEl) cpuSpeedEl.textContent = 'Error';
+            }
+        }
+
+        function updateTaskManager(data, pcName) {
+            // Update CPU chart
+            if (data.cpu && data.cpu.length > 0) {
+                updateCPUChart(data.cpu);
+                const latestCpu = data.cpu[data.cpu.length - 1];
+                document.getElementById('cpuUtilization').textContent = `${latestCpu.value.toFixed(1)}%`;
+            }
+
+            // Update Memory chart
+            if (data.memory && data.memory.length > 0) {
+                updateMemoryChart(data.memory, data.systemInfo);
+                const latestMemory = data.memory[data.memory.length - 1];
+                const memoryGB = (latestMemory.value / (1024 * 1024 * 1024)).toFixed(2);
+                const totalMemoryGB = data.systemInfo ? data.systemInfo.total_memory_gb : null;
+                if (totalMemoryGB) {
+                    const availableGB = (totalMemoryGB - parseFloat(memoryGB)).toFixed(2);
+                    document.getElementById('memoryInUse').textContent = `${memoryGB} GB`;
+                    document.getElementById('memoryAvailable').textContent = `${availableGB} GB`;
+                }
+            }
+
+            // Update system info
+            if (data.systemInfo) {
+                const info = data.systemInfo;
+                if (info.cpu_model) {
+                    document.getElementById('cpuModel').textContent = info.cpu_model;
+                }
+                if (info.cpu_speed_ghz) {
+                    document.getElementById('baseSpeed').textContent = `${info.cpu_speed_ghz.toFixed(2)} GHz`;
+                    // Use latest stats for current speed if available
+                    if (data.latestStats && data.latestStats.cpuPercent) {
+                        // Estimate current speed based on utilization (rough estimate)
+                        const estimatedSpeed = info.cpu_speed_ghz * (1 + (data.latestStats.cpuPercent / 100) * 0.1);
+                        document.getElementById('cpuSpeed').textContent = `${estimatedSpeed.toFixed(2)} GHz`;
+                    } else {
+                        document.getElementById('cpuSpeed').textContent = `${info.cpu_speed_ghz.toFixed(2)} GHz`;
+                    }
+                }
+                if (info.cpu_cores) {
+                    document.getElementById('cores').textContent = info.cpu_cores;
+                    document.getElementById('logicalProcessors').textContent = info.cpu_cores * 2; // Estimate
+                }
+                document.getElementById('sockets').textContent = '1';
+                document.getElementById('virtualization').textContent = 'Enabled';
+                document.getElementById('l1Cache').textContent = '128 KB';
+                document.getElementById('l2Cache').textContent = '512 KB';
+                document.getElementById('l3Cache').textContent = '4.0 MB';
+            }
+
+            // Update stats (these would need to come from the client, for now show placeholders)
+            const memoryCommittedEl = document.getElementById('memoryCommitted');
+            if (memoryCommittedEl) {
+                memoryCommittedEl.textContent = '-';
+            }
+        }
+
+        function updateCPUChart(cpuData) {
+            const ctx = document.getElementById('cpuUtilizationChart');
+            if (!ctx) return;
+
+            const labels = cpuData.map((point, index) => {
+                const secondsAgo = Math.floor((Date.now() - point.time) / 1000);
+                return `${secondsAgo}s`;
+            });
+            const values = cpuData.map(point => point.value);
+
+            if (cpuChart) {
+                cpuChart.data.labels = labels;
+                cpuChart.data.datasets[0].data = values;
+                cpuChart.update('none');
+            } else {
+                cpuChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'CPU Utilization',
+                            data: values,
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    color: '#64748b',
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#64748b',
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateMemoryChart(memoryData, systemInfo) {
+            const ctx = document.getElementById('memoryUtilizationChart');
+            if (!ctx) return;
+
+            const labels = memoryData.map((point, index) => {
+                const secondsAgo = Math.floor((Date.now() - point.time) / 1000);
+                return `${secondsAgo}s`;
+            });
+            const values = memoryData.map(point => (point.value / (1024 * 1024 * 1024)).toFixed(2));
+            const maxMemory = systemInfo && systemInfo.total_memory_gb ? systemInfo.total_memory_gb : Math.max(...values) * 1.2;
+
+            if (memoryChart) {
+                memoryChart.data.labels = labels;
+                memoryChart.data.datasets[0].data = values;
+                memoryChart.options.scales.y.max = maxMemory;
+                memoryChart.update('none');
+            } else {
+                memoryChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Memory Usage',
+                            data: values,
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: maxMemory,
+                                ticks: {
+                                    color: '#64748b',
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#64748b',
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function startTaskManagerRefresh(pcName) {
+            stopTaskManagerRefresh();
+            if (!pcName) return;
+            
+            // Load immediately
+            loadTaskManagerData(pcName);
+            
+            // Then refresh every 3 seconds
+            taskManagerRefreshInterval = setInterval(() => {
+                loadTaskManagerData(pcName);
+            }, TASK_MANAGER_REFRESH_INTERVAL);
+        }
+
+        function stopTaskManagerRefresh() {
+            if (taskManagerRefreshInterval) {
+                clearInterval(taskManagerRefreshInterval);
+                taskManagerRefreshInterval = null;
+            }
+        }
+
+        function showTaskManager(pcName) {
+            if (!pcName) {
+                alert('Please enter a PC name first');
+                return;
+            }
+            
+            // Show task manager section in status card
+            const taskManagerSection = document.getElementById('taskManagerSection');
+            if (taskManagerSection) {
+                taskManagerSection.style.display = 'block';
+                
+                // Scroll to task manager section
+                taskManagerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Start refreshing
+                startTaskManagerRefresh(pcName);
+            }
+        }
+
+        function hideTaskManager() {
+            const taskManagerSection = document.getElementById('taskManagerSection');
+            if (taskManagerSection) {
+                taskManagerSection.style.display = 'none';
+                stopTaskManagerRefresh();
+            }
+            const btn = document.getElementById('taskManagerBtn');
+            const btnText = document.getElementById('taskManagerBtnText');
+            if (btn && btnText) {
+                btnText.textContent = 'Show Processes';
+            }
+        }
+
+        function toggleTaskManager() {
+            const pcName = document.getElementById('pcName').value.trim();
+            if (!pcName) {
+                alert('Please enter a PC name first');
+                return;
+            }
+            
+            const taskManagerSection = document.getElementById('taskManagerSection');
+            const btnText = document.getElementById('taskManagerBtnText');
+            
+            if (taskManagerSection && taskManagerSection.style.display === 'none') {
+                showTaskManager(pcName);
+                if (btnText) btnText.textContent = 'Hide Processes';
+            } else {
+                hideTaskManager();
+            }
         }
     </script>
 </body>

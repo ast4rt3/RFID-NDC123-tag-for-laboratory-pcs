@@ -305,6 +305,48 @@ class SupabaseDB {
 
     return data;
   }
+
+  // Get system info for a PC
+  async getSystemInfo(pcName) {
+    const { data, error } = await this.client
+      .from('system_info')
+      .select('*')
+      .eq('pc_name', pcName)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned
+        return null;
+      }
+      console.error('❌ Error fetching system info:', error.message);
+      return null;
+    }
+
+    return data;
+  }
+
+  // Get latest app usage log for a PC
+  async getLatestAppUsageLog(pcName) {
+    const { data, error } = await this.client
+      .from('app_usage_logs')
+      .select('cpu_percent, memory_usage_bytes')
+      .eq('pc_name', pcName)
+      .order('end_time', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned
+        return null;
+      }
+      console.error('❌ Error fetching latest app usage log:', error.message);
+      return null;
+    }
+
+    return data;
+  }
 }
 
 module.exports = SupabaseDB;
