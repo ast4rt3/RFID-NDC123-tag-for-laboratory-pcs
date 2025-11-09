@@ -515,76 +515,6 @@
             margin-bottom: 30px;
         }
 
-        /* Pagination Styles */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-            padding: 20px;
-            flex-wrap: wrap;
-        }
-
-        .pagination-btn {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #64748b;
-            transition: all 0.3s ease;
-            min-width: 100px;
-        }
-
-        .pagination-btn:hover:not(:disabled) {
-            background: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-        }
-
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .pagination-info {
-            padding: 10px 20px;
-            color: #64748b;
-            font-weight: 600;
-        }
-
-        .pagination-page-numbers {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .page-number {
-            padding: 8px 12px;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #64748b;
-            transition: all 0.3s ease;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        .page-number:hover {
-            background: #f8fafc;
-            border-color: #4f46e5;
-        }
-
-        .page-number.active {
-            background: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-        }
-
         .error {
             background: #ef4444;
             color: white;
@@ -607,21 +537,12 @@
             }
 
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 1.8rem;
                 margin-bottom: 8px;
             }
 
             .header .subtitle {
-                font-size: 0.85rem;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .auto-refresh-indicator {
-                margin-left: 0;
-                margin-top: 10px;
-                font-size: 0.75rem;
+                font-size: 0.9rem;
             }
 
             .controls {
@@ -644,14 +565,8 @@
                 font-size: 1.1rem;
             }
 
-            .btn {
-                width: 100%;
-                justify-content: center;
-                padding: 15px;
-            }
-
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
                 padding: 20px 15px;
             }
@@ -682,131 +597,15 @@
 
             .data-table {
                 overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
             }
 
             table {
                 min-width: 600px;
-                font-size: 0.75rem;
             }
 
             th, td {
-                padding: 8px 6px;
-                font-size: 0.75rem;
-            }
-
-            .pcs-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .pc-card {
-                padding: 15px;
-            }
-
-            .pc-card-name {
-                font-size: 1rem;
-            }
-
-            .page-title {
-                font-size: 1.5rem;
-            }
-
-            .page-subtitle {
-                font-size: 0.9rem;
-            }
-
-            .pagination {
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px;
-            }
-
-            .pagination-btn {
-                width: 100%;
-                max-width: 200px;
-                padding: 12px 20px;
-            }
-
-            .pagination-info {
-                padding: 10px;
-                font-size: 0.9rem;
-                text-align: center;
-            }
-
-            .pagination-page-numbers {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 5px;
-            }
-
-            .page-number {
-                padding: 6px 10px;
+                padding: 12px 8px;
                 font-size: 0.85rem;
-                min-width: 35px;
-            }
-
-            .home-container {
-                padding: 15px;
-            }
-
-            .pc-status-container {
-                padding: 15px;
-            }
-
-            .pc-status-card {
-                padding: 20px;
-            }
-
-            .pc-status-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .system-info-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .view-toggle {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .view-toggle-btn {
-                width: 100%;
-                padding: 12px 20px;
-            }
-
-            .pc-card-info-item {
-                font-size: 0.8rem;
-            }
-
-            /* Shareable link section mobile */
-            #shareableLink {
-                font-size: 0.8rem;
-                padding: 10px;
-            }
-
-            /* PC status card shareable link */
-            .pc-status-card > div:last-child {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .pc-status-card > div:last-child > div {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .pc-status-card > div:last-child input {
-                width: 100%;
-                min-width: auto;
-            }
-
-            .pc-status-card > div:last-child button {
-                width: 100%;
             }
         }
     </style>
@@ -935,17 +734,6 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Pagination Controls -->
-            <div class="pagination" id="paginationControls" style="display: none;">
-                <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">
-                    <i class="fas fa-chevron-left"></i> Previous
-                </button>
-                <div class="pagination-page-numbers" id="pageNumbers"></div>
-                <div class="pagination-info" id="paginationInfo"></div>
-                <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">
-                    Next <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
         </div>
 
         <div id="loadingMessage" class="loading">
@@ -969,11 +757,6 @@
         let lastUpdateTime = null;
         const PC_STATUS_REFRESH_INTERVAL = 5000; // 5 seconds for PC status
         const FULL_REFRESH_INTERVAL = 20000; // 20 seconds for full data reload
-        
-        // Pagination variables
-        let allAppData = [];
-        let currentPage = 1;
-        const itemsPerPage = 10; // Show 10 items per page
 
         // Auto-refresh functionality
         // PC status updates every 5 seconds, full data reload every 20 seconds
@@ -1085,29 +868,19 @@
             }
         }
 
-            function updateLastUpdateTime() {
-            // Always use the browser's actual local time (no manual offset math)
-            const now = new Date();
-
-            const dateStr = now.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-
-            const timeStr = now.toLocaleTimeString('en-US', { 
+        function updateLastUpdateTime() {
+            lastUpdateTime = new Date();
+            const timeStr = lastUpdateTime.toLocaleTimeString('en-US', { 
                 hour: '2-digit', 
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: true 
+                hour12: false 
             });
-
             const lastUpdateElement = document.getElementById('lastUpdateTime');
             if (lastUpdateElement) {
-                lastUpdateElement.textContent = `Last updated: ${dateStr} • ${timeStr}`;
+                lastUpdateElement.textContent = `Last updated: ${timeStr}`;
             }
-            }
-
+        }
 
 
 
@@ -1479,11 +1252,6 @@
 
         function populateAppTable(appData) {
             const tbody = document.getElementById('appTableBody');
-            const paginationControls = document.getElementById('paginationControls');
-
-            // Store all data for pagination
-            allAppData = appData;
-            currentPage = 1;
 
             if (appData.length === 0) {
                 tbody.innerHTML = `
@@ -1494,29 +1262,10 @@
                             <p>No application usage recorded for this date</p>
                         </td>
                     </tr>`;
-                paginationControls.style.display = 'none';
                 return;
             }
 
-            // Show pagination if more than itemsPerPage
-            if (appData.length > itemsPerPage) {
-                paginationControls.style.display = 'flex';
-                updatePagination();
-            } else {
-                paginationControls.style.display = 'none';
-            }
-
-            // Display current page
-            displayCurrentPage();
-        }
-
-        function displayCurrentPage() {
-            const tbody = document.getElementById('appTableBody');
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = allAppData.slice(startIndex, endIndex);
-
-            tbody.innerHTML = pageData.map(entry => {
+            tbody.innerHTML = appData.map(entry => {
                 const duration = formatDuration(entry.duration_seconds || 0);
                 const memory = entry.memory_usage_bytes ? formatBytes(entry.memory_usage_bytes) : 'N/A';
                 const cpu = entry.cpu_percent ? `${Math.round(entry.cpu_percent)}%` : 'N/A';
@@ -1532,95 +1281,6 @@
                     </tr>
                 `;
             }).join('');
-
-            updatePagination();
-        }
-
-        function updatePagination() {
-            const totalPages = Math.ceil(allAppData.length / itemsPerPage);
-            const paginationInfo = document.getElementById('paginationInfo');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const pageNumbers = document.getElementById('pageNumbers');
-
-            // Update info
-            const startItem = (currentPage - 1) * itemsPerPage + 1;
-            const endItem = Math.min(currentPage * itemsPerPage, allAppData.length);
-            paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${allAppData.length}`;
-
-            // Update buttons
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages;
-
-            // Update page numbers
-            pageNumbers.innerHTML = '';
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-            
-            if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-
-            if (startPage > 1) {
-                const firstBtn = document.createElement('button');
-                firstBtn.className = 'page-number';
-                firstBtn.textContent = '1';
-                firstBtn.onclick = () => goToPage(1);
-                pageNumbers.appendChild(firstBtn);
-                
-                if (startPage > 2) {
-                    const ellipsis = document.createElement('span');
-                    ellipsis.textContent = '...';
-                    ellipsis.style.padding = '0 5px';
-                    pageNumbers.appendChild(ellipsis);
-                }
-            }
-
-            for (let i = startPage; i <= endPage; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = 'page-number' + (i === currentPage ? ' active' : '');
-                pageBtn.textContent = i;
-                pageBtn.onclick = () => goToPage(i);
-                pageNumbers.appendChild(pageBtn);
-            }
-
-            if (endPage < totalPages) {
-                if (endPage < totalPages - 1) {
-                    const ellipsis = document.createElement('span');
-                    ellipsis.textContent = '...';
-                    ellipsis.style.padding = '0 5px';
-                    pageNumbers.appendChild(ellipsis);
-                }
-                
-                const lastBtn = document.createElement('button');
-                lastBtn.className = 'page-number';
-                lastBtn.textContent = totalPages;
-                lastBtn.onclick = () => goToPage(totalPages);
-                pageNumbers.appendChild(lastBtn);
-            }
-        }
-
-        function changePage(direction) {
-            const totalPages = Math.ceil(allAppData.length / itemsPerPage);
-            const newPage = currentPage + direction;
-            
-            if (newPage >= 1 && newPage <= totalPages) {
-                currentPage = newPage;
-                displayCurrentPage();
-                // Scroll to top of table
-                document.getElementById('appTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-        function goToPage(page) {
-            const totalPages = Math.ceil(allAppData.length / itemsPerPage);
-            if (page >= 1 && page <= totalPages) {
-                currentPage = page;
-                displayCurrentPage();
-                // Scroll to top of table
-                document.getElementById('appTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
         }
 
 
@@ -1878,66 +1538,19 @@
         function formatDateTime(dateTimeString) {
             if (!dateTimeString) return 'N/A';
             try {
-                let date;
-                
-                // Check if it's an ISO string (new format from server)
-                if (typeof dateTimeString === 'string' && dateTimeString.includes('T') && dateTimeString.includes('Z')) {
-                    // ISO string with timezone - parse directly
-                    date = new Date(dateTimeString);
-                }
-                // Handle legacy format: "YYYY-MM-DD HH:MM AM/PM" (old format)
-                else if (typeof dateTimeString === 'string' && (dateTimeString.includes('AM') || dateTimeString.includes('PM'))) {
-                    // Parse the custom format: "2025-11-09 09:23 PM"
-                    const parts = dateTimeString.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
-                    if (parts) {
-                        let year = parseInt(parts[1]);
-                        let month = parseInt(parts[2]) - 1; // Month is 0-indexed
-                        let day = parseInt(parts[3]);
-                        let hour = parseInt(parts[4]);
-                        let minute = parseInt(parts[5]);
-                        let ampm = parts[6];
-                        
-                        // Convert to 24-hour format
-                        if (ampm === 'PM' && hour !== 12) {
-                            hour += 12;
-                        } else if (ampm === 'AM' && hour === 12) {
-                            hour = 0;
-                        }
-                        
-                        // Create date in local timezone (not UTC)
-                        date = new Date(year, month, day, hour, minute);
-                    } else {
-                        // Fallback to standard Date parsing
-                        date = new Date(dateTimeString);
-                    }
-                } else {
-                    // Standard ISO date string (without Z) or other format
-                    // If it looks like an ISO string, parse it as UTC and convert to local
-                    if (typeof dateTimeString === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(dateTimeString)) {
-                        // ISO-like string - parse as UTC if no timezone specified
-                        date = new Date(dateTimeString);
-                    } else {
-                        date = new Date(dateTimeString);
-                    }
-                }
-                
+                const date = new Date(dateTimeString);
                 if (isNaN(date.getTime())) {
-                    // If still invalid, return as-is
                     return dateTimeString;
                 }
-                
-                // Format using local timezone (browser's timezone)
                 return date.toLocaleString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true,
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    hour12: true
                 });
             } catch (e) {
-                console.error('Error formatting date:', dateTimeString, e);
                 return dateTimeString;
             }
         }

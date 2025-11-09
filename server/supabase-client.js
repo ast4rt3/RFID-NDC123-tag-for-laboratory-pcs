@@ -34,7 +34,7 @@ class SupabaseDB {
         return false;
       }
       
-      console.log('✅ Connected to Supabase successfully');
+      // Connected to Supabase successfully
       return true;
     } catch (err) {
       console.error('❌ Supabase connection error:', err.message);
@@ -59,7 +59,7 @@ class SupabaseDB {
       return false;
     }
     
-    console.log('✅ Time log saved:', data[0]);
+    // Time log saved silently
     return true;
   }
 
@@ -108,7 +108,7 @@ class SupabaseDB {
       return false;
     }
 
-    console.log('✅ App usage log saved:', data[0]);
+    // App usage log saved silently
     return true;
   }
 
@@ -133,7 +133,7 @@ class SupabaseDB {
       return false;
     }
     
-    console.log('✅ Browser search log saved:', data[0]);
+    // Browser search log saved silently
     return true;
   }
 
@@ -269,7 +269,7 @@ class SupabaseDB {
       throw error;
     }
 
-    console.log(`✅ System info upserted for ${pcName}`);
+    // System info upserted silently
     return data;
   }
 
@@ -287,7 +287,7 @@ class SupabaseDB {
       throw error;
     }
 
-    console.log(`✅ PC status updated for ${pcStatus.pc_name}`);
+    // PC status updated silently
     return data;
   }
 

@@ -33,14 +33,6 @@ A comprehensive **PC monitoring, analytics, and reporting system** designed for 
 - Memory, CPU, and GPU usage tracking  
 - Configurable monitoring intervals for optimization  
 
-### 🌐 Browser Activity Monitoring
-- Multi-browser support (Chrome, Firefox, Edge, Brave, Opera)  
-- Real-time browser activity tracking  
-- Search query extraction from URLs  
-- Search engine identification (Google, Bing, Yahoo, DuckDuckGo, YouTube, etc.)  
-- URL and window title analysis  
-- Browser history access (SQLite integration)  
-- Regex-based search pattern recognition  
 
 ### ⏱️ Session Management
 - PC session start/stop tracking  
@@ -53,7 +45,7 @@ A comprehensive **PC monitoring, analytics, and reporting system** designed for 
 ## 🗄️ Database & Storage Features
 
 ### 📋 Data Storage
-- MySQL/MariaDB local database integration  
+- sqlite local database integration  
 - Supabase PostgreSQL cloud support  
 - Multi-provider compatibility (AWS RDS, Google Cloud SQL, PlanetScale)  
 - Database migration, backup, and restore tools  
@@ -107,10 +99,6 @@ A comprehensive **PC monitoring, analytics, and reporting system** designed for 
 - Persistent configuration across restarts  
 - Real-time connection status display  
 
-### 🔄 Auto-Update System
-- Automatic update detection and background download  
-- Tray notifications when updates are ready  
-- One-click installation and rollback capability  
 
 ### 📊 Status Monitoring
 - Real-time system health display  
@@ -166,21 +154,18 @@ A comprehensive **PC monitoring, analytics, and reporting system** designed for 
 ## 📱 User Interface Features
 
 ### 🎨 Interface Design
-- Modern and responsive UI design  
-- Dark mode and accessibility support  
+- Modern and responsive UI design   
 - Works on desktop and mobile  
 
 ### 📋 Documentation & Help
 - Built-in documentation and troubleshooting  
-- MIT license and privacy policy  
-- Support and contact information  
 
 ---
 
 ## 🔧 Advanced Features
 
 ### ⚡ Performance Optimization
-- Resource monitoring (CPU, memory, GPU)  
+- Resource monitoring (CPU, memory)  
 - Performance thresholds and alerts  
 - Optimized background processing  
 
@@ -201,7 +186,6 @@ A comprehensive **PC monitoring, analytics, and reporting system** designed for 
 
 ### 📈 Data Analytics
 - Application usage pattern analysis  
-- Search behavior and trend tracking  
 - System resource utilization reports  
 - Session-based analytics  
 
@@ -212,7 +196,6 @@ A comprehensive **PC monitoring, analytics, and reporting system** designed for 
 
 ---
 
-**🧾 License:** MIT  
 **💡 Technologies Used:** Electron, Express.js, Supabase, Chart.js, MySQL, WebSocket
 
 ---
