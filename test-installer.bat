@@ -54,3 +54,4 @@ echo If all tests passed, you can run install-server.bat
 echo.
 pause
 
+

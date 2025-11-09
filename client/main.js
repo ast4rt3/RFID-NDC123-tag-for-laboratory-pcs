@@ -56,12 +56,12 @@ function updateTrayMenu() {
         showSettingsWindow();
       }
     },
-    {
+    /*{
       label: 'Licensing & Documentation',
       click: () => {
         showLicensingWindow();
       }
-    },
+    },*/
     { type: 'separator' },
     {
       label: 'View Status',
@@ -145,7 +145,7 @@ function showSettingsWindow() {
   });
 }
 
-function showLicensingWindow() {
+/*function showLicensingWindow() {
   if (licensingWindow) {
     licensingWindow.focus();
     return;
@@ -171,6 +171,7 @@ function showLicensingWindow() {
     licensingWindow = null;
   });
 }
+*/
 
 function showStatusWindow() {
   const statusWindow = new BrowserWindow({

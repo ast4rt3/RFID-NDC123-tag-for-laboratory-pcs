@@ -32,3 +32,4 @@ svc.on('error', function(err){
 console.log('Installing RFID NDC123 Server as Windows Service...');
 svc.install();
 
+
