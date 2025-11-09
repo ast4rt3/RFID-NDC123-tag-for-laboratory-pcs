@@ -49,6 +49,28 @@
             font-weight: 300;
         }
 
+        .auto-refresh-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            margin-left: 15px;
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            opacity: 0.8;
+        }
+
+        .auto-refresh-indicator i {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+
         .controls {
             background: #f8fafc;
             padding: 30px 40px;
@@ -479,7 +501,13 @@
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-desktop"></i> RFID Laboratory Monitor</h1>
-            <div class="subtitle" id="headerSubtitle">Enter PC name to get started</div>
+            <div class="subtitle" id="headerSubtitle">
+                Enter PC name to get started
+                <span class="auto-refresh-indicator" id="refreshIndicator" style="display: none;">
+                    <i class="fas fa-sync-alt"></i>
+                    <span id="lastUpdateTime">Auto-refreshing...</span>
+                </span>
+            </div>
         </div>
 
         <div class="controls">
@@ -582,6 +610,137 @@
         document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
 
         let appChart = null;
+        let autoRefreshInterval = null;
+        let pcStatusRefreshInterval = null;
+        let lastUpdateTime = null;
+        const PC_STATUS_REFRESH_INTERVAL = 5000; // 5 seconds for PC status
+        const FULL_REFRESH_INTERVAL = 20000; // 20 seconds for full data reload
+
+        // Auto-refresh functionality
+        // PC status updates every 5 seconds, full data reload every 20 seconds
+        function startAutoRefresh() {
+            // Clear any existing intervals
+            stopAutoRefresh();
+            
+            const pcName = document.getElementById('pcName').value.trim();
+            if (!pcName) {
+                return; // Don't start if no PC name
+            }
+            
+            // Show indicator immediately (if it exists)
+            const refreshIndicator = document.getElementById('refreshIndicator');
+            if (refreshIndicator) {
+                refreshIndicator.style.display = 'inline-flex';
+            }
+            updateLastUpdateTime();
+            
+            // Start PC status refresh interval (every 5 seconds)
+            pcStatusRefreshInterval = setInterval(() => {
+                const currentPcName = document.getElementById('pcName').value.trim();
+                if (currentPcName) {
+                    console.log('Auto-refresh: Updating PC status...');
+                    refreshPcStatusOnly(currentPcName);
+                } else {
+                    stopAutoRefresh();
+                }
+            }, PC_STATUS_REFRESH_INTERVAL);
+            
+            // Start full data refresh interval (every 20 seconds)
+            autoRefreshInterval = setInterval(() => {
+                const currentPcName = document.getElementById('pcName').value.trim();
+                if (currentPcName) {
+                    // Simply call loadData() - it will reload everything
+                    console.log('Auto-refresh: Full data reload...');
+                    loadData();
+                } else {
+                    stopAutoRefresh();
+                }
+            }, FULL_REFRESH_INTERVAL);
+            
+            console.log('Auto-refresh started for PC:', pcName, '- PC status: 5s, Full reload: 20s');
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+            if (pcStatusRefreshInterval) {
+                clearInterval(pcStatusRefreshInterval);
+                pcStatusRefreshInterval = null;
+            }
+            console.log('Auto-refresh stopped');
+            const refreshIndicator = document.getElementById('refreshIndicator');
+            if (refreshIndicator) {
+                refreshIndicator.style.display = 'none';
+            }
+        }
+
+        // Refresh only PC status (faster, every 5 seconds)
+        async function refreshPcStatusOnly(pcName) {
+            try {
+                // Fetch PC status
+                let isOnline = false;
+                let statusData = null;
+                try {
+                    const { data: statusDataResult, error: statusError } = await supabase
+                        .from('pc_status')
+                        .select('*')
+                        .eq('pc_name', pcName)
+                        .single();
+
+                    if (!statusError && statusDataResult) {
+                        statusData = statusDataResult;
+                        isOnline = statusData.is_online || false;
+                    }
+                } catch (err) {
+                    console.warn('Could not fetch PC status:', err);
+                }
+
+                // Fetch system info
+                let systemInfo = null;
+                try {
+                    const { data: systemInfoData, error: systemInfoError } = await supabase
+                        .from('system_info')
+                        .select('*')
+                        .eq('pc_name', pcName)
+                        .single();
+
+                    if (!systemInfoError && systemInfoData) {
+                        systemInfo = systemInfoData;
+                    }
+                } catch (err) {
+                    console.warn('Could not fetch system info:', err);
+                }
+
+                // Get selected date
+                const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
+
+                // Update PC status only
+                updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
+                
+                // Update last update time
+                updateLastUpdateTime();
+            } catch (error) {
+                console.error('Error refreshing PC status:', error);
+            }
+        }
+
+        function updateLastUpdateTime() {
+            lastUpdateTime = new Date();
+            const timeStr = lastUpdateTime.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false 
+            });
+            const lastUpdateElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateElement) {
+                lastUpdateElement.textContent = `Last updated: ${timeStr}`;
+            }
+        }
+
+
 
         // Get URL parameters
         function getURLParams() {
@@ -623,6 +782,18 @@
         // Initialize on page load
         window.addEventListener('DOMContentLoaded', () => {
             checkURLParams();
+        });
+
+        // Stop auto-refresh when page is hidden (tab switch)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoRefresh();
+            } else {
+                const pcName = document.getElementById('pcName').value.trim();
+                if (pcName) {
+                    startAutoRefresh();
+                }
+            }
         });
 
         async function loadData() {
@@ -709,6 +880,15 @@
                 // Process and display data
                 processData(appData || []);
 
+                // Update last update time
+                updateLastUpdateTime();
+
+                // Start auto-refresh (will reload data every 5 seconds)
+                // Only start if not already running (to avoid multiple intervals)
+                if (!autoRefreshInterval) {
+                    startAutoRefresh();
+                }
+
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('loadingMessage').innerHTML = `
@@ -720,34 +900,48 @@
         }
 
         function processData(appData) {
+            console.log('Processing data:', appData.length, 'entries');
+            
             // Calculate stats
             const totalAppSessions = appData.length;
             const totalAppTime = appData.reduce((sum, row) => sum + (row.duration_seconds || 0), 0);
 
             // Update stats grid
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card">
-                    <i class="fas fa-desktop"></i>
-                    <div class="number">${totalAppSessions}</div>
-                    <div class="label">App Sessions</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-clock"></i>
-                    <div class="number">${formatDuration(totalAppTime)}</div>
-                    <div class="label">Total Usage</div>
-                </div>
-            `;
+            const statsGrid = document.getElementById('statsGrid');
+            if (statsGrid) {
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <i class="fas fa-desktop"></i>
+                        <div class="number">${totalAppSessions}</div>
+                        <div class="label">App Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <div class="number">${formatDuration(totalAppTime)}</div>
+                        <div class="label">Total Usage</div>
+                    </div>
+                `;
+                statsGrid.style.display = 'grid';
+            }
 
             // Populate tables
             populateAppTable(appData);
 
-            // Create charts
+            // Create/update charts
             createAppChart(appData);
 
-            // Show content
-            document.getElementById('loadingMessage').style.display = 'none';
-            document.getElementById('statsGrid').style.display = 'grid';
-            document.getElementById('apps-tab').style.display = 'block';
+            // Show content (only hide loading message if it exists)
+            const loadingMessage = document.getElementById('loadingMessage');
+            if (loadingMessage) {
+                loadingMessage.style.display = 'none';
+            }
+            
+            const appsTab = document.getElementById('apps-tab');
+            if (appsTab) {
+                appsTab.style.display = 'block';
+            }
+            
+            console.log('Data processed and displayed');
         }
 
         function populateAppTable(appData) {
@@ -785,27 +979,46 @@
 
 
         function createAppChart(appData) {
-            const ctx = document.getElementById('appUsageChart').getContext('2d');
+            const chartCanvas = document.getElementById('appUsageChart');
+            if (!chartCanvas) {
+                console.warn('Chart canvas not found');
+                return;
+            }
+
+            const ctx = chartCanvas.getContext('2d');
             const appUsage = {};
 
             appData.forEach(entry => {
-                if (!appUsage[entry.app_name]) {
-                    appUsage[entry.app_name] = 0;
+                if (entry && entry.app_name) {
+                    if (!appUsage[entry.app_name]) {
+                        appUsage[entry.app_name] = 0;
+                    }
+                    appUsage[entry.app_name] += entry.duration_seconds || 0;
                 }
-                appUsage[entry.app_name] += entry.duration_seconds || 0;
             });
 
+            // Destroy existing chart if it exists
             if (appChart) {
                 appChart.destroy();
+                appChart = null;
+            }
+
+            // Create new chart
+            const labels = Object.keys(appUsage);
+            const data = Object.values(appUsage).map(seconds => Math.round(seconds / 60));
+
+            if (labels.length === 0) {
+                console.log('No app data to display in chart');
+                return;
             }
 
             appChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(appUsage),
+                    labels: labels,
                     datasets: [{
                         label: 'Usage Time (minutes)',
-                        data: Object.values(appUsage).map(seconds => Math.round(seconds / 60)),
+                        data: data,
                         backgroundColor: '#4f46e5'
                     }]
                 },
@@ -816,9 +1029,14 @@
                         y: {
                             beginAtZero: true
                         }
+                    },
+                    animation: {
+                        duration: 300
                     }
                 }
             });
+
+            console.log('Chart updated with', labels.length, 'apps');
         }
 
 
@@ -827,6 +1045,17 @@
             const pcDisplayName = document.getElementById('pcDisplayName');
             const pcStatusText = document.getElementById('pcStatusText');
             const systemInfoGrid = document.getElementById('systemInfoGrid');
+            const pcStatusContainer = document.getElementById('pcStatusContainer');
+
+            // Make sure the container is visible
+            if (pcStatusContainer) {
+                pcStatusContainer.style.display = 'block';
+            }
+
+            if (!pcDisplayName || !pcStatusText || !statusIndicator) {
+                console.error('PC status elements not found');
+                return;
+            }
 
             pcDisplayName.textContent = pcName;
             
@@ -844,6 +1073,8 @@
             } else {
                 statusIndicator.classList.add('offline');
             }
+
+            console.log('PC Status updated:', { pcName, isOnline, hasStatusData: !!statusData, hasSystemInfo: !!systemInfo });
 
             // Display system info
             if (systemInfo) {

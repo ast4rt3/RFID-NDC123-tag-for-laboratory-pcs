@@ -62,6 +62,7 @@ function updateTrayMenu() {
         showLicensingWindow();
       }
     },*/
+    
     { type: 'separator' },
     {
       label: 'View Status',
