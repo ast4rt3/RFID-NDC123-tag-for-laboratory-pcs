@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const os = require('os');
 const Database = require('./database');
-const { to12HourFormat } = require('./database');
 
 // Load environment variables
 require('dotenv').config();
@@ -68,7 +67,8 @@ wss.on('connection', ws => {
         clientId = data.pc_name;
       }
       const startTime = new Date();
-      const formattedStart = to12HourFormat(startTime);
+      // Store as ISO string to preserve timezone
+      const formattedStart = startTime.toISOString();
       activeSessions[clientId] = { start_time: formattedStart };
       appActiveSessions[clientId] = {}; // Initialize app session tracking
       try {
@@ -80,9 +80,9 @@ wss.on('connection', ws => {
       // PC stops
       if (activeSessions[data.pc_name]) {
         const endTime = new Date();
-        const formattedEnd = to12HourFormat(endTime);
+        const formattedEnd = endTime.toISOString();
         const startTime = activeSessions[data.pc_name].start_time;
-        // Duration calculation is not accurate if using formatted strings, so recalc from Date
+        // Duration calculation
         const startDate = new Date(startTime);
         const duration = Math.floor((endTime - startDate) / 1000);
         // Save to database
@@ -97,7 +97,7 @@ wss.on('connection', ws => {
       // Start tracking a new app session for this client
       if (!appActiveSessions[clientId]) appActiveSessions[clientId] = {};
       const now = new Date();
-      const formattedNow = to12HourFormat(now);
+      const formattedNow = now.toISOString();
       appActiveSessions[clientId][data.app_name] = { start_time: formattedNow };
       db.updatePCStatus(clientId, true, formattedNow, formattedNow);
     } else if (
@@ -107,7 +107,7 @@ wss.on('connection', ws => {
       if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
         const startTime = appActiveSessions[clientId][data.app_name].start_time;
         const endTime = new Date();
-        const formattedEnd = to12HourFormat(endTime);
+        const formattedEnd = endTime.toISOString();
         const startDate = new Date(startTime);
         const duration = Math.floor((endTime - startDate) / 1000);
         db.insertAppUsageLog(
@@ -130,7 +130,7 @@ wss.on('connection', ws => {
       if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
         const startTime = appActiveSessions[clientId][data.app_name].start_time;
         const endTime = new Date();
-        const formattedEnd = to12HourFormat(endTime);
+        const formattedEnd = endTime.toISOString();
         const startDate = new Date(startTime);
         const duration = Math.floor((endTime - startDate) / 1000);
         db.insertAppUsageLog(
@@ -192,7 +192,7 @@ wss.on('connection', ws => {
     if (clientId && activeSessions[clientId]) {
       console.log(`💻 PC disconnected: ${clientId}`);
       const endTime = new Date();
-      const formattedEnd = to12HourFormat(endTime);
+      const formattedEnd = endTime.toISOString();
       const startTime = activeSessions[clientId].start_time;
       const startDate = new Date(startTime);
       const duration = Math.floor((endTime - startDate) / 1000);

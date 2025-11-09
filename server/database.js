@@ -169,9 +169,9 @@ class Database {
   }
 
   async insertTimeLog(pcName, startTime, endTime, duration) {
-    // Format times in 12-hour format
-    const formattedStartTime = to12HourFormat(new Date(startTime));
-    const formattedEndTime = to12HourFormat(new Date(endTime));
+    // Convert to ISO strings to preserve timezone
+    const formattedStartTime = new Date(startTime).toISOString();
+    const formattedEndTime = new Date(endTime).toISOString();
 
     if (this.type === 'supabase') {
       return await this.db.insertTimeLog(pcName, formattedStartTime, formattedEndTime, duration);
@@ -183,7 +183,7 @@ class Database {
         start_time: formattedStartTime,
         end_time: formattedEndTime,
         duration_seconds: duration,
-        created_at: to12HourFormat(new Date())
+        created_at: new Date().toISOString()
       };
       this.db.timeLogs.push(log);
       // Log saved silently
@@ -192,9 +192,9 @@ class Database {
   }
 
   async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent) {
-    // Format times in 12-hour format
-    const formattedStartTime = to12HourFormat(new Date(startTime));
-    const formattedEndTime = to12HourFormat(new Date(endTime));
+    // Convert to ISO strings to preserve timezone
+    const formattedStartTime = new Date(startTime).toISOString();
+    const formattedEndTime = new Date(endTime).toISOString();
 
     if (this.type === 'supabase') {
       return await this.db.insertAppUsageLog(pcName, appName, formattedStartTime, formattedEndTime, duration, memoryUsage, cpuPercent, gpuPercent);
@@ -210,7 +210,7 @@ class Database {
         memory_usage_bytes: memoryUsage,
         cpu_percent: cpuPercent,
         gpu_percent: gpuPercent,
-        created_at: to12HourFormat(new Date())
+        created_at: new Date().toISOString()
       };
       this.db.appUsageLogs.push(log);
       // App usage log saved silently
@@ -219,8 +219,8 @@ class Database {
   }
 
   async insertBrowserSearchLog(pcName, browser, url, searchQuery, searchEngine, timestamp) {
-    // Format timestamp in 12-hour format
-    const formattedTimestamp = to12HourFormat(new Date(timestamp));
+    // Convert to ISO string to preserve timezone
+    const formattedTimestamp = new Date(timestamp).toISOString();
 
     if (this.type === 'supabase') {
       return await this.db.insertBrowserSearchLog(pcName, browser, url, searchQuery, searchEngine, formattedTimestamp);
@@ -234,7 +234,7 @@ class Database {
         search_query: searchQuery,
         search_engine: searchEngine,
         timestamp: formattedTimestamp,
-        created_at: to12HourFormat(new Date())
+        created_at: new Date().toISOString()
       };
       this.db.browserSearchLogs.push(log);
       // Browser activity saved silently
@@ -278,9 +278,28 @@ class Database {
   // Update or insert PC status
   async updatePCStatus(pcName, isOnline, lastSeen, lastActivity) {
     try {
-      // Format times in 12-hour format
-      const formattedLastSeen = to12HourFormat(new Date(lastSeen));
-      const formattedLastActivity = lastActivity ? to12HourFormat(new Date(lastActivity)) : null;
+      // Store dates as ISO strings (includes timezone info) instead of formatted strings
+      // This ensures timezone is preserved correctly
+      let formattedLastSeen;
+      let formattedLastActivity;
+      
+      if (typeof lastSeen === 'string' && (lastSeen.includes('AM') || lastSeen.includes('PM'))) {
+        // If it's already in the custom format, parse it back to Date first
+        formattedLastSeen = new Date(lastSeen).toISOString();
+      } else {
+        // If it's a Date object or ISO string, convert to ISO
+        formattedLastSeen = new Date(lastSeen).toISOString();
+      }
+      
+      if (lastActivity) {
+        if (typeof lastActivity === 'string' && (lastActivity.includes('AM') || lastActivity.includes('PM'))) {
+          formattedLastActivity = new Date(lastActivity).toISOString();
+        } else {
+          formattedLastActivity = new Date(lastActivity).toISOString();
+        }
+      } else {
+        formattedLastActivity = null;
+      }
 
       // Both Supabase and in-memory storage use the same structure
       const pcStatus = {
