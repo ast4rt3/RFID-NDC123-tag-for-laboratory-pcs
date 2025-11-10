@@ -147,45 +147,10 @@ wss.on('connection', ws => {
       }
     }
     
-    // Handle browser activity messages
-    else if (data.type === 'browser_activity') {
-      db.insertBrowserSearchLog(
-        data.pc_name,
-        data.browser,
-        data.url,
-        data.search_query,
-        data.search_engine,
-        data.timestamp
-      );
-    }
+   
+
     
-    // Handle browser history messages
-    else if (data.type === 'browser_history') {
-      if (data.entries && data.entries.length > 0) {
-        data.entries.forEach(entry => {
-          db.insertBrowserSearchLog(
-            data.pc_name,
-            entry.browser,
-            entry.url,
-            entry.searchQuery,
-            entry.searchEngine,
-            entry.timestamp
-          );
-        });
-      }
-    }
-    
-    // Handle browser extension search messages
-    else if (data.type === 'browser_extension_search') {
-      db.insertBrowserSearchLog(
-        data.pc_name,
-        data.browser,
-        data.url,
-        data.search_query,
-        data.search_engine,
-        data.timestamp
-      );
-    }
+  
   });
 
   ws.on('close', () => {

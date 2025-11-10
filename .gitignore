@@ -23,3 +23,5 @@ bfg.jar
 config.json
 rebuild.bat
 rfid-client-debug.log
+juglonecertification.pfx
+juglonecertification.cer
