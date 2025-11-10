@@ -334,28 +334,6 @@ class Database {
       return Promise.resolve(Object.values(this.db.pcStatus || {}));
     }
   }
-
-  // Get system info for a PC
-  async getSystemInfo(pcName) {
-    if (this.type === 'supabase') {
-      return await this.db.getSystemInfo(pcName);
-    } else {
-      // In-memory storage - return null for now
-      return Promise.resolve(null);
-    }
-  }
-
-  // Get latest app usage log for a PC
-  async getLatestAppUsageLog(pcName) {
-    if (this.type === 'supabase') {
-      return await this.db.getLatestAppUsageLog(pcName);
-    } else {
-      // In-memory storage
-      const logs = (this.db.appUsageLogs || []).filter(log => log.pc_name === pcName);
-      if (logs.length === 0) return null;
-      return Promise.resolve(logs.sort((a, b) => new Date(b.end_time) - new Date(a.end_time))[0]);
-    }
-  }
 }
 
 module.exports = Database;

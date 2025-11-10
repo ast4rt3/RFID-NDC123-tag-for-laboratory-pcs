@@ -43,7 +43,6 @@ db.testConnection().then(connected => {
 // Store active sessions in memory
 const activeSessions = {}; // { clientId: { pc_name, start_time } }
 const appActiveSessions = {}; // { clientId: { app_name, start_time } }
-const realtimeMetrics = {}; // Store real-time CPU and memory metrics per PC
 
 // Get IPv4 address
 const ipv4Address = getIPv4Address();
@@ -145,71 +144,13 @@ wss.on('connection', ws => {
           data.gpu_percent
         );
         db.updatePCStatus(clientId, true, formattedEnd, formattedEnd);
-        
-        // Store real-time metrics for task manager view
-        if (!realtimeMetrics[clientId]) {
-          realtimeMetrics[clientId] = {
-            cpu: [],
-            memory: [],
-            lastUpdate: null
-          };
-        }
-        
-        const now = Date.now();
-        const cpuPercent = parseFloat(data.cpu_percent) || 0;
-        const memoryBytes = parseInt(data.memory_usage_bytes) || 0;
-        
-        // Add new data point
-        realtimeMetrics[clientId].cpu.push({ time: now, value: cpuPercent });
-        realtimeMetrics[clientId].memory.push({ time: now, value: memoryBytes });
-        realtimeMetrics[clientId].lastUpdate = now;
-        
-        // Keep only last 60 seconds of data (assuming updates every 3 seconds, keep ~20 points)
-        const sixtySecondsAgo = now - 60000;
-        realtimeMetrics[clientId].cpu = realtimeMetrics[clientId].cpu.filter(p => p.time > sixtySecondsAgo);
-        realtimeMetrics[clientId].memory = realtimeMetrics[clientId].memory.filter(p => p.time > sixtySecondsAgo);
       }
     }
     
-    // Handle browser activity messages
-    else if (data.type === 'browser_activity') {
-      db.insertBrowserSearchLog(
-        data.pc_name,
-        data.browser,
-        data.url,
-        data.search_query,
-        data.search_engine,
-        data.timestamp
-      );
-    }
+   
+
     
-    // Handle browser history messages
-    else if (data.type === 'browser_history') {
-      if (data.entries && data.entries.length > 0) {
-        data.entries.forEach(entry => {
-          db.insertBrowserSearchLog(
-            data.pc_name,
-            entry.browser,
-            entry.url,
-            entry.searchQuery,
-            entry.searchEngine,
-            entry.timestamp
-          );
-        });
-      }
-    }
-    
-    // Handle browser extension search messages
-    else if (data.type === 'browser_extension_search') {
-      db.insertBrowserSearchLog(
-        data.pc_name,
-        data.browser,
-        data.url,
-        data.search_query,
-        data.search_engine,
-        data.timestamp
-      );
-    }
+  
   });
 
   ws.on('close', () => {
@@ -227,7 +168,6 @@ wss.on('connection', ws => {
         console.error(`[${clientId}] Error updating status on disconnect:`, err.message);
       });
       delete activeSessions[clientId];
-      delete realtimeMetrics[clientId];
     }
   });
 
@@ -258,39 +198,6 @@ app.get('/browser-logs', async (req, res) => {
     res.json(logs);
   } catch (error) {
     console.error('Error fetching browser logs:', error);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
-
-// Real-time metrics API endpoint for task manager
-app.get('/api/realtime-metrics', async (req, res) => {
-  const { pc_name } = req.query;
-  
-  if (!pc_name) {
-    return res.status(400).json({ error: 'pc_name is required' });
-  }
-  
-  try {
-    const metrics = realtimeMetrics[pc_name] || { cpu: [], memory: [], lastUpdate: null };
-    
-    // Get system info for hardware details
-    const systemInfo = await db.getSystemInfo(pc_name);
-    
-    // Get latest app usage log for additional stats
-    const latestLog = await db.getLatestAppUsageLog(pc_name);
-    
-    res.json({
-      cpu: metrics.cpu,
-      memory: metrics.memory,
-      lastUpdate: metrics.lastUpdate,
-      systemInfo: systemInfo,
-      latestStats: latestLog ? {
-        cpuPercent: latestLog.cpu_percent,
-        memoryBytes: latestLog.memory_usage_bytes
-      } : null
-    });
-  } catch (error) {
-    console.error('Error fetching real-time metrics:', error);
     res.status(500).json({ error: 'Database error' });
   }
 });

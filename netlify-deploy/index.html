@@ -2073,16 +2073,55 @@
         function formatTime(timeString) {
             if (!timeString) return 'N/A';
             try {
-                const date = new Date(timeString);
-                if (isNaN(date.getTime())) {
-                    // If it's not a valid date, try to parse as-is
+                let date;
+                
+                // Handle Date object
+                if (timeString instanceof Date) {
+                    date = timeString;
+                } else if (typeof timeString === 'number') {
+                    // Unix ms timestamp
+                    date = new Date(timeString);
+                } else if (typeof timeString === 'string') {
+                    // ISO with explicit timezone (Z or +/-offset)
+                    if (timeString.includes('T') && (timeString.includes('Z') || /[+-]\d{2}:\d{2}$/.test(timeString))) {
+                        date = new Date(timeString);
+                    }
+                    // Legacy format: "YYYY-MM-DD HH:MM AM/PM"
+                    else if (timeString.includes('AM') || timeString.includes('PM')) {
+                        const parts = timeString.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
+                        if (parts) {
+                            let year = parseInt(parts[1]);
+                            let month = parseInt(parts[2]) - 1;
+                            let day = parseInt(parts[3]);
+                            let hour = parseInt(parts[4]);
+                            let minute = parseInt(parts[5]);
+                            const ampm = parts[6];
+                            if (ampm === 'PM' && hour !== 12) hour += 12;
+                            if (ampm === 'AM' && hour === 12) hour = 0;
+                            date = new Date(year, month, day, hour, minute);
+                        } else {
+                            date = new Date(timeString);
+                        }
+                    }
+                    // ISO-like without explicit timezone
+                    else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(timeString)) {
+                        // Treat ISO-like without timezone as UTC to avoid browser local misinterpretation
+                        date = new Date(timeString.endsWith('Z') ? timeString : timeString + 'Z');
+                    } else {
+                        date = new Date(timeString);
+                    }
+                }
+
+                if (!date || isNaN(date.getTime())) {
                     return timeString;
                 }
+
                 return date.toLocaleTimeString('en-US', { 
                     hour: '2-digit', 
                     minute: '2-digit',
                     second: '2-digit',
-                    hour12: true 
+                    hour12: true,
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 });
             } catch (e) {
                 return timeString;
@@ -2126,10 +2165,9 @@
                     }
                 } else {
                     // Standard ISO date string (without Z) or other format
-                    // If it looks like an ISO string, parse it as UTC and convert to local
+                    // If it looks like an ISO string without timezone, treat as UTC
                     if (typeof dateTimeString === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(dateTimeString)) {
-                        // ISO-like string - parse as UTC if no timezone specified
-                        date = new Date(dateTimeString);
+                        date = new Date(dateTimeString.endsWith('Z') ? dateTimeString : dateTimeString + 'Z');
                     } else {
                         date = new Date(dateTimeString);
                     }
