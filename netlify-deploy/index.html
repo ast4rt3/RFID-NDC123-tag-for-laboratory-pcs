@@ -1657,7 +1657,7 @@
             const statsGrid = document.getElementById('statsGrid');
             if (statsGrid) {
                 statsGrid.innerHTML = `
-                    <div class="stat-card">
+                    <div class="stat-card" id="appSessionsCard" onclick="toggleAppSessionsBreakdown()" style="cursor: pointer;">
                         <i class="fas fa-desktop"></i>
                         <div class="number">${totalAppSessions}</div>
                         <div class="label">App Sessions</div>
@@ -1666,6 +1666,9 @@
                         <i class="fas fa-clock"></i>
                         <div class="number">${formatDuration(totalAppTime)}</div>
                         <div class="label">Total Usage</div>
+                    </div>
+                    <div id="appSessionsBreakdown" style="grid-column: 1 / -1; display: none; margin-top: 10px;">
+                        <!-- Breakdown content injected here -->
                     </div>
                 `;
                 statsGrid.style.display = 'grid';
@@ -1689,6 +1692,69 @@
             }
             
             console.log('Data processed and displayed');
+        }
+
+        function toggleAppSessionsBreakdown() {
+            const breakdownEl = document.getElementById('appSessionsBreakdown');
+            if (!breakdownEl) return;
+            if (breakdownEl.style.display === 'none' || breakdownEl.style.display === '') {
+                // Build breakdown content
+                const counts = computeAppSessionCounts();
+                if (counts.length === 0) {
+                    breakdownEl.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>No sessions to summarize</h3>
+                        </div>
+                    `;
+                } else {
+                    const total = counts.reduce((s, c) => s + c.count, 0);
+                    breakdownEl.innerHTML = `
+                        <div class="data-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Application</th>
+                                        <th>Sessions</th>
+                                        <th>Share</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${counts.map(({ name, count }) => {
+                                        const pct = total ? Math.round((count / total) * 100) : 0;
+                                        return `
+                                            <tr>
+                                                <td>${escapeHtml(name)}</td>
+                                                <td>${count}</td>
+                                                <td>${pct}%</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+                breakdownEl.style.display = 'block';
+            } else {
+                breakdownEl.style.display = 'none';
+            }
+        }
+
+        function computeAppSessionCounts() {
+            try {
+                const map = new Map();
+                (allAppData || []).forEach(entry => {
+                    const name = entry && entry.app_name ? String(entry.app_name) : 'Unknown';
+                    map.set(name, (map.get(name) || 0) + 1);
+                });
+                // Sort by count desc, then name asc
+                return Array.from(map.entries())
+                    .map(([name, count]) => ({ name, count }))
+                    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+            } catch {
+                return [];
+            }
         }
 
         function populateAppTable(appData) {
@@ -2131,6 +2197,14 @@
         function formatDateTime(dateTimeString) {
             if (!dateTimeString) return 'N/A';
             try {
+                // Normalize incoming string
+                if (typeof dateTimeString === 'string') {
+                    // Trim whitespace
+                    dateTimeString = dateTimeString.trim();
+                    // Pad fractional seconds to 3 digits if only 1-2 are present (e.g., .57 -> .570)
+                    dateTimeString = dateTimeString.replace(/(T\d{2}:\d{2}:\d{2})\.(\d{1,2})(?=(Z|[+-]\d{2}:\d{2}))/,
+                        (m, t, frac, tz) => `${t}.${frac.padEnd(3, '0')}${tz}`);
+                }
                 let date;
                 
                 // Check if it's an ISO string (new format from server)
@@ -2167,7 +2241,13 @@
                     // Standard ISO date string (without Z) or other format
                     // If it looks like an ISO string without timezone, treat as UTC
                     if (typeof dateTimeString === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(dateTimeString)) {
-                        date = new Date(dateTimeString.endsWith('Z') ? dateTimeString : dateTimeString + 'Z');
+                        // If it already has an explicit timezone offset like +08:00 or -05:00, keep it
+                        if (/[+-]\d{2}:\d{2}$/.test(dateTimeString)) {
+                            date = new Date(dateTimeString);
+                        } else {
+                            // No timezone info: treat as UTC
+                            date = new Date(dateTimeString.endsWith('Z') ? dateTimeString : dateTimeString + 'Z');
+                        }
                     } else {
                         date = new Date(dateTimeString);
                     }
