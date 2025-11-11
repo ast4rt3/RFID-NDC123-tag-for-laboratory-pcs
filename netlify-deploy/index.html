@@ -201,6 +201,15 @@
             animation: none;
         }
 
+        .status-indicator.idle {
+            background: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+        }
+
+        .status-indicator.idle::after {
+            background: rgba(245, 158, 11, 0.3);
+        }
+
         @keyframes pulse {
             0% {
                 transform: scale(1);
@@ -542,6 +551,11 @@
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
         }
 
+        .pc-card-status.idle {
+            background: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+
         .pc-card-name {
             font-size: 1.3rem;
             font-weight: 700;
@@ -691,12 +705,12 @@
             .header {
                 padding: 20px 15px;
             }
-
+            
             .header h1 {
                 font-size: 1.5rem;
                 margin-bottom: 8px;
             }
-
+            
             .header .subtitle {
                 font-size: 0.85rem;
                 display: flex;
@@ -761,7 +775,7 @@
             .chart-container {
                 padding: 20px 15px;
             }
-
+            
             .chart-wrapper {
                 height: 300px;
             }
@@ -951,26 +965,26 @@
                     <i class="fas fa-desktop"></i> PC Details
                 </button>
             </div>
-            <div class="controls">
+        <div class="controls">
                 <div class="control-group">
-                    <div class="form-group">
+            <div class="form-group">
                         <label for="pcName"><i class="fas fa-desktop"></i> PC Name</label>
                         <input type="text" id="pcName" placeholder="Enter PC name (e.g., i3S)">
-                    </div>
-                    <div class="form-group">
+            </div>
+            <div class="form-group">
                         <label for="selectedDate"><i class="fas fa-calendar"></i> Date</label>
-                        <input type="date" id="selectedDate">
-                    </div>
-                    <button class="btn" onclick="loadData()">
+                <input type="date" id="selectedDate">
+            </div>
+            <button class="btn" onclick="loadData()">
                         <i class="fas fa-search"></i>
                         Load Data
                     </button>
                     <button class="btn" onclick="toggleTaskManager()" id="taskManagerBtn" style="background: #4f46e5; color: white;">
                         <i class="fas fa-tasks"></i>
                         <span id="taskManagerBtnText">Show Processes</span>
-                    </button>
+            </button>
                 </div>
-            </div>
+        </div>
 
         <!-- PC Status Card -->
         <div class="pc-status-container" id="pcStatusContainer" style="display:none;">
@@ -989,8 +1003,8 @@
                 </div>
                 <div class="system-info-grid" id="systemInfoGrid">
                     <!-- System info will be populated here -->
-                </div>
-                
+        </div>
+
                 <!-- Task Manager Section -->
                 <div id="taskManagerSection" style="display: none; margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
                     <div class="task-manager-header-section">
@@ -998,16 +1012,16 @@
                         <div class="cpu-info-header" id="cpuInfoHeader" style="font-size: 0.9rem; color: #64748b;">
                             <span id="cpuModel">Loading...</span>
                         </div>
-                    </div>
-                    
+            </div>
+
                     <div class="task-manager-graph-container">
                         <div class="graph-header">
                             <span class="graph-label">% Utilization</span>
                             <span class="graph-time-label">60 seconds</span>
-                        </div>
+                    </div>
                         <div class="graph-wrapper">
                             <canvas id="cpuUtilizationChart"></canvas>
-                        </div>
+                    </div>
                     </div>
 
                     <div class="task-manager-stats-grid">
@@ -1019,14 +1033,14 @@
                             <div class="task-manager-stat-item">
                                 <div class="stat-label">Speed</div>
                                 <div class="stat-value-large" id="cpuSpeed">0.00 GHz</div>
-                            </div>
-                        </div>
-                        
+                </div>
+            </div>
+
                         <div class="task-manager-stats-column">
                             <div class="task-manager-stat-item">
                                 <div class="stat-label">Base speed</div>
                                 <div class="stat-value" id="baseSpeed">-</div>
-                            </div>
+                    </div>
                             <div class="task-manager-stat-item">
                                 <div class="stat-label">Sockets</div>
                                 <div class="stat-value" id="sockets">-</div>
@@ -1114,10 +1128,10 @@
         <div id="apps-tab" class="tab-content" style="display: none;">
             <div class="chart-container">
                 <div class="chart-title">App Usage Distribution</div>
-                <div class="chart-wrapper">
+                    <div class="chart-wrapper">
                     <canvas id="appUsageChart"></canvas>
+                    </div>
                 </div>
-            </div>
             <div class="data-table">
                 <table>
                     <thead>
@@ -1354,7 +1368,7 @@
                     document.getElementById('selectedDate').value = params.date;
                 } else {
                     // If no date in URL, use today's date
-                    document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
                 }
                 // Auto-load data
                 loadData();
@@ -1467,8 +1481,22 @@
                 const pcsArray = Array.from(pcsMap.values());
                 pcsGrid.innerHTML = pcsArray.map(pc => {
                     const isOnline = pc.is_online;
-                    const statusClass = isOnline ? '' : 'offline';
-                    const statusText = isOnline ? 'Online' : 'Offline';
+                    const isIdle = pc.is_idle === true;
+                    
+                    let statusClass, statusText, statusColor;
+                    if (!isOnline) {
+                        statusClass = 'offline';
+                        statusText = 'Offline';
+                        statusColor = '#ef4444';
+                    } else if (isIdle) {
+                        statusClass = 'idle';
+                        statusText = 'Idle';
+                        statusColor = '#f59e0b';
+                    } else {
+                        statusClass = '';
+                        statusText = 'Online';
+                        statusColor = '#22c55e';
+                    }
                     
                     return `
                         <div class="pc-card" onclick="navigateToPC('${escapeHtml(pc.pc_name)}')">
@@ -1477,9 +1505,9 @@
                                 <div class="pc-card-name">${escapeHtml(pc.pc_name)}</div>
                             </div>
                             <div class="pc-card-info">
-                                <div class="pc-card-info-item">
+                                    <div class="pc-card-info-item">
                                     <span>Status:</span>
-                                    <span style="color: ${isOnline ? '#22c55e' : '#ef4444'}; font-weight: 600;">${statusText}</span>
+                                    <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
                                 </div>
                                 ${pc.systemInfo && pc.systemInfo.cpu_model ? `
                                     <div class="pc-card-info-item">
@@ -1656,21 +1684,21 @@
             // Update stats grid
             const statsGrid = document.getElementById('statsGrid');
             if (statsGrid) {
-                statsGrid.innerHTML = `
+            statsGrid.innerHTML = `
                     <div class="stat-card" id="appSessionsCard" onclick="toggleAppSessionsBreakdown()" style="cursor: pointer;">
-                        <i class="fas fa-desktop"></i>
+                    <i class="fas fa-desktop"></i>
                         <div class="number">${totalAppSessions}</div>
                         <div class="label">App Sessions</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
                         <div class="number">${formatDuration(totalAppTime)}</div>
                         <div class="label">Total Usage</div>
-                    </div>
+                </div>
                     <div id="appSessionsBreakdown" style="grid-column: 1 / -1; display: none; margin-top: 10px;">
                         <!-- Breakdown content injected here -->
-                    </div>
-                `;
+                </div>
+            `;
                 statsGrid.style.display = 'grid';
             }
 
@@ -1985,9 +2013,23 @@
 
             pcDisplayName.textContent = pcName;
             
-            const statusIcon = isOnline ? 'fa-check-circle' : 'fa-times-circle';
-            const statusLabel = isOnline ? 'Online' : 'Offline';
-            const statusColor = isOnline ? '#22c55e' : '#ef4444';
+            // Check idle status
+            const isIdle = statusData && statusData.is_idle === true;
+            
+            let statusIcon, statusLabel, statusColor;
+            if (!isOnline) {
+                statusIcon = 'fa-times-circle';
+                statusLabel = 'Offline';
+                statusColor = '#ef4444';
+            } else if (isIdle) {
+                statusIcon = 'fa-moon';
+                statusLabel = 'Idle';
+                statusColor = '#f59e0b';
+            } else {
+                statusIcon = 'fa-check-circle';
+                statusLabel = 'Online';
+                statusColor = '#22c55e';
+            }
             
             pcStatusText.innerHTML = `
                 <i class="fas ${statusIcon}" style="color: ${statusColor}"></i>
@@ -1996,8 +2038,14 @@
 
             if (isOnline) {
                 statusIndicator.classList.remove('offline');
+                if (isIdle) {
+                    statusIndicator.classList.add('idle');
+                } else {
+                    statusIndicator.classList.remove('idle');
+                }
             } else {
                 statusIndicator.classList.add('offline');
+                statusIndicator.classList.remove('idle');
             }
 
             console.log('PC Status updated:', { pcName, isOnline, hasStatusData: !!statusData, hasSystemInfo: !!systemInfo });
@@ -2459,10 +2507,10 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                         },
                         scales: {
                             y: {
@@ -2489,10 +2537,10 @@
                                     color: '#e5e7eb'
                                 }
                             }
-                        }
                     }
-                });
-            }
+                }
+            });
+        }
         }
 
         function updateMemoryChart(memoryData, systemInfo) {
@@ -2514,24 +2562,24 @@
             } else {
                 memoryChart = new Chart(ctx, {
                     type: 'line',
-                    data: {
+                data: {
                         labels: labels,
-                        datasets: [{
+                    datasets: [{
                             label: 'Memory Usage',
                             data: values,
                             borderColor: '#00d4ff',
                             backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                            borderWidth: 2,
+                        borderWidth: 2,
                             fill: true,
                             tension: 0.4,
                             pointRadius: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
                                 display: false
                             }
                         },
@@ -2560,9 +2608,9 @@
                                     color: '#e5e7eb'
                                 }
                             }
-                        }
                     }
-                });
+                }
+            });
             }
         }
 

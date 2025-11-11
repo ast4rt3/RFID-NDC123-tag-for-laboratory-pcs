@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
+// Load environment variables
+require('dotenv').config();
+
 // Helper to format date in 12-hour format with AM/PM
 function to12HourFormat(date) {
   const d = new Date(date);
@@ -18,34 +21,6 @@ function to12HourFormat(date) {
 
 // Database abstraction layer that supports both local SQLite and Supabase
 class Database {
-
-  // Update or insert PC status
-  async updatePCStatus(pcName, isOnline, lastSeen, lastActivity) {
-    if (this.type === 'supabase') {
-      return await this.db.updatePCStatus(pcName, isOnline, lastSeen, lastActivity);
-    } else if (this.db && this.db.exec) {
-      // SQLite
-      return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO pc_status (pc_name, is_online, last_seen, last_activity)
-          VALUES (?, ?, ?, ?)
-          ON CONFLICT(pc_name) DO UPDATE SET is_online=excluded.is_online, last_seen=excluded.last_seen, last_activity=excluded.last_activity`;
-        this.db.run(sql, [pcName, isOnline ? 1 : 0, lastSeen, lastActivity], function(err) {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-    } else {
-      // In-memory fallback
-      if (!this.db.pcStatus) this.db.pcStatus = {};
-      this.db.pcStatus[pcName] = {
-        pc_name: pcName,
-        is_online: isOnline,
-        last_seen: lastSeen,
-        last_activity: lastActivity
-      };
-      return Promise.resolve();
-    }
-  }
 
   // Get all PC statuses
   async getAllPCStatus() {
@@ -65,32 +40,94 @@ class Database {
     }
   }
   constructor() {
-    this.type = process.env.DB_TYPE || 'sqlite'; // 'sqlite' or 'supabase'
+    // Auto-detect database type: check if Supabase credentials exist
+    if (process.env.DB_TYPE === 'supabase') {
+      this.type = 'supabase';
+    } else if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+      // Auto-detect: Supabase credentials found, use Supabase
+      this.type = 'supabase';
+      console.log('🔍 Auto-detected Supabase credentials, using Supabase database');
+    } else {
+      // No Supabase credentials, use in-memory storage
+      this.type = 'memory';
+      console.warn('⚠️ No database configured. Using in-memory storage (data will be lost on restart).');
+      console.warn('   To use Supabase, set SUPABASE_URL and SUPABASE_ANON_KEY in .env file');
+    }
     this.db = null;
     this.init();
   }
 
+  async upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname) {
+    if (this.type === 'supabase') {
+      return await this.db.upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname);
+    } else if (this.db && this.db.exec) {
+      // SQLite
+      return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO system_info (pc_name, cpu_model, cpu_cores, cpu_speed_ghz, total_memory_gb, os_platform, os_version, hostname, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          ON CONFLICT(pc_name) DO UPDATE SET 
+            cpu_model=excluded.cpu_model,
+            cpu_cores=excluded.cpu_cores,
+            cpu_speed_ghz=excluded.cpu_speed_ghz,
+            total_memory_gb=excluded.total_memory_gb,
+            os_platform=excluded.os_platform,
+            os_version=excluded.os_version,
+            hostname=excluded.hostname,
+            updated_at=CURRENT_TIMESTAMP`;
+        this.db.run(sql, [pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname], function(err) {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+    } else {
+      // In-memory storage
+      if (!this.db.systemInfo) this.db.systemInfo = {};
+      this.db.systemInfo[pcName] = {
+        pc_name: pcName,
+        cpu_model: cpuModel,
+        cpu_cores: cpuCores,
+        cpu_speed_ghz: cpuSpeedGhz,
+        total_memory_gb: totalMemoryGb,
+        os_platform: osPlatform,
+        os_version: osVersion,
+        hostname: hostname,
+        updated_at: new Date().toISOString()
+      };
+      return Promise.resolve();
+    }
+  }
+
+
   async init() {
     if (this.type === 'supabase') {
-      const SupabaseDB = require('./supabase-client');
-      this.db = new SupabaseDB();
-      const connected = await this.db.testConnection();
-      if (!connected) {
-        console.warn('⚠️ Supabase connection failed, using memory storage');
+      try {
+        const SupabaseDB = require('./supabase-client');
+        this.db = new SupabaseDB();
+        const connected = await this.db.testConnection();
+        if (!connected) {
+          console.warn('⚠️ Supabase connection failed, falling back to memory storage');
+          this.type = 'memory';
+          this.init();
+          return;
+        }
+        console.log('✅ Supabase database initialized successfully');
+        // Using Supabase database
+      } catch (error) {
+        console.error('❌ Failed to initialize Supabase:', error.message);
+        console.warn('⚠️ Falling back to memory storage');
         this.type = 'memory';
         this.init();
         return;
       }
-      // Using Supabase database
     } else {
-      // Use in-memory storage for now (no sqlite3 dependency)
+      // Use in-memory storage
       this.db = {
         timeLogs: [],
         appUsageLogs: [],
         browserSearchLogs: [],
         pcStatus: {}  // Initialize pcStatus storage
       };
-      // Using in-memory storage
+      console.log('📦 Using in-memory storage (data will not persist)');
     }
   }
 
@@ -136,7 +173,8 @@ class Database {
           pc_name TEXT PRIMARY KEY,
           is_online BOOLEAN NOT NULL,
           last_seen DATETIME,
-          last_activity DATETIME
+          last_activity DATETIME,
+          is_idle BOOLEAN DEFAULT 0
         );
 
         CREATE INDEX IF NOT EXISTS idx_time_logs_pc_name ON time_logs(pc_name);
@@ -276,19 +314,21 @@ class Database {
   }
 
   // Update or insert PC status
-  async updatePCStatus(pcName, isOnline, lastSeen, lastActivity) {
+  async updatePCStatus(pcName, isOnline, lastSeen, lastActivity, isIdle) {
     try {
       // Store dates as ISO strings (includes timezone info) instead of formatted strings
       // This ensures timezone is preserved correctly
-      let formattedLastSeen;
-      let formattedLastActivity;
+      let formattedLastSeen = null;
+      let formattedLastActivity = null;
       
-      if (typeof lastSeen === 'string' && (lastSeen.includes('AM') || lastSeen.includes('PM'))) {
-        // If it's already in the custom format, parse it back to Date first
-        formattedLastSeen = new Date(lastSeen).toISOString();
-      } else {
-        // If it's a Date object or ISO string, convert to ISO
-        formattedLastSeen = new Date(lastSeen).toISOString();
+      if (lastSeen) {
+        if (typeof lastSeen === 'string' && (lastSeen.includes('AM') || lastSeen.includes('PM'))) {
+          // If it's already in the custom format, parse it back to Date first
+          formattedLastSeen = new Date(lastSeen).toISOString();
+        } else {
+          // If it's a Date object or ISO string, convert to ISO
+          formattedLastSeen = new Date(lastSeen).toISOString();
+        }
       }
       
       if (lastActivity) {
@@ -297,31 +337,42 @@ class Database {
         } else {
           formattedLastActivity = new Date(lastActivity).toISOString();
         }
-      } else {
-        formattedLastActivity = null;
       }
 
       // Both Supabase and in-memory storage use the same structure
       const pcStatus = {
-        pc_name: pcName,
-        is_online: isOnline,
-        last_seen: formattedLastSeen,
-        last_activity: formattedLastActivity
+        pc_name: pcName
       };
+      
+      // Only include fields that are not null/undefined
+      if (isOnline !== null && isOnline !== undefined) {
+        pcStatus.is_online = isOnline;
+      }
+      if (formattedLastSeen) {
+        pcStatus.last_seen = formattedLastSeen;
+      }
+      if (formattedLastActivity) {
+        pcStatus.last_activity = formattedLastActivity;
+      }
+      if (isIdle !== null && isIdle !== undefined) {
+        pcStatus.is_idle = isIdle;
+      }
 
       if (this.type === 'supabase') {
         // For Supabase, update using the existing client
         await this.db.updatePCStatus(pcStatus);
       } else {
-        // In-memory storage
+        // In-memory storage - merge with existing status
         if (!this.db.pcStatus) this.db.pcStatus = {};
-        this.db.pcStatus[pcName] = pcStatus;
+        this.db.pcStatus[pcName] = { ...this.db.pcStatus[pcName], ...pcStatus };
       }
-      // PC status updated silently
+      // PC status updated successfully
       return Promise.resolve();
     } catch (error) {
-      console.error('Error updating PC status:', error);
-      return Promise.resolve(); // Don't throw error to prevent disrupting main flow
+      console.error(`❌ Error updating PC status for ${pcName}:`, error);
+      console.error('Error stack:', error.stack);
+      // Re-throw to allow server to handle it
+      throw error;
     }
   }
 

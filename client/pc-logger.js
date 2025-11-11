@@ -5,6 +5,7 @@ const pidusage = require('pidusage');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const si = require('systeminformation'); // For system info collection
 // const sqlite3 = require('sqlite3').verbose(); // Temporarily disabled
 
 
@@ -50,6 +51,9 @@ ws.on('open', () => {
   let lastApp = null;
   let lastStart = new Date();
   let appActive = false; // Track if an app is currently active
+  let lastActivityTime = new Date(); // Track last activity for idle detection
+  let isIdle = false; // Current idle state
+  const IDLE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   const IGNORED_APPS = [
     // Add more as needed
@@ -139,6 +143,22 @@ ws.on('open', () => {
 
     // Get GPU usage and send the log inside the callback
     getSystemGpuUsage((gpuPercent) => {
+      // Update last activity time whenever there's app activity
+      lastActivityTime = now;
+      
+      // If was idle, mark as active now
+      if (isIdle) {
+        isIdle = false;
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: 'idle_status',
+            pc_name: pcName,
+            is_idle: false,
+            timestamp: toPhilippineTimeString(now)
+          }));
+        }
+      }
+
       if (!appActive) {
         // First non-ignored app seen
         ws.send(JSON.stringify({
@@ -205,39 +225,37 @@ ws.on('open', () => {
   }, 3000); // 3 seconds
   // --- End app usage tracking ---
 
-  // --- Browser history collection (every 5 minutes) ---
-  setInterval(async () => {
-    try {
-      console.log('Collecting browser history...');
-      // Browser history collection temporarily disabled
-      // const historyEntries = await collectBrowserHistory();
-      
-      // Browser history processing temporarily disabled
-      // if (historyEntries.length > 0) {
-      //   console.log(`Found ${historyEntries.length} search entries in browser history`);
-      //   
-      //   // Send each history entry to server
-      //   for (const entry of historyEntries) {
-      //     ws.send(JSON.stringify({
-      //       type: 'browser_history',
-      //       pc_name: pcName,
-      //       browser: entry.browser,
-      //       window_title: entry.title,
-      //       url: entry.url,
-      //       search_query: entry.searchQuery,
-      //       search_engine: entry.searchEngine,
-      //       timestamp: entry.timestamp
-      //     }));
-      //   }
-      //   console.log(`Sent ${historyEntries.length} browser history entries`);
-      // } else {
-      //   console.log('No recent search entries found in browser history');
-      // }
-    } catch (error) {
-      console.error('Error collecting browser history:', error);
+  // --- Idle detection ---
+  // Check idle status every 30 seconds
+  setInterval(() => {
+    const now = new Date();
+    const timeSinceLastActivity = now - lastActivityTime;
+    const shouldBeIdle = timeSinceLastActivity >= IDLE_THRESHOLD_MS;
+
+    // Only send update if idle state changed
+    if (shouldBeIdle !== isIdle) {
+      isIdle = shouldBeIdle;
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'idle_status',
+          pc_name: pcName,
+          is_idle: isIdle,
+          timestamp: toPhilippineTimeString(now)
+        }));
+      }
     }
-  }, 300000); // 5 minutes (300000 ms)
-  // --- End browser history collection ---
+  }, 30000); // Check every 30 seconds
+  // --- End idle detection ---
+
+  // Send system information once on connection (with delay to ensure connection is stable)
+  setTimeout(() => {
+    if (ws.readyState === WebSocket.OPEN) {
+      sendSystemInfo();
+    } else {
+      console.error('WebSocket not ready when trying to send system info');
+    }
+  }, 500);
+  
 });
 
 // Add error and close event logging
@@ -318,6 +336,8 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
       console.log('🔍 Invalid URL:', e.message);
     }
   }
+  
+
   
   // Fallback: Extract from window title (more comprehensive patterns)
   if (!searchQuery && windowTitle) {
@@ -630,6 +650,64 @@ function handleExit() {
   process.exit();
 }
 
+async function sendSystemInfo() {
+  try {
+    console.log('Collecting system information...');
+    
+    // Check WebSocket is ready
+    if (ws.readyState !== WebSocket.OPEN) {
+      console.error('WebSocket not open, cannot send system info');
+      return;
+    }
+    
+    // Collect system information
+    const [cpu, mem, osInfo] = await Promise.all([
+      si.cpu(),
+      si.mem(),
+      si.osInfo()
+    ]);
+    
+    // Extract CPU model and speed
+    const cpuModel = cpu.manufacturer && cpu.brand ? `${cpu.manufacturer} ${cpu.brand}` : cpu.brand || 'Unknown';
+    const cpuCores = cpu.cores || 0;
+    const cpuSpeedGhz = cpu.speed ? (cpu.speed / 1000) : 0; // Convert MHz to GHz
+    
+    // Extract memory (convert bytes to GB)
+    const totalMemoryGb = mem.total ? (mem.total / (1024 * 1024 * 1024)) : 0;
+    
+    // Extract OS information
+    const osPlatform = osInfo.platform || os.platform();
+    const osVersion = osInfo.distro || osInfo.release || 'Unknown';
+    const hostname = os.hostname();
+    
+    // Send system info to server
+    ws.send(JSON.stringify({
+      type: 'system_info',
+      pc_name: pcName,
+      cpu_model: cpuModel,
+      cpu_cores: cpuCores,
+      cpu_speed_ghz: cpuSpeedGhz,
+      total_memory_gb: totalMemoryGb,
+      os_platform: osPlatform,
+      os_version: osVersion,
+      hostname: hostname
+    }));
+    
+    console.log('✅ System information sent successfully:', {
+      cpu_model: cpuModel,
+      cpu_cores: cpuCores,
+      cpu_speed_ghz: cpuSpeedGhz,
+      total_memory_gb: totalMemoryGb,
+      os_platform: osPlatform,
+      os_version: osVersion,
+      hostname: hostname
+    });
+  } catch (error) {
+    console.error('❌ Error collecting system information:', error);
+  }
+}
+
+// Handle shutdown and exit signals
 process.on('SIGINT', handleExit);   // Ctrl+C
 process.on('SIGTERM', handleExit);  // Termination
 process.on('SIGHUP', handleExit);   // Terminal closed

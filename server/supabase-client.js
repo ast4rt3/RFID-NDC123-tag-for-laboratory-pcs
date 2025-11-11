@@ -9,7 +9,8 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase credentials. Please set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file');
-  process.exit(1);
+  // Don't exit - let the database layer handle fallback to memory storage
+  throw new Error('Missing Supabase credentials');
 }
 
 // Create Supabase client
