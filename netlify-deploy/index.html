@@ -1331,6 +1331,18 @@
                     </div>
                 </div>
 
+                <!-- Session Activity Timeline (AFTER CPU CONSUMERS) -->
+                <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
+                    <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">Session Activity Timeline</h4>
+                    <div style="width:100%; height:320px; position:relative;">
+                        <canvas id="sessionActivityChart"></canvas>
+                    </div>
+                    <div style="margin-top:15px; padding:15px; background:#f8fafc; border-radius:8px; font-size:0.9rem; color:#64748b;">
+                        <p style="margin:0;"><i class="fas fa-info-circle" style="color:#6366f1; margin-right:8px;"></i>
+                        Shows the number of active sessions per hour. Higher bars indicate peak usage times in your lab.</p>
+                    </div>
+                </div>
+
                 <!-- Summary Section (LAST) -->
                 <div style="background:#f3f4f6; padding:20px; border-radius:12px;">
                     <h4 style="font-size:1rem; font-weight:700; margin:0 0 12px 0; color:#1f2937;">Summary</h4>
@@ -2880,6 +2892,15 @@
             return;
         }
 
+        // STOP auto-refresh while viewing Analytics
+        try {
+            stopAutoRefresh();
+        } catch (e) {
+            console.warn('stopAutoRefresh() failed or not defined yet', e);
+        }
+        const refreshIndicator = document.getElementById('refreshIndicator');
+        if (refreshIndicator) refreshIndicator.style.display = 'none';
+
         // Hides pagination controls
         const paginationControls = document.getElementById('paginationControls');
         if (paginationControls) {
@@ -3125,6 +3146,175 @@
                 });
             }
 
+                        // Calculate Session Activity Timeline (hourly active sessions) - FIXED
+            const sessionActivityByHour = {};
+            
+            // Initialize all 24 hours with 0
+            for (let i = 0; i < 24; i++) {
+                sessionActivityByHour[i] = 0;
+            }
+
+            // Count sessions per hour - IMPROVED
+            if (appData && appData.length > 0) {
+                appData.forEach(a => {
+                    if (a.start_time) {
+                        try {
+                            // Parse the start_time accurately
+                            let startTime;
+                            
+                            if (typeof a.start_time === 'string') {
+                                // Handle ISO format: "2025-11-14T05:22:38" or "2025-11-14T05:22:38Z"
+                                if (a.start_time.includes('T')) {
+                                    startTime = new Date(a.start_time);
+                                }
+                                // Handle legacy format: "2025-11-14 05:22 PM"
+                                else if (a.start_time.includes('AM') || a.start_time.includes('PM')) {
+                                    const parts = a.start_time.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
+                                    if (parts) {
+                                        let year = parseInt(parts[1]);
+                                        let month = parseInt(parts[2]) - 1;
+                                        let day = parseInt(parts[3]);
+                                        let hour = parseInt(parts[4]);
+                                        let minute = parseInt(parts[5]);
+                                        let ampm = parts[6];
+                                        
+                                        if (ampm === 'PM' && hour !== 12) hour += 12;
+                                        if (ampm === 'AM' && hour === 12) hour = 0;
+                                        
+                                        startTime = new Date(year, month, day, hour, minute);
+                                    }
+                                } else {
+                                    startTime = new Date(a.start_time);
+                                }
+                            } else if (typeof a.start_time === 'number') {
+                                // Unix timestamp
+                                startTime = new Date(a.start_time);
+                            } else {
+                                startTime = new Date(a.start_time);
+                            }
+
+                            // Validate the date
+                            if (startTime && !isNaN(startTime.getTime())) {
+                                const hour = startTime.getHours();
+                                sessionActivityByHour[hour] += 1;
+                                console.log(`Session at ${hour}:00 - Total for hour ${hour}: ${sessionActivityByHour[hour]}`);
+                            } else {
+                                console.warn('Invalid start_time:', a.start_time);
+                            }
+                        } catch (error) {
+                            console.warn('Error parsing start_time:', a.start_time, error);
+                        }
+                    }
+                });
+            }
+
+            console.log('Session Activity by Hour:', sessionActivityByHour);
+
+                        // Prepare data for chart - CHANGED TO 12-HOUR FORMAT
+            const hourLabels = Array.from({ length: 24 }, (_, i) => {
+                // Format as 12-hour time with AM/PM
+                if (i === 0) return '12 AM';
+                if (i < 12) return `${i} AM`;
+                if (i === 12) return '12 PM';
+                return `${i - 12} PM`;
+            });
+            const sessionCounts = Array.from({ length: 24 }, (_, i) => sessionActivityByHour[i] || 0);
+            
+            // Find peak hour
+            const maxSessions = Math.max(...sessionCounts);
+            const peakHour = sessionCounts.indexOf(maxSessions);
+            const peakHourLabel = hourLabels[peakHour];
+            const peakSessions = sessionCounts[peakHour];
+
+            console.log('Peak Hour:', { peakHour, peakHourLabel, peakSessions, maxSessions });
+
+            // Destroy old session activity chart if exists
+            if (window.sessionActivityChart) {
+                try { window.sessionActivityChart.destroy(); } catch(e) {}
+                window.sessionActivityChart = null;
+            }
+
+            // Create Session Activity Timeline Chart
+            const sessionActivityCanvas = document.getElementById('sessionActivityChart');
+            if (sessionActivityCanvas && sessionCounts.length > 0) {
+                window.sessionActivityChart = new Chart(sessionActivityCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: hourLabels,
+                        datasets: [{
+                            label: 'Active Sessions',
+                            data: sessionCounts,
+                            backgroundColor: sessionCounts.map((count, idx) => 
+                                idx === peakHour ? '#ef4444' : '#8b5cf6'
+                            ),
+                            borderRadius: 4,
+                            hoverBackgroundColor: '#7c3aed',
+                            borderWidth: 1,
+                            borderColor: 'rgba(0,0,0,0.05)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: undefined,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                padding: 12,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    title: function(context) {
+                                        return `Time: ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        return `Sessions: ${context.parsed.y}`;
+                                    },
+                                    afterLabel: function(context) {
+                                        if (context.dataIndex === peakHour) {
+                                            return '⭐ Peak Hour';
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        return value + ' sessions';
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Number of Sessions',
+                                    font: { size: 12, weight: 'bold' }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Hour of Day (12-hour format)',
+                                    font: { size: 12, weight: 'bold' }
+                                },
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 45,
+                                    minRotation: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Update summary with peak hour info
+            const peakHourInfo = peakSessions > 0 ? `Peak usage at <strong>${peakHourLabel}</strong> with <strong>${peakSessions}</strong> session${peakSessions !== 1 ? 's' : ''}.` : 'No session data available.';
+
             // Sort by peak CPU and get top 10
             const topCpuApps = Object.values(cpuHogs)
                 .sort((a, b) => b.peakCpu - a.peakCpu)
@@ -3293,7 +3483,8 @@
                  <strong>Average CPU:</strong> ${avgCpu.toFixed(1)}%<br>
                  <strong>Average Memory:</strong> ${avgMem.toFixed(2)} GB<br>
                  <strong>Total Active Time:</strong> ${totalActive.toFixed(1)} hours<br>
-                 <strong>Idle Time:</strong> ${idleTime.toFixed(1)} hours`;
+                 <strong>Idle Time:</strong> ${idleTime.toFixed(1)} hours<br>
+                 <strong>Peak Activity:</strong> ${peakHourInfo}`;
 
             console.log('Analytics rendered successfully');
 
