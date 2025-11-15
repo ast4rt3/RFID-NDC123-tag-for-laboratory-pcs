@@ -1286,6 +1286,31 @@
                             <div style="font-size:0.85rem; color:#0c4a6e;">Active/Idle ratio</div>
                         </div>
                     </div>
+
+                    <!-- Top Memory Hogs Table -->
+                    <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-top:40px;">
+                        <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">Top Memory Consumers</h4>
+                        <div style="overflow-x:auto;">
+                            <table style="width:100%; border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:white;">
+                                        <th style="padding:15px; text-align:left; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Application</th>
+                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Peak Memory</th>
+                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Avg Memory</th>
+                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Sessions</th>
+                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topMemoryHogsTable">
+                                    <tr>
+                                        <td colspan="5" style="padding:30px; text-align:center; color:#64748b;">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
             
                 
              <!-- Pagination Controls -->
@@ -2926,6 +2951,86 @@
             document.getElementById('avgSessionDuration').textContent = avgSessionDuration.toFixed(1) + ' min';
             document.getElementById('avgCpuUsage').textContent = avgCpu.toFixed(1) + '%';
             document.getElementById('resourceEfficiency').textContent = resourceEfficiencyRatio + ':1';
+
+            // Calculate Top Memory Hogs
+            const memoryHogs = {};
+            if (appData && appData.length > 0) {
+                appData.forEach(a => {
+                    const app = a.app_name || 'Unknown';
+                    const mem = (Number(a.memory_usage_bytes) || 0) / (1024 ** 3); // Convert to GB
+                    
+                    if (!memoryHogs[app]) {
+                        memoryHogs[app] = {
+                            name: app,
+                            peakMemory: mem,
+                            totalMemory: mem,
+                            count: 1,
+                            sessions: []
+                        };
+                    } else {
+                        memoryHogs[app].totalMemory += mem;
+                        memoryHogs[app].count += 1;
+                        if (mem > memoryHogs[app].peakMemory) {
+                            memoryHogs[app].peakMemory = mem;
+                        }
+                    }
+                    memoryHogs[app].sessions.push({
+                        startTime: a.start_time,
+                        memory: mem
+                    });
+                });
+            }
+
+            // Sort by peak memory and get top 10
+            const topMemoryApps = Object.values(memoryHogs)
+                .sort((a, b) => b.peakMemory - a.peakMemory)
+                .slice(0, 10);
+
+            // Update Top Memory Hogs table
+            const topMemoryTable = document.getElementById('topMemoryHogsTable');
+            if (topMemoryTable) {
+                if (topMemoryApps.length === 0) {
+                    topMemoryTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="padding:30px; text-align:center; color:#64748b;">
+                                <i class="fas fa-inbox"></i> No memory data available
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    topMemoryTable.innerHTML = topMemoryApps.map((app, index) => {
+                        const avgMemory = app.totalMemory / app.count;
+                        const isHighMemory = app.peakMemory > 1.0; // Flag if > 1GB
+                        const statusColor = isHighMemory ? '#ef4444' : '#22c55e';
+                        const statusIcon = isHighMemory ? 'fa-alert-circle' : 'fa-check-circle';
+                        const statusText = isHighMemory ? 'High' : 'Normal';
+                        
+                        return `
+                            <tr style="border-bottom:1px solid #e5e7eb;">
+                                <td style="padding:15px; color:#1f2937; font-weight:500;">
+                                    <i class="fas fa-cube" style="color:#6366f1; margin-right:8px;"></i>
+                                    ${escapeHtml(app.name)}
+                                </td>
+                                <td style="padding:15px; text-align:center; color:#1f2937; font-weight:600;">
+                                    ${app.peakMemory.toFixed(2)} GB
+                                </td>
+                                <td style="padding:15px; text-align:center; color:#64748b;">
+                                    ${avgMemory.toFixed(2)} GB
+                                </td>
+                                <td style="padding:15px; text-align:center; color:#64748b;">
+                                    ${app.count}
+                                </td>
+                                <td style="padding:15px; text-align:center;">
+                                    <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 12px; background:${statusColor}20; color:${statusColor}; border-radius:20px; font-size:0.85rem; font-weight:600;">
+                                        <i class="fas ${statusIcon}" style="font-size:0.9rem;"></i>
+                                        ${statusText}
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
 
             // Prepare top apps
             const sortedApps = Object.entries(appUsage)
