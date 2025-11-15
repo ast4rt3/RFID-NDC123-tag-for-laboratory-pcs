@@ -1252,6 +1252,40 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Resource Utilization Summary -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:40px; padding:20px; background:#f0f9ff; border-radius:12px; border-left:4px solid #0284c7;">
+                        <div style="text-align:center;">
+                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Peak CPU Load</div>
+                            <div id="peakCpuLoad" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
+                            <div style="font-size:0.85rem; color:#0c4a6e;">Maximum usage</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Peak Memory</div>
+                            <div id="peakMemory" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
+                            <div style="font-size:0.85rem; color:#0c4a6e;">Maximum usage</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Total Sessions</div>
+                            <div id="totalSessions" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
+                            <div style="font-size:0.85rem; color:#0c4a6e;">App sessions count</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Avg Session Duration</div>
+                            <div id="avgSessionDuration" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
+                            <div style="font-size:0.85rem; color:#0c4a6e;">Average per session</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Avg CPU Usage</div>
+                            <div id="avgCpuUsage" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
+                            <div style="font-size:0.85rem; color:#0c4a6e;">Average during active time</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Resource Efficiency</div>
+                            <div id="resourceEfficiency" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
+                            <div style="font-size:0.85rem; color:#0c4a6e;">Active/Idle ratio</div>
+                        </div>
+                    </div>
             
                 
              <!-- Pagination Controls -->
@@ -2844,6 +2878,7 @@
             const memTrend = [];
             const timeLabels = [];
             let totalCpu = 0, totalMem = 0, count = 0;
+            let peakCpu = 0, peakMem = 0;
 
             if (appData && appData.length > 0) {
                 appData.forEach(a => {
@@ -2856,6 +2891,10 @@
                     totalCpu += cpu;
                     totalMem += mem;
                     count++;
+
+                    // Track peak values
+                    if (cpu > peakCpu) peakCpu = cpu;
+                    if (mem > peakMem) peakMem = mem;
 
                     const timeStr = a.start_time ? new Date(a.start_time).toLocaleTimeString('en-US', {
                         hour: '2-digit',
@@ -2870,6 +2909,9 @@
 
             const avgCpu = count > 0 ? totalCpu / count : 0;
             const avgMem = count > 0 ? totalMem / count : 0;
+            const totalSessions = appData ? appData.length : 0;
+            const avgSessionDuration = totalSessions > 0 ? (totalActiveSeconds / totalSessions / 60) : 0; // in minutes
+            const resourceEfficiencyRatio = idleTime > 0 ? (totalActive / idleTime).toFixed(2) : 0;
 
             // Update summary cards
             document.getElementById('totalActiveTime').textContent = totalActive.toFixed(1) + 'h';
@@ -2877,12 +2919,21 @@
             document.getElementById('avgCpuLoad').textContent = avgCpu.toFixed(1) + '%';
             document.getElementById('avgMemUsage').textContent = avgMem.toFixed(2) + ' GB';
 
+            // Update Resource Utilization Summary
+            document.getElementById('peakCpuLoad').textContent = peakCpu.toFixed(1) + '%';
+            document.getElementById('peakMemory').textContent = peakMem.toFixed(2) + ' GB';
+            document.getElementById('totalSessions').textContent = totalSessions;
+            document.getElementById('avgSessionDuration').textContent = avgSessionDuration.toFixed(1) + ' min';
+            document.getElementById('avgCpuUsage').textContent = avgCpu.toFixed(1) + '%';
+            document.getElementById('resourceEfficiency').textContent = resourceEfficiencyRatio + ':1';
+
             // Prepare top apps
             const sortedApps = Object.entries(appUsage)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 10);
             const labels = sortedApps.map(a => a[0]);
             const values = sortedApps.map(a => Number(a[1].toFixed(2)));
+
 
             // Destroy old charts
             if (window.appChart) {
