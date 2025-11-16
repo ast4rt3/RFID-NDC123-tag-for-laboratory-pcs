@@ -1228,6 +1228,14 @@
                     </div>
                 </div>
 
+                <!-- Donut Chart -->
+                <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+                    <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Application Usage Distribution (All PCs) </h4>
+                    <div style="width:100%; height:320px; position:relative;">
+                        <canvas id="allPcUsagePieChart"></canvas>
+                    </div>
+                </div>
+
                 <!-- Charts Container (SECOND) -->
                 <div style="display:flex; flex-direction:column; gap:40px; margin-bottom:40px;">
                     <!-- Top Applications Chart -->
@@ -3397,6 +3405,51 @@
             .slice(0, 10);
             const labelsAll = sortedAllPcApps.map(a => a[0]);
             const valuesAll = sortedAllPcApps.map(a => Number(a[1].toFixed(2)));
+
+            // Destroy old chart if exists
+if (window.allPcPieChart) {
+    try { window.allPcPieChart.destroy(); } catch(e) {}
+    window.allPcPieChart = null;
+}
+
+// Get canvas and render chart
+const pieCanvas = document.getElementById('allPcUsagePieChart');
+if (pieCanvas && labelsAll.length > 0) {
+    window.allPcPieChart = new Chart(pieCanvas.getContext('2d'), {
+        type: 'doughnut', // or 'pie'
+        data: {
+            labels: labelsAll,
+            datasets: [{
+                label: 'Application Usage Distribution (All PCs)',
+                data: valuesAll,
+                backgroundColor: [
+                    '#6366f1', '#22c55e', '#ef4444', '#f59e0b',
+                    '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316',
+                    '#64748b', '#84cc16'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { boxWidth: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw} hours`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 
 
             // Destroy old charts
