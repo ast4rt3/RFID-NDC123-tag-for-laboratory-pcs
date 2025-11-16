@@ -2894,8 +2894,9 @@
         
 
     async function showAnalyticsReports() {
-    // Declare allPcUsage at the top so it's accessible everywhere
-    let allPcUsage = {};
+    // Global-in-function state
+    let allPcUsage = {}; // All-PC aggregated usage (hours)
+    let appUsage = {};   // Per-PC aggregated usage (hours)
 
     const pcName = document.getElementById('pcName').value.trim();
     const date = document.getElementById('selectedDate').value;
@@ -2904,37 +2905,26 @@
         return;
     }
 
-    // STOP auto-refresh while viewing Analytics
-    try {
-        stopAutoRefresh();
-    } catch (e) {
-        console.warn('stopAutoRefresh() failed or not defined yet', e);
-    }
+    // Stop auto-refresh while viewing Analytics
+    try { stopAutoRefresh(); } catch (e) { console.warn('stopAutoRefresh() failed or not defined yet', e); }
     const refreshIndicator = document.getElementById('refreshIndicator');
     if (refreshIndicator) refreshIndicator.style.display = 'none';
 
-    // Hides pagination controls
+    // Hide pagination controls
     const paginationControls = document.getElementById('paginationControls');
-    if (paginationControls) {
-        paginationControls.style.display = 'none';
-    }
+    if (paginationControls) paginationControls.style.display = 'none';
 
-    // Make sure the parent tab is visible
+    // Show analytics section
     const appsTab = document.getElementById('apps-tab');
-    if (appsTab) {
-        appsTab.style.display = 'block';
-    }
+    if (appsTab) appsTab.style.display = 'block';
 
-    // Hide other content
     const firstChartContainer = appsTab ? appsTab.querySelector('.chart-container') : null;
     const dataTable = appsTab ? appsTab.querySelector('.data-table') : null;
     const pagination = document.getElementById('paginationControls');
-
     if (firstChartContainer) firstChartContainer.style.display = 'none';
     if (dataTable) dataTable.style.display = 'none';
     if (pagination) pagination.style.display = 'none';
 
-    // Show analytics section FIRST and wait for layout
     const analyticsSection = document.getElementById('analyticsSection');
     if (analyticsSection) {
         analyticsSection.style.display = 'block';
@@ -2944,21 +2934,24 @@
     const taskManagerSection = document.getElementById('taskManagerSection');
     if (taskManagerSection) taskManagerSection.style.display = 'none';
 
-    // Highlight button
     const analyticsBtn = document.getElementById('analyticsBtn');
     if (analyticsBtn) {
         analyticsBtn.style.boxShadow = '0 8px 30px rgba(147,51,234,0.25)';
     }
 
-    // CRITICAL: Wait for DOM layout to complete before fetching data
+    // Wait for DOM layout to complete before fetching data
     await new Promise(resolve => setTimeout(resolve, 250));
 
-    // Fetch data - USE CORRECT ISO FORMAT (with T separator)
+    // Date range
     const startIso = `${date}T00:00:00`;
     const endIso = `${date}T23:59:59`;
 
     try {
-        const [{ data: appData, error: appErr }, { data: sessionData, error: timeErr }] = await Promise.all([
+        // Fetch per-PC data and sessions (filtered by pc_name)
+        const [
+            { data: appData, error: appErr },
+            { data: sessionData, error: timeErr }
+        ] = await Promise.all([
             supabase
                 .from('app_usage_logs')
                 .select('app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent')
@@ -2973,23 +2966,12 @@
                 .lte('end_time', endIso)
         ]);
 
-        // ✅ Fetch ALL PCs usage for the same date
+        // Fetch ALL-PC app usage (NO pc_name filter)
         const { data: allPcData, error: allPcErr } = await supabase
             .from('app_usage_logs')
             .select('app_name, duration_seconds')
             .gte('start_time', startIso)
             .lte('end_time', endIso);
-
-        if (allPcErr) {
-            console.error("Error fetching all-PC app usage:", allPcErr);
-        } else if (allPcData && allPcData.length > 0) {
-            allPcUsage = {};
-            allPcData.forEach(row => {
-                const app = row.app_name || 'Unknown';
-                const duration = (row.duration_seconds || 0) / 3600; // convert to hours
-                allPcUsage[app] = (allPcUsage[app] || 0) + duration;
-            });
-        }
 
         if (appErr || timeErr) {
             console.error('Supabase errors:', appErr, timeErr);
@@ -2997,28 +2979,39 @@
             return;
         }
 
+        // Aggregate All-PC usage (hours)
+        if (allPcErr) {
+            console.error('Error fetching all-PC app usage:', allPcErr);
+        } else if (allPcData && allPcData.length > 0) {
+            allPcUsage = {}; // reset
+            allPcData.forEach(row => {
+                const app = row.app_name || 'Unknown';
+                const duration = (row.duration_seconds || 0) / 3600;
+                allPcUsage[app] = (allPcUsage[app] || 0) + duration;
+            });
+        }
+
+        // If no per-PC data and no sessions, show message
         if ((!appData || appData.length === 0) && (!sessionData || sessionData.length === 0)) {
             alert('No analytics data found for this PC and date.');
             return;
         }
 
-        // Compute analytics
+        // Compute per-PC analytics
         let totalActiveSeconds = 0;
         if (sessionData && sessionData.length > 0) {
-            sessionData.forEach(s => {
-                totalActiveSeconds += s.duration_seconds || 0;
-            });
+            sessionData.forEach(s => { totalActiveSeconds += s.duration_seconds || 0; });
         }
         const totalActive = totalActiveSeconds / 3600;
         const idleTime = Math.max(0, 24 - totalActive);
 
-        const appUsage = {};
         const cpuTrend = [];
         const memTrend = [];
         const timeLabels = [];
         let totalCpu = 0, totalMem = 0, count = 0;
         let peakCpu = 0, peakMem = 0;
 
+        appUsage = {};
         if (appData && appData.length > 0) {
             appData.forEach(a => {
                 const app = a.app_name || 'Unknown';
@@ -3035,9 +3028,7 @@
                 if (mem > peakMem) peakMem = mem;
 
                 const timeStr = a.start_time ? new Date(a.start_time).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
+                    hour: '2-digit', minute: '2-digit', hour12: false
                 }) : '';
                 cpuTrend.push(cpu);
                 memTrend.push(mem);
@@ -3048,7 +3039,7 @@
         const avgCpu = count > 0 ? totalCpu / count : 0;
         const avgMem = count > 0 ? totalMem / count : 0;
         const totalSessions = appData ? appData.length : 0;
-        const avgSessionDuration = totalSessions > 0 ? (totalActiveSeconds / totalSessions / 60) : 0; // in minutes
+        const avgSessionDuration = totalSessions > 0 ? (totalActiveSeconds / totalSessions / 60) : 0; // minutes
         const resourceEfficiencyRatio = idleTime > 0 ? (totalActive / idleTime).toFixed(2) : 0;
 
         // Update summary cards
@@ -3057,7 +3048,6 @@
         document.getElementById('avgCpuLoad').textContent = avgCpu.toFixed(1) + '%';
         document.getElementById('avgMemUsage').textContent = avgMem.toFixed(2) + ' GB';
 
-        // Update Resource Utilization Summary
         document.getElementById('peakCpuLoad').textContent = peakCpu.toFixed(1) + '%';
         document.getElementById('peakMemory').textContent = peakMem.toFixed(2) + ' GB';
         document.getElementById('totalSessions').textContent = totalSessions;
