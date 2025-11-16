@@ -1225,8 +1225,7 @@
                         <div style="width:100%; height:320px; position:relative;">
                               <canvas id="analyticsAllPcChart"></canvas>
                         </div>
-                    </div>
-                </div>
+                    </div>          
 
                 <!-- Donut Chart -->
                 <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
@@ -1234,7 +1233,18 @@
                     <div style="width:100%; height:320px; position:relative;">
                         <canvas id="allPcUsagePieChart"></canvas>
                     </div>
-                </div>
+                </div>      
+
+                <!-- Bar Chart: Performance Metrics (All PCs) -->
+<div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
+  <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">
+    Performance Metrics Overview (All PCs)
+  </h4>
+  <div style="width:100%; height:400px; position:relative;">
+    <canvas id="performanceMetricsChart"></canvas>
+  </div>
+</div>
+
 
                 <!-- Charts Container (SECOND) -->
                 <div style="display:flex; flex-direction:column; gap:40px; margin-bottom:40px;">
@@ -2976,10 +2986,13 @@
 
         // Fetch ALL-PC app usage (NO pc_name filter)
         const { data: allPcData, error: allPcErr } = await supabase
-            .from('app_usage_logs')
-            .select('app_name, duration_seconds')
-            .gte('start_time', startIso)
-            .lte('end_time', endIso);
+  .from('app_usage_logs')
+  .select('pc_name, app_name, cpu_percent, memory_usage_bytes, duration_seconds, start_time')
+  .gte('start_time', startIso)
+  .lte('end_time', endIso)
+  .not('cpu_percent', 'is', null)
+  .not('memory_usage_bytes', 'is', null);
+
 
         if (appErr || timeErr) {
             console.error('Supabase errors:', appErr, timeErr);
@@ -3451,6 +3464,113 @@ if (pieCanvas && labelsAll.length > 0) {
     });
 }
 
+// Destroy old chart if exists
+if (window.performanceMetricsChart) {
+    try { window.performanceMetricsChart.destroy(); } catch (e) {}
+    window.performanceMetricsChart = null;
+}
+
+const metricsCanvas = document.getElementById('performanceMetricsChart');
+if (metricsCanvas && allPcData && allPcData.length > 0) {
+    const pcStats = {};
+
+    // Aggregate metrics per PC
+    allPcData.forEach(row => {
+        const pc = row.pc_name;
+        if (!pc) return;
+
+        const cpu = Number(row.cpu_percent) || 0;
+        const mem = (Number(row.memory_usage_bytes) || 0) / (1024 ** 3);
+        const duration = Number(row.duration_seconds) || 0;
+
+        if (!pcStats[pc]) {
+            pcStats[pc] = { totalCpu: 0, totalMem: 0, totalDuration: 0, sessions: 0 };
+        }
+
+        pcStats[pc].totalCpu += cpu;
+        pcStats[pc].totalMem += mem;
+        pcStats[pc].totalDuration += duration;
+        pcStats[pc].sessions++;
+    });
+
+    const labels = Object.keys(pcStats);
+    const cpuData = [];
+    const memData = [];
+    const sessionData = [];
+    const durationData = [];
+
+    labels.forEach(pc => {
+        const stats = pcStats[pc];
+        const avgCpu = stats.totalCpu / stats.sessions;
+        const avgMem = stats.totalMem / stats.sessions;
+        const avgDuration = (stats.totalDuration / stats.sessions) / 60; // seconds → minutes
+        const totalSessions = stats.sessions;
+
+        cpuData.push(avgCpu);
+        memData.push(avgMem);
+        sessionData.push(totalSessions);
+        durationData.push(avgDuration);
+    });
+
+    window.performanceMetricsChart = new Chart(metricsCanvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Avg CPU (%)',
+                    data: cpuData,
+                    backgroundColor: '#3b82f6'
+                },
+                {
+                    label: 'Avg Memory (GB)',
+                    data: memData,
+                    backgroundColor: '#10b981'
+                },
+                {
+                    label: 'Total Sessions',
+                    data: sessionData,
+                    backgroundColor: '#f59e0b'
+                },
+                {
+                    label: 'Avg Duration (min)',
+                    data: durationData,
+                    backgroundColor: '#ef4444'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: { size: 12 },
+                        color: '#374151'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.dataset.label}: ${ctx.raw.toFixed(2)}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: false,
+                    title: { display: true, text: 'PC Name' }
+                },
+                y: {
+                    stacked: false,
+                    beginAtZero: true,
+                    title: { display: true, text: 'Metric Value' }
+                }
+            }
+        }
+    });
+}
+
 
             // Destroy old charts
             if (window.allPcChart) {
@@ -3534,7 +3654,7 @@ if (analyticsAllPcCanvas && labelsAll.length > 0) {
                     title: { display: true, text: 'Active Time (hours)' }
                 },
                 x: {
-                    title: { display: true, text: 'Applications' }
+                    title: { display: true, text: ' ' }
                 }
             }
         }
