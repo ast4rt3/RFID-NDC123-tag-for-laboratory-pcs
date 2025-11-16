@@ -1276,7 +1276,14 @@
                             <canvas id="analyticsMemChart"></canvas>
                         </div>
                     </div>
-                </div>
+
+                    <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
+                    <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Active vs Idle</h4>
+                    <div style="width:100%; height:320px; position:relative;">
+                        <canvas id="activeIdleChart" style="width:100%; height:280px;"></canvas>
+                    </div>
+                    </div>
+                    
 
                 <!-- Resource Utilization Summary (AFTER CHARTS) -->
                 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:40px; padding:20px; background:#f0f9ff; border-radius:12px; border-left:4px solid #0284c7;">
@@ -1337,6 +1344,7 @@
                     </div>
                 </div>
 
+
                 <!-- Top CPU Consumers Table (AFTER CHARTS) -->
                 <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
                     <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">Top CPU Consumers</h4>
@@ -1359,16 +1367,6 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-
-                <!-- Session Activity Timeline (AFTER CPU CONSUMERS) -->
-                
-
-                <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
-                    <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Session Activity by Hour</h4>
-                    <div style="width:100%; height:400px; position:relative;">
-                        <canvas id="sessionActivityChart"></canvas>
                     </div>
                 </div>
 
@@ -2241,6 +2239,56 @@
 
             console.log('Chart updated with', labels.length, 'apps');
         }
+
+        // Active vs Idle chart
+function createActiveIdleChart(activeMinutes, idleMinutes) {
+    const ctx = document.getElementById('activeIdleChart').getContext('2d');
+
+    if (window.activeIdleChart && typeof window.activeIdleChart.destroy === 'function') {
+  window.activeIdleChart.destroy();
+}
+
+
+    window.activeIdleChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Time Breakdown'],
+            datasets: [
+                {
+                    label: 'Active Time',
+                    data: [activeMinutes],
+                    backgroundColor: '#10b981'
+                },
+                {
+                    label: 'Idle Time',
+                    data: [idleMinutes],
+                    backgroundColor: '#ef4444'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} min`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Minutes',
+                        font: { size: 12, weight: 'bold' }
+                    }
+                }
+            }
+        }
+    });
+}
 
 
         function updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate) {
@@ -3188,175 +3236,7 @@
                 });
             }
 
-                        // Calculate Session Activity Timeline (hourly active sessions) - FIXED
-            const sessionActivityByHour = {};
-            
-            // Initialize all 24 hours with 0
-            for (let i = 0; i < 24; i++) {
-                sessionActivityByHour[i] = 0;
-            }
-
-            // Count sessions per hour - IMPROVED
-            if (appData && appData.length > 0) {
-                appData.forEach(a => {
-                    if (a.start_time) {
-                        try {
-                            // Parse the start_time accurately
-                            let startTime;
-                            
-                            if (typeof a.start_time === 'string') {
-                                // Handle ISO format: "2025-11-14T05:22:38" or "2025-11-14T05:22:38Z"
-                                if (a.start_time.includes('T')) {
-                                    startTime = new Date(a.start_time);
-                                }
-                                // Handle legacy format: "2025-11-14 05:22 PM"
-                                else if (a.start_time.includes('AM') || a.start_time.includes('PM')) {
-                                    const parts = a.start_time.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
-                                    if (parts) {
-                                        let year = parseInt(parts[1]);
-                                        let month = parseInt(parts[2]) - 1;
-                                        let day = parseInt(parts[3]);
-                                        let hour = parseInt(parts[4]);
-                                        let minute = parseInt(parts[5]);
-                                        let ampm = parts[6];
-                                        
-                                        if (ampm === 'PM' && hour !== 12) hour += 12;
-                                        if (ampm === 'AM' && hour === 12) hour = 0;
-                                        
-                                        startTime = new Date(year, month, day, hour, minute);
-                                    }
-                                } else {
-                                    startTime = new Date(a.start_time);
-                                }
-                            } else if (typeof a.start_time === 'number') {
-                                // Unix timestamp
-                                startTime = new Date(a.start_time);
-                            } else {
-                                startTime = new Date(a.start_time);
-                            }
-
-                            // Validate the date
-                            if (startTime && !isNaN(startTime.getTime())) {
-                                const hour = startTime.getHours();
-                                sessionActivityByHour[hour] += 1;
-                                console.log(`Session at ${hour}:00 - Total for hour ${hour}: ${sessionActivityByHour[hour]}`);
-                            } else {
-                                console.warn('Invalid start_time:', a.start_time);
-                            }
-                        } catch (error) {
-                            console.warn('Error parsing start_time:', a.start_time, error);
-                        }
-                    }
-                });
-            }
-
-            console.log('Session Activity by Hour:', sessionActivityByHour);
-
-                        // Prepare data for chart - CHANGED TO 12-HOUR FORMAT
-            const hourLabels = Array.from({ length: 24 }, (_, i) => {
-                // Format as 12-hour time with AM/PM
-                if (i === 0) return '12 AM';
-                if (i < 12) return `${i} AM`;
-                if (i === 12) return '12 PM';
-                return `${i - 12} PM`;
-            });
-            const sessionCounts = Array.from({ length: 24 }, (_, i) => sessionActivityByHour[i] || 0);
-            
-            // Find peak hour
-            const maxSessions = Math.max(...sessionCounts);
-            const peakHour = sessionCounts.indexOf(maxSessions);
-            const peakHourLabel = hourLabels[peakHour];
-            const peakSessions = sessionCounts[peakHour];
-
-            console.log('Peak Hour:', { peakHour, peakHourLabel, peakSessions, maxSessions });
-
-            // Destroy old session activity chart if exists
-            if (window.sessionActivityChart) {
-                try { window.sessionActivityChart.destroy(); } catch(e) {}
-                window.sessionActivityChart = null;
-            }
-
-            // Create Session Activity Timeline Chart
-            const sessionActivityCanvas = document.getElementById('sessionActivityChart');
-            if (sessionActivityCanvas && sessionCounts.length > 0) {
-                window.sessionActivityChart = new Chart(sessionActivityCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: hourLabels,
-                        datasets: [{
-                            label: 'Active Sessions',
-                            data: sessionCounts,
-                            backgroundColor: sessionCounts.map((count, idx) => 
-                                idx === peakHour ? '#ef4444' : '#8b5cf6'
-                            ),
-                            borderRadius: 4,
-                            hoverBackgroundColor: '#7c3aed',
-                            borderWidth: 1,
-                            borderColor: 'rgba(0,0,0,0.05)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: undefined,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                padding: 12,
-                                titleFont: { size: 13, weight: 'bold' },
-                                bodyFont: { size: 12 },
-                                callbacks: {
-                                    title: function(context) {
-                                        return `Time: ${context[0].label}`;
-                                    },
-                                    label: function(context) {
-                                        return `Sessions: ${context.parsed.y}`;
-                                    },
-                                    afterLabel: function(context) {
-                                        if (context.dataIndex === peakHour) {
-                                            return '⭐ Peak Hour';
-                                        }
-                                        return '';
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    callback: function(value) {
-                                        return value + ' sessions';
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Number of Sessions',
-                                    font: { size: 12, weight: 'bold' }
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Hour of Day (12-hour format)',
-                                    font: { size: 12, weight: 'bold' }
-                                },
-                                ticks: {
-                                    autoSkip: false,
-                                    maxRotation: 45,
-                                    minRotation: 0
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Update summary with peak hour info
-            const peakHourInfo = peakSessions > 0 ? `Peak usage at <strong>${peakHourLabel}</strong> with <strong>${peakSessions}</strong> session${peakSessions !== 1 ? 's' : ''}.` : 'No session data available.';
-
+                        
             // Sort by peak CPU and get top 10
             const topCpuApps = Object.values(cpuHogs)
                 .sort((a, b) => b.peakCpu - a.peakCpu)
@@ -3801,9 +3681,16 @@ if (analyticsAllPcCanvas && labelsAll.length > 0) {
                 `<strong>Most used app:</strong> ${escapeHtml(topApp)}<br>
                  <strong>Average CPU:</strong> ${avgCpu.toFixed(1)}%<br>
                  <strong>Average Memory:</strong> ${avgMem.toFixed(2)} GB<br>
-                 <strong>Total Active Time:</strong> ${totalActive.toFixed(1)} hours<br>
                  <strong>Idle Time:</strong> ${idleTime.toFixed(1)} hours<br>
-                 <strong>Peak Activity:</strong> ${peakHourInfo}`;
+                 <strong>Total Active Time:</strong> ${totalActive.toFixed(1)}`;    
+
+                 // Convert hours to minutes for chart
+const totalActiveMinutes = totalActive * 60;
+const totalIdleMinutes = idleTime * 60;
+
+// Render Active vs Idle chart
+createActiveIdleChart(totalActiveMinutes, totalIdleMinutes);
+           
 
             console.log('Analytics rendered successfully');
 
