@@ -1007,15 +1007,6 @@
                         <label for="selectedDate"><i class="fas fa-calendar"></i> Date</label>
                         <input type="date" id="selectedDate">
                     </div>
-                    <div class="form-group">
-                        <label for="dateRangeSelect"><i class="fas fa-clock"></i> Range</label>
-                        <select id="dateRangeSelect" onchange="handleRangeChange()">
-                            <option value="custom" selected>Single Day</option>
-                            <option value="last3">Last 3 days</option>
-                            <option value="last5">Last 5 days</option>
-                            <option value="last30">Last 30 days</option>
-                        </select>
-                    </div>
                     <button class="btn" onclick="loadData()">
                         <i class="fas fa-search"></i>
                         Load Data
@@ -1209,8 +1200,30 @@
         <div class="home-container" id="analyticsPage">
             <h2 class="page-title">Analytics Reports</h2>
             <p class="page-subtitle">Performance and usage summary across all PCs and the selected PC</p>
+            <div class="controls" style="margin-bottom:20px;">
+                <div class="control-group" style="align-items:flex-start;">
+                    <div class="form-group">
+                        <label for="analyticsRangeSelect"><i class="fas fa-clock"></i> Range</label>
+                        <select id="analyticsRangeSelect" onchange="handleAnalyticsRangeChange()">
+                            <option value="today" selected>Today</option>
+                            <option value="last3">Last 3 days</option>
+                            <option value="last5">Last 5 days</option>
+                            <option value="last30">Last 30 days</option>
+                            <option value="custom">Custom Date</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="analyticsCustomDateGroup" style="display:none;">
+                        <label for="analyticsCustomDate"><i class="fas fa-calendar-day"></i> Custom Date</label>
+                        <input type="date" id="analyticsCustomDate">
+                    </div>
+                    <button class="btn" style="background:#7933ea; color:white; margin-left:auto;" onclick="showAnalyticsReports()" id="analyticsLoadBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        Load Analytics
+                    </button>
+                </div>
+            </div>
             <div id="analyticsPlaceholder" class="loading">
-                Select a PC and date to load analytics insights
+                Select a PC, pick a range, then click "Load Analytics"
             </div>
 
             <div id="analyticsSection" style="display:none; margin-top:30px;">
@@ -1422,6 +1435,11 @@
 
         // Set today's date as default
         document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+        const analyticsDateInput = document.getElementById('analyticsCustomDate');
+        if (analyticsDateInput) {
+            analyticsDateInput.value = new Date().toISOString().split('T')[0];
+        }
+        handleAnalyticsRangeChange();
 
         let appChart = null;
         let cpuChart = null;
@@ -1545,9 +1563,8 @@
                 }
 
                 // Get selected date
-                const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
-
                 // Update PC status only
+                const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
                 updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
                 
                 // Update last update time
@@ -1583,6 +1600,62 @@
 
 
 
+        function handleAnalyticsRangeChange() {
+            const rangeSelect = document.getElementById('analyticsRangeSelect');
+            const customGroup = document.getElementById('analyticsCustomDateGroup');
+            const customInput = document.getElementById('analyticsCustomDate');
+            if (!rangeSelect || !customGroup || !customInput) return;
+            const isCustom = rangeSelect.value === 'custom';
+            customGroup.style.display = isCustom ? 'block' : 'none';
+            customInput.disabled = !isCustom;
+            if (isCustom && !customInput.value) {
+                customInput.value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        function getAnalyticsRangeConfig() {
+            const rangeSelect = document.getElementById('analyticsRangeSelect');
+            const customInput = document.getElementById('analyticsCustomDate');
+            const mode = rangeSelect ? rangeSelect.value : 'today';
+            const today = new Date();
+            const todayIso = today.toISOString().split('T')[0];
+
+            const buildSingleDay = (dateStr, label) => ({
+                mode: 'single',
+                startIso: `${dateStr}T00:00:00`,
+                endIso: `${dateStr}T23:59:59`,
+                label,
+                selectedDate: dateStr
+            });
+
+            if (mode === 'custom') {
+                const customDate = customInput && customInput.value ? customInput.value : todayIso;
+                if (customInput && !customInput.value) {
+                    customInput.value = customDate;
+                }
+                return buildSingleDay(customDate, customDate);
+            }
+
+            if (mode === 'today') {
+                return buildSingleDay(todayIso, 'Today');
+            }
+
+            const dayCounts = { last3: 3, last5: 5, last30: 30 };
+            const days = dayCounts[mode] || 3;
+            const endDate = new Date();
+            endDate.setHours(23, 59, 59, 999);
+            const startDate = new Date(endDate);
+            startDate.setDate(startDate.getDate() - (days - 1));
+            startDate.setHours(0, 0, 0, 0);
+
+            return {
+                mode,
+                startIso: startDate.toISOString(),
+                endIso: endDate.toISOString(),
+                label: `Last ${days} days`
+            };
+        }
+
         // Get URL parameters
         function getURLParams() {
             const params = new URLSearchParams(window.location.search);
@@ -1600,6 +1673,8 @@
             }
             if (date) {
                 url.searchParams.set('date', date);
+            } else {
+                url.searchParams.delete('date');
             }
             window.history.pushState({}, '', url);
         }
@@ -1607,14 +1682,12 @@
         // Check for URL parameters on page load
         function checkURLParams() {
             const params = getURLParams();
+            if (params.date) {
+                document.getElementById('selectedDate').value = params.date;
+            }
+
             if (params.pc) {
                 document.getElementById('pcName').value = params.pc;
-                if (params.date) {
-                    document.getElementById('selectedDate').value = params.date;
-                } else {
-                    // If no date in URL, use today's date
-                    document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
-                }
                 // Auto-load data
                 loadData();
             }
@@ -1669,9 +1742,8 @@
                 event.preventDefault();
             }
             const pcName = document.getElementById('pcName').value.trim();
-            const date = document.getElementById('selectedDate').value;
-            if (!pcName || !date) {
-                alert('Please enter a PC name and select a date first.');
+            if (!pcName) {
+                alert('Please enter a PC name first.');
                 return;
             }
             setActivePage('analytics');
@@ -1833,24 +1905,23 @@
 
         async function loadData() {
             const pcName = document.getElementById('pcName').value.trim();
-            let selectedDate = document.getElementById('selectedDate').value;
+            const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
 
             if (!pcName) {
                 alert('Please enter a PC name');
                 return;
             }
 
-            // If no date selected, use today's date
-            if (!selectedDate) {
-                selectedDate = new Date().toISOString().split('T')[0];
-                document.getElementById('selectedDate').value = selectedDate;
-            }
-
             // Update URL with current parameters
             updateURL(pcName, selectedDate);
 
             // Update header and show loading state
-            document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
+            const headerText = document.getElementById('headerText');
+            if (headerText) {
+                headerText.textContent = `PC: ${pcName} • ${selectedDate}`;
+            } else {
+                document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
+            }
             document.getElementById('loadingMessage').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
             document.getElementById('loadingMessage').style.display = 'block';
             document.getElementById('statsGrid').style.display = 'none';
@@ -1905,15 +1976,12 @@
                 updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
 
                 // Fetch app usage data
-                const startDate = `${selectedDate}T00:00:00`;
-                const endDate = `${selectedDate}T23:59:59`;
-
                 const { data: appData, error: appError } = await supabase
                     .from('app_usage_logs')
                     .select('*')
                     .eq('pc_name', pcName)
-                    .gte('start_time', startDate)
-                    .lte('end_time', endDate)
+                    .gte('start_time', `${selectedDate}T00:00:00`)
+                    .lte('end_time', `${selectedDate}T23:59:59`)
                     .order('start_time', { ascending: false });
 
                 if (appError) {
@@ -2457,6 +2525,8 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
             url.searchParams.set('pc', pcName);
             if (date) {
                 url.searchParams.set('date', date);
+            } else {
+                url.searchParams.delete('date');
             }
             const shareableLink = document.getElementById('shareableLink');
             if (shareableLink) {
@@ -3015,9 +3085,9 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
     let appUsage = {};   // Per-PC aggregated usage (hours)
 
     const pcName = document.getElementById('pcName').value.trim();
-    const date = document.getElementById('selectedDate').value;
-    if (!pcName || !date) {
-        alert('Please enter a PC name and select a date first.');
+    const rangeConfig = getAnalyticsRangeConfig();
+    if (!pcName) {
+        alert('Please enter a PC name first.');
         return;
     }
 
@@ -3030,7 +3100,7 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
     const analyticsSection = document.getElementById('analyticsSection');
     if (analyticsPlaceholder) {
         analyticsPlaceholder.style.display = 'block';
-        analyticsPlaceholder.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading analytics...';
+        analyticsPlaceholder.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading analytics (${rangeConfig.label})...`;
     }
     if (analyticsSection) {
         analyticsSection.style.display = 'none';
@@ -3040,8 +3110,7 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
     await new Promise(resolve => setTimeout(resolve, 250));
 
     // Date range
-    const startIso = `${date}T00:00:00`;
-    const endIso = `${date}T23:59:59`;
+    const { startIso, endIso } = rangeConfig;
 
     try {
         // Fetch per-PC data and sessions (filtered by pc_name)
@@ -3093,7 +3162,7 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
 
         // If no per-PC data and no sessions, show message
         if ((!appData || appData.length === 0) && (!sessionData || sessionData.length === 0)) {
-            alert('No analytics data found for this PC and date.');
+            alert(`No analytics data found for this PC and range (${rangeConfig.label}).`);
             return;
         }
 
@@ -3787,7 +3856,8 @@ if (scatterCanvas && allPcData && allPcData.length > 0) {
             // Update summary text
             const topApp = sortedApps[0] ? `${sortedApps[0][0]} (${sortedApps[0][1].toFixed(1)}h)` : 'None';
             document.getElementById('analyticsSummary').innerHTML =
-                `<strong>Most used app:</strong> ${escapeHtml(topApp)}<br>
+                `<strong>Range:</strong> ${escapeHtml(rangeConfig.label)}<br>
+                 <strong>Most used app:</strong> ${escapeHtml(topApp)}<br>
                  <strong>Average CPU:</strong> ${avgCpu.toFixed(1)}%<br>
                  <strong>Average Memory:</strong> ${avgMem.toFixed(2)} GB<br>
                  <strong>Idle Time:</strong> ${idleTime.toFixed(1)} hours<br>
@@ -3822,10 +3892,11 @@ createActiveIdleChart(totalActiveMinutes, totalIdleMinutes);
     // CSV Export Function with Enhanced Data & Better Formatting
     function downloadAnalyticsCSV() {
         const pcName = document.getElementById('pcName').value.trim();
-        const selectedDate = document.getElementById('selectedDate').value;
+        const rangeConfig = getAnalyticsRangeConfig();
+        const reportRange = rangeConfig.label;
         
-        if (!pcName || !selectedDate) {
-            alert('Please select a PC and date first.');
+        if (!pcName) {
+            alert('Please select a PC first.');
             return;
         }
 
@@ -3872,7 +3943,7 @@ createActiveIdleChart(totalActiveMinutes, totalIdleMinutes);
         csvLines.push('"Analytics Report - ICS Lab Monitor"');
         csvLines.push(`"Generated: ${new Date().toLocaleString()}"`);
         csvLines.push(`"PC Name: ${pcName}"`);
-        csvLines.push(`"Report Date: ${selectedDate}"`);
+        csvLines.push(`"Report Range: ${reportRange}"`);
         csvLines.push(''); // Blank line
 
         // System Information Section
@@ -3926,7 +3997,8 @@ createActiveIdleChart(totalActiveMinutes, totalIdleMinutes);
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `analytics_${pcName}_${selectedDate}.csv`);
+        const rangeSlug = reportRange ? reportRange.replace(/[^\w]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') : 'range';
+        link.setAttribute('download', `analytics_${pcName}_${rangeSlug}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
