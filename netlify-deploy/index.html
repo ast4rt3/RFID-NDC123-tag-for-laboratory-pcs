@@ -3465,14 +3465,15 @@ const scatterCanvas = document.getElementById('resourceEfficiencyChart');
 if (scatterCanvas && allPcData && allPcData.length > 0) {
     const pcStats = {};
 
-    // Aggregate CPU + Memory per PC
+    // Aggregate CPU, Memory and Duration per PC
     allPcData.forEach(row => {
         const pc = row.pc_name;
         const cpuRaw = row.cpu_percent;
         const memRaw = row.memory_usage_bytes;
+        const dur = Number(row.duration_seconds) || 0;
 
         if (!pc || cpuRaw == null || memRaw == null) {
-            console.warn('Skipping invalid row:', row);
+            // skip invalid rows
             return;
         }
 
@@ -3480,29 +3481,45 @@ if (scatterCanvas && allPcData && allPcData.length > 0) {
         const mem = Number(memRaw) / (1024 ** 3); // bytes → GB
 
         if (!pcStats[pc]) {
-            pcStats[pc] = { totalCpu: 0, totalMem: 0, count: 0 };
+            pcStats[pc] = { totalCpu: 0, totalMem: 0, totalDuration: 0, count: 0 };
         }
         pcStats[pc].totalCpu += cpu;
         pcStats[pc].totalMem += mem;
+        pcStats[pc].totalDuration += dur;
         pcStats[pc].count++;
     });
 
-    // Build datasets
-    const datasets = Object.entries(pcStats).map(([pc, stats]) => {
+    // Build datasets: each PC becomes a single bubble (x=avgCpu, y=avgMem, r=avgDuration)
+    const datasets = Object.entries(pcStats).map(([pc, stats], idx) => {
         const avgCpu = stats.totalCpu / stats.count;
         const avgMem = stats.totalMem / stats.count;
+        const avgDurationMin = (stats.totalDuration / stats.count) / 60; // minutes
+
+        // Map avg duration to radius (px) with reasonable bounds
+        const r = Math.max(6, Math.min(30, Math.round(avgDurationMin * 0.6 + 4)));
+
+        const colorPalette = ['#3b82f6','#10b981','#ef4444','#f59e0b','#8b5cf6','#6366f1','#14b8a6','#f97316','#64748b','#84cc16'];
+        const color = colorPalette[idx % colorPalette.length];
 
         return {
             label: pc,
-            data: [{ x: avgCpu, y: avgMem }],
-            backgroundColor: (avgCpu > 15 || avgMem > 4) ? '#ef4444' : '#3b82f6',
-            pointRadius: 6
+            data: [{ x: +avgCpu.toFixed(2), y: +avgMem.toFixed(3), r }],
+            backgroundColor: color + '80', // semi-transparent
+            borderColor: color,
+            borderWidth: 1,
+            hoverBackgroundColor: color + 'c0'
         };
     });
 
     if (datasets.length > 0) {
+        // Destroy previous if present (the page already handles some destruction, but safe to repeat)
+        if (window.resourceEfficiencyChart) {
+            try { window.resourceEfficiencyChart.destroy(); } catch(e) {}
+            window.resourceEfficiencyChart = null;
+        }
+
         window.resourceEfficiencyChart = new Chart(scatterCanvas.getContext('2d'), {
-            type: 'scatter',
+            type: 'bubble',
             data: { datasets },
             options: {
                 responsive: true,
@@ -3510,26 +3527,31 @@ if (scatterCanvas && allPcData && allPcData.length > 0) {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: ctx =>
-                                `${ctx.dataset.label}: CPU ${ctx.raw.x.toFixed(1)}%, Mem ${ctx.raw.y.toFixed(2)} GB`
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const x = context.raw.x !== undefined ? context.raw.x : (context.parsed && context.parsed.x);
+                                const y = context.raw.y !== undefined ? context.raw.y : (context.parsed && context.parsed.y);
+                                const rVal = context.raw.r || (context.parsed && context.parsed.r) || '';
+                                return `${label}: CPU ${Number(x).toFixed(1)}%, Mem ${Number(y).toFixed(2)} GB, bubble ~ ${rVal}px (avg session)`;
+                            }
                         }
                     },
-                    legend: { display: false }
+                    legend: { position: 'right' }
                 },
                 scales: {
                     x: {
                         title: { display: true, text: 'Average CPU Usage (%)' },
-                        min: 0
+                        beginAtZero: true
                     },
                     y: {
                         title: { display: true, text: 'Average Memory Usage (GB)' },
-                        min: 0
+                        beginAtZero: true
                     }
                 }
             }
         });
     } else {
-        console.warn('No valid PC data found for scatter plot.');
+        console.warn('No valid PC data found for bubble chart.');
     }
 }
 
