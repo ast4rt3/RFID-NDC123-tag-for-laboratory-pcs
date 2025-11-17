@@ -1656,6 +1656,67 @@
             };
         }
 
+        function computeActiveIdleFromEntries(entries, rangeStartMs, rangeEndMs) {
+            const totalRangeMs = Math.max(0, rangeEndMs - rangeStartMs);
+            if (!entries || !entries.length || totalRangeMs === 0) {
+                return { activeSeconds: 0, idleSeconds: totalRangeMs / 1000 };
+            }
+
+            const intervals = entries.map(entry => {
+                const startRaw = entry.start_time || entry.startTime || entry.start;
+                const endRaw = entry.end_time || entry.endTime || entry.end;
+                let start = startRaw ? new Date(startRaw).getTime() : NaN;
+                let end = endRaw ? new Date(endRaw).getTime() : NaN;
+
+                if (isNaN(start) && !isNaN(end) && entry.duration_seconds) {
+                    start = end - Number(entry.duration_seconds) * 1000;
+                }
+                if (isNaN(end) && !isNaN(start) && entry.duration_seconds) {
+                    end = start + Number(entry.duration_seconds) * 1000;
+                }
+
+                if (isNaN(start) || isNaN(end)) {
+                    return null;
+                }
+
+                const clampedStart = Math.max(rangeStartMs, start);
+                const clampedEnd = Math.min(rangeEndMs, end);
+
+                if (clampedEnd <= clampedStart) {
+                    return null;
+                }
+
+                return [clampedStart, clampedEnd];
+            }).filter(Boolean);
+
+            if (!intervals.length) {
+                return { activeSeconds: 0, idleSeconds: totalRangeMs / 1000 };
+            }
+
+            intervals.sort((a, b) => a[0] - b[0]);
+            const merged = [];
+            for (const interval of intervals) {
+                if (!merged.length) {
+                    merged.push(interval.slice());
+                    continue;
+                }
+                const last = merged[merged.length - 1];
+                if (interval[0] <= last[1]) {
+                    last[1] = Math.max(last[1], interval[1]);
+                } else {
+                    merged.push(interval.slice());
+                }
+            }
+
+            const activeMs = merged.reduce((sum, [start, end]) => sum + (end - start), 0);
+            const idleMs = Math.max(0, totalRangeMs - activeMs);
+
+            return {
+                activeSeconds: activeMs / 1000,
+                idleSeconds: idleMs / 1000
+            };
+        }
+
         // Get URL parameters
         function getURLParams() {
             const params = new URLSearchParams(window.location.search);
@@ -1741,13 +1802,8 @@
             if (event && event.preventDefault) {
                 event.preventDefault();
             }
-            const pcName = document.getElementById('pcName').value.trim();
-            if (!pcName) {
-                alert('Please enter a PC name first.');
-                return;
-            }
             setActivePage('analytics');
-            showAnalyticsReports();
+            stopAutoRefresh();
         }
 
         function navigateToPC(pcName) {
@@ -3086,10 +3142,9 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
 
     const pcName = document.getElementById('pcName').value.trim();
     const rangeConfig = getAnalyticsRangeConfig();
-    if (!pcName) {
-        alert('Please enter a PC name first.');
-        return;
-    }
+    const hasPcFilter = !!pcName;
+    let appData = [];
+    let sessionData = [];
 
     // Stop auto-refresh while viewing Analytics
     try { stopAutoRefresh(); } catch (e) { console.warn('stopAutoRefresh() failed or not defined yet', e); }
@@ -3113,24 +3168,34 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
     const { startIso, endIso } = rangeConfig;
 
     try {
-        // Fetch per-PC data and sessions (filtered by pc_name)
-        const [
-            { data: appData, error: appErr },
-            { data: sessionData, error: timeErr }
-        ] = await Promise.all([
-            supabase
-                .from('app_usage_logs')
-                .select('app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent')
-                .eq('pc_name', pcName)
-                .gte('start_time', startIso)
-                .lte('end_time', endIso),
-            supabase
-                .from('time_logs')
-                .select('start_time, end_time, duration_seconds')
-                .eq('pc_name', pcName)
-                .gte('start_time', startIso)
-                .lte('end_time', endIso)
-        ]);
+        if (hasPcFilter) {
+            const [
+                { data: pcAppData, error: appErr },
+                { data: pcSessionData, error: timeErr }
+            ] = await Promise.all([
+                supabase
+                    .from('app_usage_logs')
+                    .select('app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent')
+                    .eq('pc_name', pcName)
+                    .gte('start_time', startIso)
+                    .lte('end_time', endIso),
+                supabase
+                    .from('time_logs')
+                    .select('start_time, end_time, duration_seconds')
+                    .eq('pc_name', pcName)
+                    .gte('start_time', startIso)
+                    .lte('end_time', endIso)
+            ]);
+
+            if (appErr || timeErr) {
+                console.error('Supabase errors:', appErr, timeErr);
+                alert('Failed to load data from Supabase.');
+                return;
+            }
+
+            appData = pcAppData || [];
+            sessionData = pcSessionData || [];
+        }
 
         // Fetch ALL-PC app usage (NO pc_name filter)
         const { data: allPcData, error: allPcErr } = await supabase
@@ -3141,12 +3206,6 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
   .not('cpu_percent', 'is', null)
   .not('memory_usage_bytes', 'is', null);
 
-
-        if (appErr || timeErr) {
-            console.error('Supabase errors:', appErr, timeErr);
-            alert('Failed to load data from Supabase.');
-            return;
-        }
 
         // Aggregate All-PC usage (hours)
         if (allPcErr) {
@@ -3161,18 +3220,28 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
         }
 
         // If no per-PC data and no sessions, show message
-        if ((!appData || appData.length === 0) && (!sessionData || sessionData.length === 0)) {
+        const analyticsEntries = hasPcFilter ? (appData || []) : (allPcData || []);
+
+        if (hasPcFilter && analyticsEntries.length === 0 && (!sessionData || !sessionData.length)) {
             alert(`No analytics data found for this PC and range (${rangeConfig.label}).`);
             return;
         }
 
-        // Compute per-PC analytics
-        let totalActiveSeconds = 0;
-        if (sessionData && sessionData.length > 0) {
-            sessionData.forEach(s => { totalActiveSeconds += s.duration_seconds || 0; });
+        if (!hasPcFilter && analyticsEntries.length === 0) {
+            alert(`No analytics data found for range (${rangeConfig.label}).`);
+            return;
         }
+
+        const rangeStartMs = new Date(startIso).getTime();
+        const rangeEndMs = new Date(endIso).getTime();
+        const idleSource = (sessionData && sessionData.length > 0) ? sessionData : analyticsEntries;
+        const { activeSeconds: totalActiveSeconds } = computeActiveIdleFromEntries(idleSource, rangeStartMs, rangeEndMs);
         const totalActive = totalActiveSeconds / 3600;
-        const idleTime = Math.max(0, 24 - totalActive);
+        const MS_IN_DAY = 24 * 60 * 60 * 1000;
+        const DAILY_EXPECTED_HOURS = 8;
+        const expectedDays = Math.max(1, Math.ceil((rangeEndMs - rangeStartMs) / MS_IN_DAY));
+        const expectedHours = expectedDays * DAILY_EXPECTED_HOURS;
+        const idleTime = Math.max(0, expectedHours - totalActive);
 
         const cpuTrend = [];
         const memTrend = [];
@@ -3181,8 +3250,8 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
         let peakCpu = 0, peakMem = 0;
 
         appUsage = {};
-        if (appData && appData.length > 0) {
-            appData.forEach(a => {
+        if (analyticsEntries && analyticsEntries.length > 0) {
+            analyticsEntries.forEach(a => {
                 const app = a.app_name || 'Unknown';
                 const duration = (a.duration_seconds || 0) / 3600;
                 appUsage[app] = (appUsage[app] || 0) + duration;
@@ -3207,9 +3276,9 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
 
         const avgCpu = count > 0 ? totalCpu / count : 0;
         const avgMem = count > 0 ? totalMem / count : 0;
-        const totalSessions = appData ? appData.length : 0;
+        const totalSessions = analyticsEntries.length;
         const avgSessionDuration = totalSessions > 0 ? (totalActiveSeconds / totalSessions / 60) : 0; // minutes
-        const resourceEfficiencyRatio = idleTime > 0 ? (totalActive / idleTime).toFixed(2) : 0;
+        const resourceEfficiencyRatio = idleTime > 0 ? (totalActive / idleTime).toFixed(2) : (totalActive > 0 ? '∞' : '0');
 
         // Update summary cards
         document.getElementById('totalActiveTime').textContent = totalActive.toFixed(1) + 'h';
@@ -3226,8 +3295,8 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
     
             // Calculate Top Memory Hogs
             const memoryHogs = {};
-            if (appData && appData.length > 0) {
-                appData.forEach(a => {
+            if (analyticsEntries && analyticsEntries.length > 0) {
+                analyticsEntries.forEach(a => {
                     const app = a.app_name || 'Unknown';
                     const mem = (Number(a.memory_usage_bytes) || 0) / (1024 ** 3); // Convert to GB
                     
@@ -3306,8 +3375,8 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
 
                         // Calculate Top CPU Consumers
             const cpuHogs = {};
-            if (appData && appData.length > 0) {
-                appData.forEach(a => {
+            if (analyticsEntries && analyticsEntries.length > 0) {
+                analyticsEntries.forEach(a => {
                     const app = a.app_name || 'Unknown';
                     const cpu = Number(a.cpu_percent) || 0;
                     
@@ -3855,8 +3924,10 @@ if (scatterCanvas && allPcData && allPcData.length > 0) {
 
             // Update summary text
             const topApp = sortedApps[0] ? `${sortedApps[0][0]} (${sortedApps[0][1].toFixed(1)}h)` : 'None';
+            const scopeLabel = hasPcFilter ? escapeHtml(pcName) : 'All PCs (aggregated)';
             document.getElementById('analyticsSummary').innerHTML =
                 `<strong>Range:</strong> ${escapeHtml(rangeConfig.label)}<br>
+                 <strong>Scope:</strong> ${scopeLabel}<br>
                  <strong>Most used app:</strong> ${escapeHtml(topApp)}<br>
                  <strong>Average CPU:</strong> ${avgCpu.toFixed(1)}%<br>
                  <strong>Average Memory:</strong> ${avgMem.toFixed(2)} GB<br>
@@ -3891,14 +3962,10 @@ createActiveIdleChart(totalActiveMinutes, totalIdleMinutes);
 
     // CSV Export Function with Enhanced Data & Better Formatting
     function downloadAnalyticsCSV() {
-        const pcName = document.getElementById('pcName').value.trim();
+        const rawPcName = document.getElementById('pcName').value.trim();
+        const pcName = rawPcName || 'All PCs';
         const rangeConfig = getAnalyticsRangeConfig();
         const reportRange = rangeConfig.label;
-        
-        if (!pcName) {
-            alert('Please select a PC first.');
-            return;
-        }
 
         // Get data from the summary cards
         const totalActiveTime = document.getElementById('totalActiveTime').textContent;
