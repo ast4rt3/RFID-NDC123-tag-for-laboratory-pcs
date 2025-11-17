@@ -2291,6 +2291,7 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
 }
 
 
+
         function updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate) {
             const statusIndicator = document.getElementById('statusIndicator');
             const pcDisplayName = document.getElementById('pcDisplayName');
@@ -3532,10 +3533,6 @@ if (scatterCanvas && allPcData && allPcData.length > 0) {
     }
 }
 
-
-
-
-
             // Destroy old charts
             if (window.allPcChart) {
                 try { window.allPcChart.destroy(); } catch(e) {}
@@ -3593,37 +3590,100 @@ if (scatterCanvas && allPcData && allPcData.length > 0) {
                 });
             }
 
-            // Create All-PC Chart
-if (analyticsAllPcCanvas && labelsAll.length > 0) {
-    window.allPcChart = new Chart(analyticsAllPcCanvas.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: labelsAll,
-            datasets: [{
-                label: 'All PCs Usage (hours)',
-                data: valuesAll,
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-                borderRadius: 4
-            }]
-        },
-        options: {
-            plugins: { legend: { display: false } },
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Active Time (hours)' }
-                },
-                x: {
-                    title: { display: true, text: ' ' }
+            // Create All-PC Chart (stacked by PC per application)
+            if (analyticsAllPcCanvas && labelsAll.length > 0 && allPcData && allPcData.length > 0) {
+                // Build mapping: app -> { pcName: hours, ... }
+                const appPcMap = {};
+                const pcTotals = {};
+
+                allPcData.forEach(row => {
+                    const app = row.app_name || 'Unknown';
+                    const pc = row.pc_name || 'Unknown PC';
+                    const hours = (Number(row.duration_seconds) || 0) / 3600;
+
+                    if (!appPcMap[app]) appPcMap[app] = {};
+                    appPcMap[app][pc] = (appPcMap[app][pc] || 0) + hours;
+
+                    pcTotals[pc] = (pcTotals[pc] || 0) + hours;
+                });
+
+                // Choose top PCs to display individually, aggregate the rest into "Other PCs"
+                const pcList = Object.keys(pcTotals).sort((a, b) => pcTotals[b] - pcTotals[a]);
+                const MAX_PCS = 6; // keep chart readable
+                const topPcs = pcList.slice(0, MAX_PCS);
+                const otherPcs = pcList.slice(MAX_PCS);
+
+                // Build dataset for each PC
+                const colorPalette = ['#6366f1', '#22c55e', '#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316', '#64748b', '#84cc16'];
+                const datasets = [];
+
+                topPcs.forEach((pc, idx) => {
+                    const data = labelsAll.map(app => {
+                        return +(appPcMap[app] && appPcMap[app][pc] ? appPcMap[app][pc].toFixed(3) : 0);
+                    });
+
+                    datasets.push({
+                        label: pc,
+                        data,
+                        backgroundColor: colorPalette[idx % colorPalette.length],
+                        borderColor: colorPalette[idx % colorPalette.length],
+                        borderWidth: 1
+                    });
+                });
+
+                // Aggregate 'Other PCs' if any
+                if (otherPcs.length > 0) {
+                    const otherData = labelsAll.map(app => {
+                        let sum = 0;
+                        otherPcs.forEach(pc => {
+                            if (appPcMap[app] && appPcMap[app][pc]) sum += appPcMap[app][pc];
+                        });
+                        return +sum.toFixed(3);
+                    });
+
+                    datasets.push({
+                        label: 'Other PCs',
+                        data: otherData,
+                        backgroundColor: '#94a3b8',
+                        borderColor: '#94a3b8',
+                        borderWidth: 1
+                    });
                 }
+
+                // Destroy existing chart if present
+                if (window.allPcChart) {
+                    try { window.allPcChart.destroy(); } catch (e) {}
+                    window.allPcChart = null;
+                }
+
+                // Create stacked bar chart: apps on X axis, stacks are PCs
+                window.allPcChart = new Chart(analyticsAllPcCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: labelsAll,
+                        datasets: datasets
+                    },
+                    options: {
+                        plugins: {
+                            legend: { position: 'right' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${Number(context.raw).toFixed(2)} h`;
+                                    }
+                                }
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            x: { stacked: true, title: { display: true, text: 'Applications' } },
+                            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Active Time (hours)' } }
+                        }
+                    }
+                });
             }
-        }
-    });
-}
 
             // Create CPU Chart
             if (analyticsCpuCanvas && cpuTrend.length > 0) {
