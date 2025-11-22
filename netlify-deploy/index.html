@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICS Lab Monitor</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="icon.ico">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -15,7 +16,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #cbd3f4 0%, #003A72 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
             padding: 20px;
@@ -31,7 +32,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, hsl(231, 69%, 61%) 0%, #00396E 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
             padding: 40px;
             text-align: center;
@@ -199,6 +200,15 @@
 
         .status-indicator.offline::after {
             animation: none;
+        }
+
+        .status-indicator.idle {
+            background: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+        }
+
+        .status-indicator.idle::after {
+            background: rgba(245, 158, 11, 0.3);
         }
 
         @keyframes pulse {
@@ -542,6 +552,11 @@
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
         }
 
+        .pc-card-status.idle {
+            background: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+
         .pc-card-name {
             font-size: 1.3rem;
             font-weight: 700;
@@ -691,12 +706,12 @@
             .header {
                 padding: 20px 15px;
             }
-
+            
             .header h1 {
                 font-size: 1.5rem;
                 margin-bottom: 8px;
             }
-
+            
             .header .subtitle {
                 font-size: 0.85rem;
                 display: flex;
@@ -761,7 +776,7 @@
             .chart-container {
                 padding: 20px 15px;
             }
-
+            
             .chart-wrapper {
                 height: 300px;
             }
@@ -906,56 +921,6 @@
             .pc-status-card > div:last-child button {
                 width: 100%;
             }
-
-           
-
-            
-      /* Analytics charts wrapper - REMOVED max-width constraint to fill parent section */
-        #analyticsSection .analytics-charts {
-            width: 100%; /* Ensure it takes full width of the parent #analyticsSection (max 980px) */
-            /* max-width: 900px; <--- This line should be REMOVED or commented out */
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-            box-sizing: border-box;
-        }
-
-        /* Each chart card uses a fixed height so Chart.js can measure the canvas */
-        #analyticsSection .chart-card {
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.04);
-        }
-
-        /* IMPORTANT: a wrapper with an explicit height so Chart.js has a measurable layout */
-        #analyticsSection .chart-card .chart-wrapper {
-            height: 320px;           /* desktop fixed height */
-            min-height: 320px;
-            position: relative;
-        }
-
-        /* Make canvases fill their wrapper - use 100% of the wrapper's height */
-        #analyticsSection canvas {
-            width: 100% !important; /* This is the correct rule for the canvas itself */
-            height: 100% !important;
-            max-height: 320px !important;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            #analyticsSection {
-                padding: 12px;
-            }
-            #analyticsSection .chart-card .chart-wrapper {
-                height: 240px;
-            }
-            #analyticsSection canvas {
-                max-height: 240px !important;
-            }
-        }
-
         }
     </style>
 </head>
@@ -972,20 +937,16 @@
             </div>
         </div>
 
-        <div class="view-toggle">
-            <button class="view-toggle-btn active" data-page="home" onclick="showHomePage(event)">
-                <i class="fas fa-home"></i> Home
-            </button>
-            <button class="view-toggle-btn" data-page="detail" onclick="showDetailPage(event)">
-                <i class="fas fa-desktop"></i> PC Details
-            </button>
-            <button class="view-toggle-btn" data-page="analytics" onclick="showAnalyticsPage(event)">
-                <i class="fas fa-chart-line"></i> Analytics
-            </button>
-        </div>
-
         <!-- Home/Dashboard Page -->
         <div class="home-container active" id="homePage">
+            <div class="view-toggle">
+                <button class="view-toggle-btn active" onclick="showHomePage()">
+                    <i class="fas fa-home"></i> Home
+                </button>
+                <button class="view-toggle-btn" onclick="showDetailPage()">
+                    <i class="fas fa-desktop"></i> PC Details
+                </button>
+            </div>
             <h2 class="page-title">Available PCs</h2>
             <p class="page-subtitle">Click on a PC to view its details and activity</p>
             <div class="pcs-grid" id="pcsGrid">
@@ -997,27 +958,34 @@
 
         <!-- Detail Page -->
         <div class="home-container" id="detailPage">
-            <div class="controls">
+            <div class="view-toggle">
+                <button class="view-toggle-btn" onclick="showHomePage()">
+                    <i class="fas fa-home"></i> Home
+                </button>
+                <button class="view-toggle-btn active" onclick="showDetailPage()">
+                    <i class="fas fa-desktop"></i> PC Details
+                </button>
+            </div>
+        <div class="controls">
                 <div class="control-group">
-                    <div class="form-group">
+            <div class="form-group">
                         <label for="pcName"><i class="fas fa-desktop"></i> PC Name</label>
                         <input type="text" id="pcName" placeholder="Enter PC name (e.g., i3S)">
-                    </div>
-                    <div class="form-group">
+            </div>
+            <div class="form-group">
                         <label for="selectedDate"><i class="fas fa-calendar"></i> Date</label>
-                        <input type="date" id="selectedDate">
-                    </div>
-                    <button class="btn" onclick="loadData()">
+                <input type="date" id="selectedDate">
+            </div>
+            <button class="btn" onclick="loadData()">
                         <i class="fas fa-search"></i>
                         Load Data
                     </button>
                     <button class="btn" onclick="toggleTaskManager()" id="taskManagerBtn" style="background: #4f46e5; color: white;">
                         <i class="fas fa-tasks"></i>
                         <span id="taskManagerBtnText">Show Processes</span>
-                    </button>
-                    
+            </button>
                 </div>
-            </div>
+        </div>
 
         <!-- PC Status Card -->
         <div class="pc-status-container" id="pcStatusContainer" style="display:none;">
@@ -1036,8 +1004,8 @@
                 </div>
                 <div class="system-info-grid" id="systemInfoGrid">
                     <!-- System info will be populated here -->
-                </div>
-                
+        </div>
+
                 <!-- Task Manager Section -->
                 <div id="taskManagerSection" style="display: none; margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
                     <div class="task-manager-header-section">
@@ -1045,16 +1013,16 @@
                         <div class="cpu-info-header" id="cpuInfoHeader" style="font-size: 0.9rem; color: #64748b;">
                             <span id="cpuModel">Loading...</span>
                         </div>
-                    </div>
-                    
+            </div>
+
                     <div class="task-manager-graph-container">
                         <div class="graph-header">
                             <span class="graph-label">% Utilization</span>
                             <span class="graph-time-label">60 seconds</span>
-                        </div>
+                    </div>
                         <div class="graph-wrapper">
                             <canvas id="cpuUtilizationChart"></canvas>
-                        </div>
+                    </div>
                     </div>
 
                     <div class="task-manager-stats-grid">
@@ -1066,14 +1034,14 @@
                             <div class="task-manager-stat-item">
                                 <div class="stat-label">Speed</div>
                                 <div class="stat-value-large" id="cpuSpeed">0.00 GHz</div>
-                            </div>
-                        </div>
-                        
+                </div>
+            </div>
+
                         <div class="task-manager-stats-column">
                             <div class="task-manager-stat-item">
                                 <div class="stat-label">Base speed</div>
                                 <div class="stat-value" id="baseSpeed">-</div>
-                            </div>
+                    </div>
                             <div class="task-manager-stat-item">
                                 <div class="stat-label">Sockets</div>
                                 <div class="stat-value" id="sockets">-</div>
@@ -1158,13 +1126,13 @@
 
         <div id="statsGrid" class="stats-grid" style="display: none;"></div>
 
-         <div id="apps-tab" class="tab-content" style="display: none;">
+        <div id="apps-tab" class="tab-content" style="display: none;">
             <div class="chart-container">
                 <div class="chart-title">App Usage Distribution</div>
-                <div class="chart-wrapper">
+                    <div class="chart-wrapper">
                     <canvas id="appUsageChart"></canvas>
+                    </div>
                 </div>
-            </div>
             <div class="data-table">
                 <table>
                     <thead>
@@ -1182,8 +1150,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-             <!-- Pagination Controls -->
+            <!-- Pagination Controls -->
             <div class="pagination" id="paginationControls" style="display: none;">
                 <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">
                     <i class="fas fa-chevron-left"></i> Previous
@@ -1193,230 +1160,6 @@
                 <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">
                     Next <i class="fas fa-chevron-right"></i>
                 </button>
-            </div>
-        </div>
-
-        <!-- Analytics Page -->
-        <div class="home-container" id="analyticsPage">
-            <h2 class="page-title">Analytics Reports</h2>
-            <p class="page-subtitle">Performance and usage summary across all PCs and the selected PC</p>
-            <div class="controls" style="margin-bottom:20px;">
-                <div class="control-group" style="align-items:flex-start;">
-                    <div class="form-group">
-                        <label for="analyticsRangeSelect"><i class="fas fa-clock"></i> Range</label>
-                        <select id="analyticsRangeSelect" onchange="handleAnalyticsRangeChange()">
-                            <option value="today" selected>Today</option>
-                            <option value="last3">Last 3 days</option>
-                            <option value="last5">Last 5 days</option>
-                            <option value="last30">Last 30 days</option>
-                            <option value="custom">Custom Date</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="analyticsCustomDateGroup" style="display:none;">
-                        <label for="analyticsCustomDate"><i class="fas fa-calendar-day"></i> Custom Date</label>
-                        <input type="date" id="analyticsCustomDate">
-                    </div>
-                    <button class="btn" style="background:#7933ea; color:white; margin-left:auto;" onclick="showAnalyticsReports()" id="analyticsLoadBtn">
-                        <i class="fas fa-sync-alt"></i>
-                        Load Analytics
-                    </button>
-                </div>
-            </div>
-            <div id="analyticsPlaceholder" class="loading">
-                Select a PC, pick a range, then click "Load Analytics"
-            </div>
-
-            <div id="analyticsSection" style="display:none; margin-top:30px;">
-                <div style="max-width:980px; margin:0 auto; padding:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                        <div>
-                            <h3 style="font-size:1.6rem; font-weight:700; color:#1f2937; margin-bottom:5px;">Analytics Reports</h3>
-                            <p style="color:#64748b; margin-bottom:0;">Performance and usage summary across all PCs and the selected PC</p>
-                        </div>
-                        <button onclick="downloadAnalyticsCSV()" style="background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:white; padding:10px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; transition:all 0.3s;">
-                            <i class="fas fa-download" style="font-size:0.9rem;"></i>
-                            Export CSV
-                        </button>
-                    </div>
-
-                    <!-- Summary Cards (FIRST) -->
-                    <div id="analyticsSummaryCards" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:20px; margin-bottom:40px;">
-                        <div class="summary-card" style="background:#eef2ff; padding:20px; border-radius:12px; text-align:center;">
-                            <h4 style="margin:0; font-size:0.9rem; color:#6366f1; font-weight:600;">Total Active Time</h4>
-                            <p id="totalActiveTime" style="font-size:1.8rem; font-weight:700; color:#1e3a8a; margin:10px 0 0 0;">-</p>
-                        </div>
-                        <div class="summary-card" style="background:#ecfdf5; padding:20px; border-radius:12px; text-align:center;">
-                            <h4 style="margin:0; font-size:0.9rem; color:#059669; font-weight:600;">Idle Time</h4>
-                            <p id="idleTime" style="font-size:1.8rem; font-weight:700; color:#065f46; margin:10px 0 0 0;">-</p>
-                        </div>
-                        <div class="summary-card" style="background:#fef3c7; padding:20px; border-radius:12px; text-align:center;">
-                            <h4 style="margin:0; font-size:0.9rem; color:#b45309; font-weight:600;">Avg CPU Load</h4>
-                            <p id="avgCpuLoad" style="font-size:1.8rem; font-weight:700; color:#92400e; margin:10px 0 0 0;">-</p>
-                        </div>
-                        <div class="summary-card" style="background:#fee2e2; padding:20px; border-radius:12px; text-align:center;">
-                            <h4 style="margin:0; font-size:0.9rem; color:#b91c1c; font-weight:600;">Avg Memory Usage</h4>
-                            <p id="avgMemUsage" style="font-size:1.8rem; font-weight:700; color:#991b1b; margin:10px 0 0 0;">-</p>
-                        </div>
-                    </div>
-
-                    <!-- Top Applications Chart (All PCs) -->
-                    <div style="display:flex; flex-direction:column; gap:40px; margin-bottom:40px;">
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Top Applications by Usage (All PCs) </h4>
-                            <div style="width:100%; height:320px; position:relative;">
-                                <canvas id="analyticsAllPcChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Donut Chart -->
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Application Usage Distribution (All PCs) </h4>
-                            <div style="width:100%; height:320px; position:relative;">
-                                <canvas id="allPcUsagePieChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Bar Chart: Performance Metrics (All PCs) -->
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Performance Metrics Overview (All PCs) </h4>
-                            <div style="width:100%; height:400px; position:relative;">
-                                <canvas id="performanceMetricsChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Scatter Plot: Resource Efficiency (All PCs) -->
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Resource Efficiency Comparison (All PCs) </h4>
-                            <div style="width:100%; height:400px; position:relative;">
-                                <canvas id="resourceEfficiencyChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Charts Container (SECOND) -->
-                    <div style="display:flex; flex-direction:column; gap:40px; margin-bottom:40px;">
-                        <!-- Top Applications Chart -->
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">Top Applications by Usage</h4>
-                            <div style="width:100%; height:320px; position:relative;">
-                                <canvas id="analyticsAppChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- CPU Trend Chart -->
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">CPU Usage Trend (%)</h4>
-                            <div style="width:100%; height:320px; position:relative;">
-                                <canvas id="analyticsCpuChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Memory Trend Chart -->
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">Memory Usage Trend (GB)</h4>
-                            <div style="width:100%; height:320px; position:relative;">
-                                <canvas id="analyticsMemChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
-                            <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;"> Active vs Idle</h4>
-                            <div style="width:100%; height:320px; position:relative;">
-                                <canvas id="activeIdleChart" style="width:100%; height:280px;"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Resource Utilization Summary (AFTER CHARTS) -->
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:40px; padding:20px; background:#f0f9ff; border-radius:12px; border-left:4px solid #0284c7;">
-                        <div style="text-align:center;">
-                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Peak CPU Load</div>
-                            <div id="peakCpuLoad" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
-                            <div style="font-size:0.85rem; color:#0c4a6e;">Maximum usage</div>
-                        </div>
-                        <div style="text-align:center;">
-                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Peak Memory</div>
-                            <div id="peakMemory" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
-                            <div style="font-size:0.85rem; color:#0c4a6e;">Maximum usage</div>
-                        </div>
-                        <div style="text-align:center;">
-                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Total Sessions</div>
-                            <div id="totalSessions" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
-                            <div style="font-size:0.85rem; color:#0c4a6e;">App sessions count</div>
-                        </div>
-                        <div style="text-align:center;">
-                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Avg Session Duration</div>
-                            <div id="avgSessionDuration" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
-                            <div style="font-size:0.85rem; color:#0c4a6e;">Average per session</div>
-                        </div>
-                        <div style="text-align:center;">
-                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Avg CPU Usage</div>
-                            <div id="avgCpuUsage" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
-                            <div style="font-size:0.85rem; color:#0c4a6e;">Average during active time</div>
-                        </div>
-                        <div style="text-align:center;">
-                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#0c4a6e; font-weight:600; margin-bottom:8px;">Resource Efficiency</div>
-                            <div id="resourceEfficiency" style="font-size:2.2rem; font-weight:700; color:#0369a1; margin-bottom:5px;">-</div>
-                            <div style="font-size:0.85rem; color:#0c4a6e;">Active/Idle ratio</div>
-                        </div>
-                    </div>
-
-                    <!-- Top Memory Hogs Table (AFTER CHARTS) -->
-                    <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
-                        <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">Top Memory Consumers</h4>
-                        <div style="overflow-x:auto;">
-                            <table style="width:100%; border-collapse:collapse;">
-                                <thead>
-                                    <tr style="background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:white;">
-                                        <th style="padding:15px; text-align:left; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Application</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Peak Memory</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Avg Memory</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Sessions</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="topMemoryHogsTable">
-                                    <tr>
-                                        <td colspan="5" style="padding:30px; text-align:center; color:#64748b;">
-                                            <i class="fas fa-spinner fa-spin"></i> Loading...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Top CPU Consumers Table (AFTER CHARTS) -->
-                    <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-bottom:40px;">
-                        <h4 style="font-size:1rem; font-weight:700; margin:0 0 20px 0; color:#1f2937;">Top CPU Consumers</h4>
-                        <div style="overflow-x:auto;">
-                            <table style="width:100%; border-collapse:collapse;">
-                                <thead>
-                                    <tr style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:white;">
-                                        <th style="padding:15px; text-align:left; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Application</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Peak CPU</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Avg CPU</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Sessions</th>
-                                        <th style="padding:15px; text-align:center; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="topCpuConsumersTable">
-                                    <tr>
-                                        <td colspan="5" style="padding:30px; text-align:center; color:#64748b;">
-                                            <i class="fas fa-spinner fa-spin"></i> Loading...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Summary Section (LAST) -->
-                    <div style="background:#f3f4f6; padding:20px; border-radius:12px;">
-                        <h4 style="font-size:1rem; font-weight:700; margin:0 0 12px 0; color:#1f2937;">Summary</h4>
-                        <p id="analyticsSummary" style="color:#4b5563; line-height:1.6; margin:0;"></p>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1435,11 +1178,6 @@
 
         // Set today's date as default
         document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
-        const analyticsDateInput = document.getElementById('analyticsCustomDate');
-        if (analyticsDateInput) {
-            analyticsDateInput.value = new Date().toISOString().split('T')[0];
-        }
-        handleAnalyticsRangeChange();
 
         let appChart = null;
         let cpuChart = null;
@@ -1563,8 +1301,9 @@
                 }
 
                 // Get selected date
-                // Update PC status only
                 const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
+
+                // Update PC status only
                 updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
                 
                 // Update last update time
@@ -1600,123 +1339,6 @@
 
 
 
-        function handleAnalyticsRangeChange() {
-            const rangeSelect = document.getElementById('analyticsRangeSelect');
-            const customGroup = document.getElementById('analyticsCustomDateGroup');
-            const customInput = document.getElementById('analyticsCustomDate');
-            if (!rangeSelect || !customGroup || !customInput) return;
-            const isCustom = rangeSelect.value === 'custom';
-            customGroup.style.display = isCustom ? 'block' : 'none';
-            customInput.disabled = !isCustom;
-            if (isCustom && !customInput.value) {
-                customInput.value = new Date().toISOString().split('T')[0];
-            }
-        }
-
-        function getAnalyticsRangeConfig() {
-            const rangeSelect = document.getElementById('analyticsRangeSelect');
-            const customInput = document.getElementById('analyticsCustomDate');
-            const mode = rangeSelect ? rangeSelect.value : 'today';
-            const today = new Date();
-            const todayIso = today.toISOString().split('T')[0];
-
-            const buildSingleDay = (dateStr, label) => ({
-                mode: 'single',
-                startIso: `${dateStr}T00:00:00`,
-                endIso: `${dateStr}T23:59:59`,
-                label,
-                selectedDate: dateStr
-            });
-
-            if (mode === 'custom') {
-                const customDate = customInput && customInput.value ? customInput.value : todayIso;
-                if (customInput && !customInput.value) {
-                    customInput.value = customDate;
-                }
-                return buildSingleDay(customDate, customDate);
-            }
-
-            if (mode === 'today') {
-                return buildSingleDay(todayIso, 'Today');
-            }
-
-            const dayCounts = { last3: 3, last5: 5, last30: 30 };
-            const days = dayCounts[mode] || 3;
-            const endDate = new Date();
-            endDate.setHours(23, 59, 59, 999);
-            const startDate = new Date(endDate);
-            startDate.setDate(startDate.getDate() - (days - 1));
-            startDate.setHours(0, 0, 0, 0);
-
-            return {
-                mode,
-                startIso: startDate.toISOString(),
-                endIso: endDate.toISOString(),
-                label: `Last ${days} days`
-            };
-        }
-
-        function computeActiveIdleFromEntries(entries, rangeStartMs, rangeEndMs) {
-            const totalRangeMs = Math.max(0, rangeEndMs - rangeStartMs);
-            if (!entries || !entries.length || totalRangeMs === 0) {
-                return { activeSeconds: 0, idleSeconds: totalRangeMs / 1000 };
-            }
-
-            const intervals = entries.map(entry => {
-                const startRaw = entry.start_time || entry.startTime || entry.start;
-                const endRaw = entry.end_time || entry.endTime || entry.end;
-                let start = startRaw ? new Date(startRaw).getTime() : NaN;
-                let end = endRaw ? new Date(endRaw).getTime() : NaN;
-
-                if (isNaN(start) && !isNaN(end) && entry.duration_seconds) {
-                    start = end - Number(entry.duration_seconds) * 1000;
-                }
-                if (isNaN(end) && !isNaN(start) && entry.duration_seconds) {
-                    end = start + Number(entry.duration_seconds) * 1000;
-                }
-
-                if (isNaN(start) || isNaN(end)) {
-                    return null;
-                }
-
-                const clampedStart = Math.max(rangeStartMs, start);
-                const clampedEnd = Math.min(rangeEndMs, end);
-
-                if (clampedEnd <= clampedStart) {
-                    return null;
-                }
-
-                return [clampedStart, clampedEnd];
-            }).filter(Boolean);
-
-            if (!intervals.length) {
-                return { activeSeconds: 0, idleSeconds: totalRangeMs / 1000 };
-            }
-
-            intervals.sort((a, b) => a[0] - b[0]);
-            const merged = [];
-            for (const interval of intervals) {
-                if (!merged.length) {
-                    merged.push(interval.slice());
-                    continue;
-                }
-                const last = merged[merged.length - 1];
-                if (interval[0] <= last[1]) {
-                    last[1] = Math.max(last[1], interval[1]);
-                } else {
-                    merged.push(interval.slice());
-                }
-            }
-
-            const activeMs = merged.reduce((sum, [start, end]) => sum + (end - start), 0);
-            const idleMs = Math.max(0, totalRangeMs - activeMs);
-
-            return {
-                activeSeconds: activeMs / 1000,
-                idleSeconds: idleMs / 1000
-            };
-        }
-
         // Get URL parameters
         function getURLParams() {
             const params = new URLSearchParams(window.location.search);
@@ -1734,8 +1356,6 @@
             }
             if (date) {
                 url.searchParams.set('date', date);
-            } else {
-                url.searchParams.delete('date');
             }
             window.history.pushState({}, '', url);
         }
@@ -1743,72 +1363,48 @@
         // Check for URL parameters on page load
         function checkURLParams() {
             const params = getURLParams();
-            if (params.date) {
-                document.getElementById('selectedDate').value = params.date;
-            }
-
             if (params.pc) {
                 document.getElementById('pcName').value = params.pc;
+                if (params.date) {
+                    document.getElementById('selectedDate').value = params.date;
+                } else {
+                    // If no date in URL, use today's date
+        document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+                }
                 // Auto-load data
                 loadData();
             }
         }
 
         // Page navigation
-        const PAGE_MAP = {
-            home: 'homePage',
-            detail: 'detailPage',
-            analytics: 'analyticsPage'
-        };
-
-        function setActivePage(page) {
-            Object.entries(PAGE_MAP).forEach(([key, id]) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                if (key === page) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
-            });
-
-            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-                const target = btn.getAttribute('data-page');
-                btn.classList.toggle('active', target === page);
-            });
-        }
-
         function showHomePage(event) {
-            setActivePage('home');
-            if (event && event.preventDefault) {
-                event.preventDefault();
+            document.getElementById('homePage').classList.add('active');
+            document.getElementById('detailPage').classList.remove('active');
+            document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                document.querySelectorAll('.view-toggle-btn')[0].classList.add('active');
             }
-            stopAutoRefresh();
             loadAllPCs();
         }
 
         function showDetailPage(event) {
-            setActivePage('detail');
-            if (event && event.preventDefault) {
-                event.preventDefault();
+            document.getElementById('homePage').classList.remove('active');
+            document.getElementById('detailPage').classList.add('active');
+            document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                document.querySelectorAll('.view-toggle-btn')[1].classList.add('active');
             }
-            const pcName = document.getElementById('pcName').value.trim();
-            if (pcName) {
-                startAutoRefresh();
-            }
-        }
-
-        function showAnalyticsPage(event) {
-            if (event && event.preventDefault) {
-                event.preventDefault();
-            }
-            setActivePage('analytics');
-            stopAutoRefresh();
         }
 
         function navigateToPC(pcName) {
             document.getElementById('pcName').value = pcName;
             showDetailPage();
+            document.querySelector('.view-toggle-btn:last-child').classList.add('active');
+            document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
             loadData();
         }
 
@@ -1886,8 +1482,22 @@
                 const pcsArray = Array.from(pcsMap.values());
                 pcsGrid.innerHTML = pcsArray.map(pc => {
                     const isOnline = pc.is_online;
-                    const statusClass = isOnline ? '' : 'offline';
-                    const statusText = isOnline ? 'Online' : 'Offline';
+                    const isIdle = pc.is_idle === true;
+                    
+                    let statusClass, statusText, statusColor;
+                    if (!isOnline) {
+                        statusClass = 'offline';
+                        statusText = 'Offline';
+                        statusColor = '#ef4444';
+                    } else if (isIdle) {
+                        statusClass = 'idle';
+                        statusText = 'Idle';
+                        statusColor = '#f59e0b';
+                    } else {
+                        statusClass = '';
+                        statusText = 'Online';
+                        statusColor = '#22c55e';
+                    }
                     
                     return `
                         <div class="pc-card" onclick="navigateToPC('${escapeHtml(pc.pc_name)}')">
@@ -1896,9 +1506,9 @@
                                 <div class="pc-card-name">${escapeHtml(pc.pc_name)}</div>
                             </div>
                             <div class="pc-card-info">
-                                <div class="pc-card-info-item">
+                                    <div class="pc-card-info-item">
                                     <span>Status:</span>
-                                    <span style="color: ${isOnline ? '#22c55e' : '#ef4444'}; font-weight: 600;">${statusText}</span>
+                                    <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
                                 </div>
                                 ${pc.systemInfo && pc.systemInfo.cpu_model ? `
                                     <div class="pc-card-info-item">
@@ -1940,6 +1550,8 @@
             if (params.pc) {
                 // If URL has PC parameter, show detail page
                 showDetailPage();
+                document.querySelector('.view-toggle-btn:last-child').classList.add('active');
+                document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
                 checkURLParams();
             } else {
                 // Otherwise show home page
@@ -1961,36 +1573,29 @@
 
         async function loadData() {
             const pcName = document.getElementById('pcName').value.trim();
-            const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
+            let selectedDate = document.getElementById('selectedDate').value;
 
             if (!pcName) {
                 alert('Please enter a PC name');
                 return;
             }
 
+            // If no date selected, use today's date
+            if (!selectedDate) {
+                selectedDate = new Date().toISOString().split('T')[0];
+                document.getElementById('selectedDate').value = selectedDate;
+            }
+
             // Update URL with current parameters
             updateURL(pcName, selectedDate);
 
             // Update header and show loading state
-            const headerText = document.getElementById('headerText');
-            if (headerText) {
-                headerText.textContent = `PC: ${pcName} • ${selectedDate}`;
-            } else {
-                document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
-            }
+            document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
             document.getElementById('loadingMessage').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
             document.getElementById('loadingMessage').style.display = 'block';
             document.getElementById('statsGrid').style.display = 'none';
             document.getElementById('pcStatusContainer').style.display = 'none';
             document.getElementById('apps-tab').style.display = 'none';
-            
-            // HIDE analytics section when loading data
-            const analyticsSection = document.getElementById('analyticsSection');
-            if (analyticsSection) {
-                analyticsSection.style.display = 'none';
-            }
-            
-            
             hideTaskManager();
 
             try {
@@ -2032,12 +1637,21 @@
                 updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
 
                 // Fetch app usage data
+                // Convert selected date to UTC date range for proper querying
+                // The selected date is in local timezone, but we need to query UTC
+                // Create start of day in local timezone, then convert to UTC
+                const localStart = new Date(`${selectedDate}T00:00:00`);
+                const localEnd = new Date(`${selectedDate}T23:59:59.999`);
+                // Convert to UTC ISO strings for database query
+                const startDate = localStart.toISOString();
+                const endDate = localEnd.toISOString();
+
                 const { data: appData, error: appError } = await supabase
                     .from('app_usage_logs')
                     .select('*')
                     .eq('pc_name', pcName)
-                    .gte('start_time', `${selectedDate}T00:00:00`)
-                    .lte('end_time', `${selectedDate}T23:59:59`)
+                    .gte('start_time', startDate)
+                    .lte('start_time', endDate)
                     .order('start_time', { ascending: false });
 
                 if (appError) {
@@ -2067,14 +1681,8 @@
             }
         }
 
-                function processData(appData) {
+        function processData(appData) {
             console.log('Processing data:', appData.length, 'entries');
-            
-            // Make sure analytics is hidden
-            const analyticsSection = document.getElementById('analyticsSection');
-            if (analyticsSection) {
-                analyticsSection.style.display = 'none';
-            }
             
             // Calculate stats
             const totalAppSessions = appData.length;
@@ -2083,21 +1691,21 @@
             // Update stats grid
             const statsGrid = document.getElementById('statsGrid');
             if (statsGrid) {
-                statsGrid.innerHTML = `
+            statsGrid.innerHTML = `
                     <div class="stat-card" id="appSessionsCard" onclick="toggleAppSessionsBreakdown()" style="cursor: pointer;">
-                        <i class="fas fa-desktop"></i>
+                    <i class="fas fa-desktop"></i>
                         <div class="number">${totalAppSessions}</div>
                         <div class="label">App Sessions</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
                         <div class="number">${formatDuration(totalAppTime)}</div>
                         <div class="label">Total Usage</div>
-                    </div>
+                </div>
                     <div id="appSessionsBreakdown" style="grid-column: 1 / -1; display: none; margin-top: 10px;">
                         <!-- Breakdown content injected here -->
-                    </div>
-                `;
+                </div>
+            `;
                 statsGrid.style.display = 'grid';
             }
 
@@ -2107,33 +1715,15 @@
             // Create/update charts
             createAppChart(appData);
 
-            // Hide loading message
+            // Show content (only hide loading message if it exists)
             const loadingMessage = document.getElementById('loadingMessage');
             if (loadingMessage) {
                 loadingMessage.style.display = 'none';
             }
             
-            // SHOW apps-tab with all content
             const appsTab = document.getElementById('apps-tab');
             if (appsTab) {
                 appsTab.style.display = 'block';
-            }
-
-            // EXPLICITLY SHOW chart container and data table
-            const chartContainer = appsTab ? appsTab.querySelector('.chart-container') : null;
-            const dataTable = appsTab ? appsTab.querySelector('.data-table') : null;
-
-            if (chartContainer) {
-                chartContainer.style.display = 'block';
-            }
-            if (dataTable) {
-                dataTable.style.display = 'block';
-            }
-
-            // SHOW pagination controls
-            const paginationControls = document.getElementById('paginationControls');
-            if (paginationControls) {
-                paginationControls.style.display = 'flex';
             }
             
             console.log('Data processed and displayed');
@@ -2410,57 +2000,6 @@
             console.log('Chart updated with', labels.length, 'apps');
         }
 
-        // Active vs Idle chart
-function createActiveIdleChart(activeMinutes, idleMinutes) {
-    const ctx = document.getElementById('activeIdleChart').getContext('2d');
-
-    if (window.activeIdleChart && typeof window.activeIdleChart.destroy === 'function') {
-  window.activeIdleChart.destroy();
-}
-
-
-    window.activeIdleChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Time Breakdown'],
-            datasets: [
-                {
-                    label: 'Active Time',
-                    data: [activeMinutes],
-                    backgroundColor: '#10b981'
-                },
-                {
-                    label: 'Idle Time',
-                    data: [idleMinutes],
-                    backgroundColor: '#ef4444'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} min`
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Minutes',
-                        font: { size: 12, weight: 'bold' }
-                    }
-                }
-            }
-        }
-    });
-}
-
-
 
         function updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate) {
             const statusIndicator = document.getElementById('statusIndicator');
@@ -2481,9 +2020,23 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
 
             pcDisplayName.textContent = pcName;
             
-            const statusIcon = isOnline ? 'fa-check-circle' : 'fa-times-circle';
-            const statusLabel = isOnline ? 'Online' : 'Offline';
-            const statusColor = isOnline ? '#22c55e' : '#ef4444';
+            // Check idle status
+            const isIdle = statusData && statusData.is_idle === true;
+            
+            let statusIcon, statusLabel, statusColor;
+            if (!isOnline) {
+                statusIcon = 'fa-times-circle';
+                statusLabel = 'Offline';
+                statusColor = '#ef4444';
+            } else if (isIdle) {
+                statusIcon = 'fa-moon';
+                statusLabel = 'Idle';
+                statusColor = '#f59e0b';
+            } else {
+                statusIcon = 'fa-check-circle';
+                statusLabel = 'Online';
+                statusColor = '#22c55e';
+            }
             
             pcStatusText.innerHTML = `
                 <i class="fas ${statusIcon}" style="color: ${statusColor}"></i>
@@ -2492,8 +2045,14 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
 
             if (isOnline) {
                 statusIndicator.classList.remove('offline');
+                if (isIdle) {
+                    statusIndicator.classList.add('idle');
+                } else {
+                    statusIndicator.classList.remove('idle');
+                }
             } else {
                 statusIndicator.classList.add('offline');
+                statusIndicator.classList.remove('idle');
             }
 
             console.log('PC Status updated:', { pcName, isOnline, hasStatusData: !!statusData, hasSystemInfo: !!systemInfo });
@@ -2581,8 +2140,6 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
             url.searchParams.set('pc', pcName);
             if (date) {
                 url.searchParams.set('date', date);
-            } else {
-                url.searchParams.delete('date');
             }
             const shareableLink = document.getElementById('shareableLink');
             if (shareableLink) {
@@ -2957,10 +2514,10 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                         },
                         scales: {
                             y: {
@@ -2987,10 +2544,10 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
                                     color: '#e5e7eb'
                                 }
                             }
-                        }
                     }
-                });
-            }
+                }
+            });
+        }
         }
 
         function updateMemoryChart(memoryData, systemInfo) {
@@ -3012,24 +2569,24 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
             } else {
                 memoryChart = new Chart(ctx, {
                     type: 'line',
-                    data: {
+                data: {
                         labels: labels,
-                        datasets: [{
+                    datasets: [{
                             label: 'Memory Usage',
                             data: values,
                             borderColor: '#00d4ff',
                             backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                            borderWidth: 2,
+                        borderWidth: 2,
                             fill: true,
                             tension: 0.4,
                             pointRadius: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
                                 display: false
                             }
                         },
@@ -3058,9 +2615,9 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
                                     color: '#e5e7eb'
                                 }
                             }
-                        }
                     }
-                });
+                }
+            });
             }
         }
 
@@ -3133,945 +2690,6 @@ function createActiveIdleChart(activeMinutes, idleMinutes) {
                 hideTaskManager();
             }
         }
-        
-
-    async function showAnalyticsReports() {
-    // Global-in-function state
-    let allPcUsage = {}; // All-PC aggregated usage (hours)
-    let appUsage = {};   // Per-PC aggregated usage (hours)
-
-    const pcName = document.getElementById('pcName').value.trim();
-    const rangeConfig = getAnalyticsRangeConfig();
-    const hasPcFilter = !!pcName;
-    let appData = [];
-    let sessionData = [];
-
-    // Stop auto-refresh while viewing Analytics
-    try { stopAutoRefresh(); } catch (e) { console.warn('stopAutoRefresh() failed or not defined yet', e); }
-    const refreshIndicator = document.getElementById('refreshIndicator');
-    if (refreshIndicator) refreshIndicator.style.display = 'none';
-
-    const analyticsPlaceholder = document.getElementById('analyticsPlaceholder');
-    const analyticsSection = document.getElementById('analyticsSection');
-    if (analyticsPlaceholder) {
-        analyticsPlaceholder.style.display = 'block';
-        analyticsPlaceholder.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading analytics (${rangeConfig.label})...`;
-    }
-    if (analyticsSection) {
-        analyticsSection.style.display = 'none';
-    }
-
-    // Wait for DOM layout to complete before fetching data
-    await new Promise(resolve => setTimeout(resolve, 250));
-
-    // Date range
-    const { startIso, endIso } = rangeConfig;
-
-    try {
-        if (hasPcFilter) {
-            const [
-                { data: pcAppData, error: appErr },
-                { data: pcSessionData, error: timeErr }
-            ] = await Promise.all([
-                supabase
-                    .from('app_usage_logs')
-                    .select('app_name, start_time, end_time, duration_seconds, memory_usage_bytes, cpu_percent, gpu_percent')
-                    .eq('pc_name', pcName)
-                    .gte('start_time', startIso)
-                    .lte('end_time', endIso),
-                supabase
-                    .from('time_logs')
-                    .select('start_time, end_time, duration_seconds')
-                    .eq('pc_name', pcName)
-                    .gte('start_time', startIso)
-                    .lte('end_time', endIso)
-            ]);
-
-            if (appErr || timeErr) {
-                console.error('Supabase errors:', appErr, timeErr);
-                alert('Failed to load data from Supabase.');
-                return;
-            }
-
-            appData = pcAppData || [];
-            sessionData = pcSessionData || [];
-        }
-
-        // Fetch ALL-PC app usage (NO pc_name filter)
-        const { data: allPcData, error: allPcErr } = await supabase
-  .from('app_usage_logs')
-  .select('pc_name, app_name, cpu_percent, memory_usage_bytes, duration_seconds, start_time')
-  .gte('start_time', startIso)
-  .lte('end_time', endIso)
-  .not('cpu_percent', 'is', null)
-  .not('memory_usage_bytes', 'is', null);
-
-
-        // Aggregate All-PC usage (hours)
-        if (allPcErr) {
-            console.error('Error fetching all-PC app usage:', allPcErr);
-        } else if (allPcData && allPcData.length > 0) {
-            allPcUsage = {}; // reset
-            allPcData.forEach(row => {
-                const app = row.app_name || 'Unknown';
-                const duration = (row.duration_seconds || 0) / 3600;
-                allPcUsage[app] = (allPcUsage[app] || 0) + duration;
-            });
-        }
-
-        // If no per-PC data and no sessions, show message
-        const analyticsEntries = hasPcFilter ? (appData || []) : (allPcData || []);
-
-        if (hasPcFilter && analyticsEntries.length === 0 && (!sessionData || !sessionData.length)) {
-            alert(`No analytics data found for this PC and range (${rangeConfig.label}).`);
-            return;
-        }
-
-        if (!hasPcFilter && analyticsEntries.length === 0) {
-            alert(`No analytics data found for range (${rangeConfig.label}).`);
-            return;
-        }
-
-        const rangeStartMs = new Date(startIso).getTime();
-        const rangeEndMs = new Date(endIso).getTime();
-        const idleSource = (sessionData && sessionData.length > 0) ? sessionData : analyticsEntries;
-        const { activeSeconds: totalActiveSeconds } = computeActiveIdleFromEntries(idleSource, rangeStartMs, rangeEndMs);
-        const totalActive = totalActiveSeconds / 3600;
-        const MS_IN_DAY = 24 * 60 * 60 * 1000;
-        const DAILY_EXPECTED_HOURS = 8;
-        const expectedDays = Math.max(1, Math.ceil((rangeEndMs - rangeStartMs) / MS_IN_DAY));
-        const expectedHours = expectedDays * DAILY_EXPECTED_HOURS;
-        const idleTime = Math.max(0, expectedHours - totalActive);
-
-        const cpuTrend = [];
-        const memTrend = [];
-        const timeLabels = [];
-        let totalCpu = 0, totalMem = 0, count = 0;
-        let peakCpu = 0, peakMem = 0;
-
-        appUsage = {};
-        if (analyticsEntries && analyticsEntries.length > 0) {
-            analyticsEntries.forEach(a => {
-                const app = a.app_name || 'Unknown';
-                const duration = (a.duration_seconds || 0) / 3600;
-                appUsage[app] = (appUsage[app] || 0) + duration;
-
-                const cpu = Number(a.cpu_percent) || 0;
-                const mem = (Number(a.memory_usage_bytes) || 0) / (1024 ** 3);
-                totalCpu += cpu;
-                totalMem += mem;
-                count++;
-
-                if (cpu > peakCpu) peakCpu = cpu;
-                if (mem > peakMem) peakMem = mem;
-
-                const timeStr = a.start_time ? new Date(a.start_time).toLocaleTimeString('en-US', {
-                    hour: '2-digit', minute: '2-digit', hour12: false
-                }) : '';
-                cpuTrend.push(cpu);
-                memTrend.push(mem);
-                timeLabels.push(timeStr);
-            });
-        }
-
-        const avgCpu = count > 0 ? totalCpu / count : 0;
-        const avgMem = count > 0 ? totalMem / count : 0;
-        const totalSessions = analyticsEntries.length;
-        const avgSessionDuration = totalSessions > 0 ? (totalActiveSeconds / totalSessions / 60) : 0; // minutes
-        const resourceEfficiencyRatio = idleTime > 0 ? (totalActive / idleTime).toFixed(2) : (totalActive > 0 ? '∞' : '0');
-
-        // Update summary cards
-        document.getElementById('totalActiveTime').textContent = totalActive.toFixed(1) + 'h';
-        document.getElementById('idleTime').textContent = idleTime.toFixed(1) + 'h';
-        document.getElementById('avgCpuLoad').textContent = avgCpu.toFixed(1) + '%';
-        document.getElementById('avgMemUsage').textContent = avgMem.toFixed(2) + ' GB';
-
-        document.getElementById('peakCpuLoad').textContent = peakCpu.toFixed(1) + '%';
-        document.getElementById('peakMemory').textContent = peakMem.toFixed(2) + ' GB';
-        document.getElementById('totalSessions').textContent = totalSessions;
-        document.getElementById('avgSessionDuration').textContent = avgSessionDuration.toFixed(1) + ' min';
-        document.getElementById('avgCpuUsage').textContent = avgCpu.toFixed(1) + '%';
-        document.getElementById('resourceEfficiency').textContent = resourceEfficiencyRatio + ':1';
-    
-            // Calculate Top Memory Hogs
-            const memoryHogs = {};
-            if (analyticsEntries && analyticsEntries.length > 0) {
-                analyticsEntries.forEach(a => {
-                    const app = a.app_name || 'Unknown';
-                    const mem = (Number(a.memory_usage_bytes) || 0) / (1024 ** 3); // Convert to GB
-                    
-                    if (!memoryHogs[app]) {
-                        memoryHogs[app] = {
-                            name: app,
-                            peakMemory: mem,
-                            totalMemory: mem,
-                            count: 1,
-                            sessions: []
-                        };
-                    } else {
-                        memoryHogs[app].totalMemory += mem;
-                        memoryHogs[app].count += 1;
-                        if (mem > memoryHogs[app].peakMemory) {
-                            memoryHogs[app].peakMemory = mem;
-                        }
-                    }
-                    memoryHogs[app].sessions.push({
-                        startTime: a.start_time,
-                        memory: mem
-                    });
-                });
-            }
-
-            // Sort by peak memory and get top 10
-            const topMemoryApps = Object.values(memoryHogs)
-                .sort((a, b) => b.peakMemory - a.peakMemory)
-                .slice(0, 10);
-
-            // Update Top Memory Hogs table
-            const topMemoryTable = document.getElementById('topMemoryHogsTable');
-            if (topMemoryTable) {
-                if (topMemoryApps.length === 0) {
-                    topMemoryTable.innerHTML = `
-                        <tr>
-                            <td colspan="5" style="padding:30px; text-align:center; color:#64748b;">
-                                <i class="fas fa-inbox"></i> No memory data available
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    topMemoryTable.innerHTML = topMemoryApps.map((app, index) => {
-                        const avgMemory = app.totalMemory / app.count;
-                        const isHighMemory = app.peakMemory > 1.0; // Flag if > 1GB
-                        const statusColor = isHighMemory ? '#ef4444' : '#22c55e';
-                        const statusIcon = isHighMemory ? 'fa-alert-circle' : 'fa-check-circle';
-                        const statusText = isHighMemory ? 'High' : 'Normal';
-                        
-                        return `
-                            <tr style="border-bottom:1px solid #e5e7eb;">
-                                <td style="padding:15px; color:#1f2937; font-weight:500;">
-                                    <i class="fas fa-cube" style="color:#6366f1; margin-right:8px;"></i>
-                                    ${escapeHtml(app.name)}
-                                </td>
-                                <td style="padding:15px; text-align:center; color:#1f2937; font-weight:600;">
-                                    ${app.peakMemory.toFixed(2)} GB
-                                </td>
-                                <td style="padding:15px; text-align:center; color:#64748b;">
-                                    ${avgMemory.toFixed(2)} GB
-                                </td>
-                                <td style="padding:15px; text-align:center; color:#64748b;">
-                                    ${app.count}
-                                </td>
-                                <td style="padding:15px; text-align:center;">
-                                    <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 12px; background:${statusColor}20; color:${statusColor}; border-radius:20px; font-size:0.85rem; font-weight:600;">
-                                        <i class="fas ${statusIcon}" style="font-size:0.9rem;"></i>
-                                        ${statusText}
-                                    </span>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                }
-            }
-
-                        // Calculate Top CPU Consumers
-            const cpuHogs = {};
-            if (analyticsEntries && analyticsEntries.length > 0) {
-                analyticsEntries.forEach(a => {
-                    const app = a.app_name || 'Unknown';
-                    const cpu = Number(a.cpu_percent) || 0;
-                    
-                    if (!cpuHogs[app]) {
-                        cpuHogs[app] = {
-                            name: app,
-                            peakCpu: cpu,
-                            totalCpu: cpu,
-                            count: 1,
-                            sessions: []
-                        };
-                    } else {
-                        cpuHogs[app].totalCpu += cpu;
-                        cpuHogs[app].count += 1;
-                        if (cpu > cpuHogs[app].peakCpu) {
-                            cpuHogs[app].peakCpu = cpu;
-                        }
-                    }
-                    cpuHogs[app].sessions.push({
-                        startTime: a.start_time,
-                        cpu: cpu
-                    });
-                });
-            }
-
-                        
-            // Sort by peak CPU and get top 10
-            const topCpuApps = Object.values(cpuHogs)
-                .sort((a, b) => b.peakCpu - a.peakCpu)
-                .slice(0, 10);
-
-            // Update Top CPU Consumers table
-            const topCpuTable = document.getElementById('topCpuConsumersTable');
-            if (topCpuTable) {
-                if (topCpuApps.length === 0) {
-                    topCpuTable.innerHTML = `
-                        <tr>
-                            <td colspan="5" style="padding:30px; text-align:center; color:#64748b;">
-                                <i class="fas fa-inbox"></i> No CPU data available
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    topCpuTable.innerHTML = topCpuApps.map((app, index) => {
-                        const avgCpu = app.totalCpu / app.count;
-                        const isHighCpu = app.peakCpu > 50; // Flag if peak > 50%
-                        const statusColor = isHighCpu ? '#ef4444' : '#22c55e';
-                        const statusIcon = isHighCpu ? 'fa-warning' : 'fa-check-circle';
-                        const statusText = isHighCpu ? 'High' : 'Normal';
-                        
-                        return `
-                            <tr style="border-bottom:1px solid #e5e7eb;">
-                                <td style="padding:15px; color:#1f2937; font-weight:500;">
-                                    <i class="fas fa-microchip" style="color:#f59e0b; margin-right:8px;"></i>
-                                    ${escapeHtml(app.name)}
-                                </td>
-                                <td style="padding:15px; text-align:center; color:#1f2937; font-weight:600;">
-                                    ${app.peakCpu.toFixed(1)} %
-                                </td>
-                                <td style="padding:15px; text-align:center; color:#64748b;">
-                                    ${avgCpu.toFixed(1)} %
-                                </td>
-                                <td style="padding:15px; text-align:center; color:#64748b;">
-                                    ${app.count}
-                                </td>
-                                <td style="padding:15px; text-align:center;">
-                                    <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 12px; background:${statusColor}20; color:${statusColor}; border-radius:20px; font-size:0.85rem; font-weight:600;">
-                                        <i class="fas ${statusIcon}" style="font-size:0.9rem;"></i>
-                                        ${statusText}
-                                    </span>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                }
-            }
-
-            // Prepare top apps
-            const sortedApps = Object.entries(appUsage)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-            const labels = sortedApps.map(a => a[0]);
-            const values = sortedApps.map(a => Number(a[1].toFixed(2)));
-
-            // Prepare top apps (all PCs)
-            const sortedAllPcApps = Object.entries(allPcUsage)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 10);
-            const labelsAll = sortedAllPcApps.map(a => a[0]);
-            const valuesAll = sortedAllPcApps.map(a => Number(a[1].toFixed(2)));
-
-            // Destroy old chart if exists
-if (window.allPcPieChart) {
-    try { window.allPcPieChart.destroy(); } catch(e) {}
-    window.allPcPieChart = null;
-}
-
-// Get canvas and render chart
-const pieCanvas = document.getElementById('allPcUsagePieChart');
-if (pieCanvas && labelsAll.length > 0) {
-    window.allPcPieChart = new Chart(pieCanvas.getContext('2d'), {
-        type: 'doughnut', // or 'pie'
-        data: {
-            labels: labelsAll,
-            datasets: [{
-                label: 'Application Usage Distribution (All PCs)',
-                data: valuesAll,
-                backgroundColor: [
-                    '#6366f1', '#22c55e', '#ef4444', '#f59e0b',
-                    '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316',
-                    '#64748b', '#84cc16'
-                ],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: { boxWidth: 20 }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw} hours`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-// Destroy old chart if exists
-if (window.performanceMetricsChart) {
-    try { window.performanceMetricsChart.destroy(); } catch (e) {}
-    window.performanceMetricsChart = null;
-}
-
-const metricsCanvas = document.getElementById('performanceMetricsChart');
-if (metricsCanvas && allPcData && allPcData.length > 0) {
-    const pcStats = {};
-
-    // Aggregate metrics per PC
-    allPcData.forEach(row => {
-        const pc = row.pc_name;
-        if (!pc) return;
-
-        const cpu = Number(row.cpu_percent) || 0;
-        const mem = (Number(row.memory_usage_bytes) || 0) / (1024 ** 3);
-        const duration = Number(row.duration_seconds) || 0;
-
-        if (!pcStats[pc]) {
-            pcStats[pc] = { totalCpu: 0, totalMem: 0, totalDuration: 0, sessions: 0 };
-        }
-
-        pcStats[pc].totalCpu += cpu;
-        pcStats[pc].totalMem += mem;
-        pcStats[pc].totalDuration += duration;
-        pcStats[pc].sessions++;
-    });
-
-    const labels = Object.keys(pcStats);
-    const cpuData = [];
-    const memData = [];
-    const sessionData = [];
-    const durationData = [];
-
-    labels.forEach(pc => {
-        const stats = pcStats[pc];
-        const avgCpu = stats.totalCpu / stats.sessions;
-        const avgMem = stats.totalMem / stats.sessions;
-        const avgDuration = (stats.totalDuration / stats.sessions) / 60; // seconds → minutes
-        const totalSessions = stats.sessions;
-
-        cpuData.push(avgCpu);
-        memData.push(avgMem);
-        sessionData.push(totalSessions);
-        durationData.push(avgDuration);
-    });
-
-    window.performanceMetricsChart = new Chart(metricsCanvas.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [
-                {
-                    label: 'Avg CPU (%)',
-                    data: cpuData,
-                    backgroundColor: '#3b82f6'
-                },
-                {
-                    label: 'Avg Memory (GB)',
-                    data: memData,
-                    backgroundColor: '#10b981'
-                },
-                {
-                    label: 'Total Sessions',
-                    data: sessionData,
-                    backgroundColor: '#f59e0b'
-                },
-                {
-                    label: 'Avg Duration (min)',
-                    data: durationData,
-                    backgroundColor: '#ef4444'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: { size: 12 },
-                        color: '#374151'
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => `${ctx.dataset.label}: ${ctx.raw.toFixed(2)}`
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    stacked: false,
-                    title: { display: true, text: 'PC Name' }
-                },
-                y: {
-                    stacked: false,
-                    beginAtZero: true,
-                    title: { display: true, text: 'Metric Value' }
-                }
-            }
-        }
-    });
-}
-
-// Destroy old scatter chart if exists
-if (window.resourceEfficiencyChart) {
-    try { window.resourceEfficiencyChart.destroy(); } catch(e) {}
-    window.resourceEfficiencyChart = null;
-}
-
-const scatterCanvas = document.getElementById('resourceEfficiencyChart');
-if (scatterCanvas && allPcData && allPcData.length > 0) {
-    const pcStats = {};
-
-    // Aggregate CPU, Memory and Duration per PC
-    allPcData.forEach(row => {
-        const pc = row.pc_name;
-        const cpuRaw = row.cpu_percent;
-        const memRaw = row.memory_usage_bytes;
-        const dur = Number(row.duration_seconds) || 0;
-
-        if (!pc || cpuRaw == null || memRaw == null) {
-            // skip invalid rows
-            return;
-        }
-
-        const cpu = Number(cpuRaw);
-        const mem = Number(memRaw) / (1024 ** 3); // bytes → GB
-
-        if (!pcStats[pc]) {
-            pcStats[pc] = { totalCpu: 0, totalMem: 0, totalDuration: 0, count: 0 };
-        }
-        pcStats[pc].totalCpu += cpu;
-        pcStats[pc].totalMem += mem;
-        pcStats[pc].totalDuration += dur;
-        pcStats[pc].count++;
-    });
-
-    // Build datasets: each PC becomes a single bubble (x=avgCpu, y=avgMem, r=avgDuration)
-    const datasets = Object.entries(pcStats).map(([pc, stats], idx) => {
-        const avgCpu = stats.totalCpu / stats.count;
-        const avgMem = stats.totalMem / stats.count;
-        const avgDurationMin = (stats.totalDuration / stats.count) / 60; // minutes
-
-        // Map avg duration to radius (px) with reasonable bounds
-        const r = Math.max(6, Math.min(30, Math.round(avgDurationMin * 0.6 + 4)));
-
-        const colorPalette = ['#3b82f6','#10b981','#ef4444','#f59e0b','#8b5cf6','#6366f1','#14b8a6','#f97316','#64748b','#84cc16'];
-        const color = colorPalette[idx % colorPalette.length];
-
-        return {
-            label: pc,
-            data: [{ x: +avgCpu.toFixed(2), y: +avgMem.toFixed(3), r }],
-            backgroundColor: color + '80', // semi-transparent
-            borderColor: color,
-            borderWidth: 1,
-            hoverBackgroundColor: color + 'c0'
-        };
-    });
-
-    if (datasets.length > 0) {
-        // Destroy previous if present (the page already handles some destruction, but safe to repeat)
-        if (window.resourceEfficiencyChart) {
-            try { window.resourceEfficiencyChart.destroy(); } catch(e) {}
-            window.resourceEfficiencyChart = null;
-        }
-
-        window.resourceEfficiencyChart = new Chart(scatterCanvas.getContext('2d'), {
-            type: 'bubble',
-            data: { datasets },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.dataset.label || '';
-                                const x = context.raw.x !== undefined ? context.raw.x : (context.parsed && context.parsed.x);
-                                const y = context.raw.y !== undefined ? context.raw.y : (context.parsed && context.parsed.y);
-                                const rVal = context.raw.r || (context.parsed && context.parsed.r) || '';
-                                return `${label}: CPU ${Number(x).toFixed(1)}%, Mem ${Number(y).toFixed(2)} GB, bubble ~ ${rVal}px (avg session)`;
-                            }
-                        }
-                    },
-                    legend: { position: 'right' }
-                },
-                scales: {
-                    x: {
-                        title: { display: true, text: 'Average CPU Usage (%)' },
-                        beginAtZero: true
-                    },
-                    y: {
-                        title: { display: true, text: 'Average Memory Usage (GB)' },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    } else {
-        console.warn('No valid PC data found for bubble chart.');
-    }
-}
-
-            // Destroy old charts
-            if (window.allPcChart) {
-                try { window.allPcChart.destroy(); } catch(e) {}
-                window.allPcChart = null;
-            }
-            if (window.appChart) {
-                try { window.appChart.destroy(); } catch(e) {}
-                window.appChart = null;
-            }
-            if (window.cpuChart) {
-                try { window.cpuChart.destroy(); } catch(e) {}
-                window.cpuChart = null;
-            }
-            if (window.memChart) {
-                try { window.memChart.destroy(); } catch(e) {}
-                window.memChart = null;
-            }
-
-            // CRITICAL: Wait again for canvas measurement before creating charts
-            await new Promise(resolve => setTimeout(resolve, 150));
-
-            // Get canvas elements
-            const analyticsAppCanvas = document.getElementById('analyticsAppChart');
-            const analyticsCpuCanvas = document.getElementById('analyticsCpuChart');
-            const analyticsMemCanvas = document.getElementById('analyticsMemChart');
-            const analyticsAllPcCanvas = document.getElementById('analyticsAllPcChart');
-
-            console.log('Canvas elements:', {
-                app: !!analyticsAppCanvas,
-                cpu: !!analyticsCpuCanvas,
-                mem: !!analyticsMemCanvas
-            });
-
-            // Create App Chart
-            if (analyticsAppCanvas && labels.length > 0) {
-                window.appChart = new Chart(analyticsAppCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Usage (hours)',
-                            data: values,
-                            backgroundColor: '#6366f1',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        plugins: { legend: { display: false } },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
-            }
-
-            // Create All-PC Chart (stacked by PC per application)
-            if (analyticsAllPcCanvas && labelsAll.length > 0 && allPcData && allPcData.length > 0) {
-                // Build mapping: app -> { pcName: hours, ... }
-                const appPcMap = {};
-                const pcTotals = {};
-
-                allPcData.forEach(row => {
-                    const app = row.app_name || 'Unknown';
-                    const pc = row.pc_name || 'Unknown PC';
-                    const hours = (Number(row.duration_seconds) || 0) / 3600;
-
-                    if (!appPcMap[app]) appPcMap[app] = {};
-                    appPcMap[app][pc] = (appPcMap[app][pc] || 0) + hours;
-
-                    pcTotals[pc] = (pcTotals[pc] || 0) + hours;
-                });
-
-                // Choose top PCs to display individually, aggregate the rest into "Other PCs"
-                const pcList = Object.keys(pcTotals).sort((a, b) => pcTotals[b] - pcTotals[a]);
-                const MAX_PCS = 6; // keep chart readable
-                const topPcs = pcList.slice(0, MAX_PCS);
-                const otherPcs = pcList.slice(MAX_PCS);
-
-                // Build dataset for each PC
-                const colorPalette = ['#6366f1', '#22c55e', '#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f97316', '#64748b', '#84cc16'];
-                const datasets = [];
-
-                topPcs.forEach((pc, idx) => {
-                    const data = labelsAll.map(app => {
-                        return +(appPcMap[app] && appPcMap[app][pc] ? appPcMap[app][pc].toFixed(3) : 0);
-                    });
-
-                    datasets.push({
-                        label: pc,
-                        data,
-                        backgroundColor: colorPalette[idx % colorPalette.length],
-                        borderColor: colorPalette[idx % colorPalette.length],
-                        borderWidth: 1
-                    });
-                });
-
-                // Aggregate 'Other PCs' if any
-                if (otherPcs.length > 0) {
-                    const otherData = labelsAll.map(app => {
-                        let sum = 0;
-                        otherPcs.forEach(pc => {
-                            if (appPcMap[app] && appPcMap[app][pc]) sum += appPcMap[app][pc];
-                        });
-                        return +sum.toFixed(3);
-                    });
-
-                    datasets.push({
-                        label: 'Other PCs',
-                        data: otherData,
-                        backgroundColor: '#94a3b8',
-                        borderColor: '#94a3b8',
-                        borderWidth: 1
-                    });
-                }
-
-                // Destroy existing chart if present
-                if (window.allPcChart) {
-                    try { window.allPcChart.destroy(); } catch (e) {}
-                    window.allPcChart = null;
-                }
-
-                // Create stacked bar chart: apps on X axis, stacks are PCs
-                window.allPcChart = new Chart(analyticsAllPcCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: labelsAll,
-                        datasets: datasets
-                    },
-                    options: {
-                        plugins: {
-                            legend: { position: 'right' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return `${context.dataset.label}: ${Number(context.raw).toFixed(2)} h`;
-                                    }
-                                }
-                            }
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: { mode: 'index', intersect: false },
-                        scales: {
-                            x: { stacked: true, title: { display: true, text: 'Applications' } },
-                            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Active Time (hours)' } }
-                        }
-                    }
-                });
-            }
-
-            // Create CPU Chart
-            if (analyticsCpuCanvas && cpuTrend.length > 0) {
-                window.cpuChart = new Chart(analyticsCpuCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: timeLabels,
-                        datasets: [{
-                            label: 'CPU (%)',
-                            data: cpuTrend,
-                            backgroundColor: '#f59e0b',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, max: 100 },
-                            x: { ticks: { autoSkip: true } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
-
-            // Create Memory Chart
-            if (analyticsMemCanvas && memTrend.length > 0) {
-                window.memChart = new Chart(analyticsMemCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: timeLabels,
-                        datasets: [{
-                            label: 'Memory (GB)',
-                            data: memTrend,
-                            backgroundColor: '#10b981',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true },
-                            x: { ticks: { autoSkip: true } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
-
-            // Update summary text
-            const topApp = sortedApps[0] ? `${sortedApps[0][0]} (${sortedApps[0][1].toFixed(1)}h)` : 'None';
-            const scopeLabel = hasPcFilter ? escapeHtml(pcName) : 'All PCs (aggregated)';
-            document.getElementById('analyticsSummary').innerHTML =
-                `<strong>Range:</strong> ${escapeHtml(rangeConfig.label)}<br>
-                 <strong>Scope:</strong> ${scopeLabel}<br>
-                 <strong>Most used app:</strong> ${escapeHtml(topApp)}<br>
-                 <strong>Average CPU:</strong> ${avgCpu.toFixed(1)}%<br>
-                 <strong>Average Memory:</strong> ${avgMem.toFixed(2)} GB<br>
-                 <strong>Idle Time:</strong> ${idleTime.toFixed(1)} hours<br>
-                 <strong>Total Active Time:</strong> ${totalActive.toFixed(1)}`;    
-
-                 // Convert hours to minutes for chart
-const totalActiveMinutes = totalActive * 60;
-const totalIdleMinutes = idleTime * 60;
-
-// Render Active vs Idle chart
-createActiveIdleChart(totalActiveMinutes, totalIdleMinutes);
-           
-
-            console.log('Analytics rendered successfully');
-
-            if (analyticsPlaceholder) {
-                analyticsPlaceholder.style.display = 'none';
-            }
-            if (analyticsSection) {
-                analyticsSection.style.display = 'block';
-            }
-
-        } catch (error) {
-            console.error('Error in showAnalyticsReports:', error);
-            if (analyticsPlaceholder) {
-                analyticsPlaceholder.innerHTML = '<i class="fas fa-exclamation-circle"></i> Unable to load analytics. Please try again.';
-            }
-            alert('Error loading analytics: ' + error.message);
-        }
-    }
-
-    // CSV Export Function with Enhanced Data & Better Formatting
-    function downloadAnalyticsCSV() {
-        const rawPcName = document.getElementById('pcName').value.trim();
-        const pcName = rawPcName || 'All PCs';
-        const rangeConfig = getAnalyticsRangeConfig();
-        const reportRange = rangeConfig.label;
-
-        // Get data from the summary cards
-        const totalActiveTime = document.getElementById('totalActiveTime').textContent;
-        const idleTime = document.getElementById('idleTime').textContent;
-        const avgCpuLoad = document.getElementById('avgCpuLoad').textContent;
-        const avgMemUsage = document.getElementById('avgMemUsage').textContent;
-        const peakCpuLoad = document.getElementById('peakCpuLoad').textContent;
-        const peakMemory = document.getElementById('peakMemory').textContent;
-        const totalSessions = document.getElementById('totalSessions').textContent;
-        const avgSessionDuration = document.getElementById('avgSessionDuration').textContent;
-        const resourceEfficiency = document.getElementById('resourceEfficiency').textContent;
-
-        // Get PC system info if available
-        const systemInfoGrid = document.getElementById('systemInfoGrid');
-        let cpuModel = 'N/A', totalRam = 'N/A', osVersion = 'N/A', lastOnline = 'N/A';
-        
-        if (systemInfoGrid) {
-            const items = systemInfoGrid.querySelectorAll('.system-info-item');
-            items.forEach(item => {
-                const label = item.querySelector('.label')?.textContent.toLowerCase() || '';
-                const value = item.querySelector('.value')?.textContent || 'N/A';
-                
-                if (label.includes('cpu') || label.includes('processor')) cpuModel = value;
-                if (label.includes('ram') || label.includes('memory')) totalRam = value;
-                if (label.includes('os') || label.includes('windows')) osVersion = value;
-                if (label.includes('last') || label.includes('online')) lastOnline = value;
-            });
-        }
-
-        // Helper function to escape CSV values
-        const escapeCSVValue = (val) => {
-            if (val === null || val === undefined) return '';
-            const str = String(val).trim();
-            // Always quote strings to avoid truncation and special character issues
-            return `"${str.replace(/"/g, '""')}"`;
-        };
-
-        // Build CSV lines array for better control
-        let csvLines = [];
-        
-        // Header Section - Single column format for better alignment
-        csvLines.push('"Analytics Report - ICS Lab Monitor"');
-        csvLines.push(`"Generated: ${new Date().toLocaleString()}"`);
-        csvLines.push(`"PC Name: ${pcName}"`);
-        csvLines.push(`"Report Range: ${reportRange}"`);
-        csvLines.push(''); // Blank line
-
-        // System Information Section
-        csvLines.push('"SYSTEM INFORMATION"');
-        csvLines.push('"Property","Value"');
-        csvLines.push(`"CPU Model",${escapeCSVValue(cpuModel)}`);
-        csvLines.push(`"Total Memory",${escapeCSVValue(totalRam)}`);
-        csvLines.push(`"Operating System",${escapeCSVValue(osVersion)}`);
-        csvLines.push(`"Last Seen Online",${escapeCSVValue(lastOnline)}`);
-        csvLines.push(''); // Blank line
-
-        // Summary Section
-        csvLines.push('"SUMMARY METRICS"');
-        csvLines.push('"Metric","Value","Unit"');
-        csvLines.push(`"Total Active Time","${totalActiveTime}","Hours"`);
-        csvLines.push(`"Idle Time","${idleTime}","Hours"`);
-        csvLines.push(`"Average CPU Load","${avgCpuLoad}","Percentage"`);
-        csvLines.push(`"Average Memory Usage","${avgMemUsage}","GB"`);
-        csvLines.push(`"Peak CPU Load","${peakCpuLoad}","Percentage"`);
-        csvLines.push(`"Peak Memory","${peakMemory}","GB"`);
-        csvLines.push(`"Total Sessions","${totalSessions}","Count"`);
-        csvLines.push(`"Average Session Duration","${avgSessionDuration}","Minutes"`);
-        csvLines.push(`"Resource Efficiency Ratio","${resourceEfficiency}","Ratio"`);
-        csvLines.push(''); // Blank line
-
-        // App Usage Section
-        const appTableBody = document.getElementById('appTableBody');
-        if (appTableBody && appTableBody.children.length > 0) {
-            csvLines.push('"APP USAGE DETAILS"');
-            csvLines.push('"Application Name","Active Time (Minutes)","CPU % (Average)","Memory (GB Average)","Sessions Count"');
-            
-            Array.from(appTableBody.children).forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 5) {
-                    const appName = cells[0].textContent.trim();
-                    const activeTime = cells[1].textContent.trim();
-                    const cpu = cells[2].textContent.trim();
-                    const memory = cells[3].textContent.trim();
-                    const sessions = cells[4].textContent.trim();
-                    
-                    csvLines.push(`${escapeCSVValue(appName)},"${activeTime}","${cpu}","${memory}","${sessions}"`);
-                }
-            });
-        }
-
-        // Join all lines with newlines
-        const csvContent = csvLines.join('\n');
-
-        // Create blob for better encoding handling
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        const rangeSlug = reportRange ? reportRange.replace(/[^\w]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') : 'range';
-        link.setAttribute('download', `analytics_${pcName}_${rangeSlug}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        console.log('CSV exported successfully with proper formatting and full text visibility');
-    }</script>
+    </script>
 </body>
 </html>

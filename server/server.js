@@ -35,9 +35,13 @@ const db = new Database();
 
 // Test database connection (non-blocking)
 db.testConnection().then(connected => {
-  if (!connected) {
+  if (connected) {
+    console.log('✅ Database connection successful');
+  } else {
     console.warn('⚠️ Database connection failed, but server will continue running');
   }
+}).catch(err => {
+  console.error('❌ Database connection error:', err.message);
 });
 
 // Store active sessions in memory
@@ -56,7 +60,13 @@ wss.on('connection', ws => {
   let clientId = null;
 
   ws.on('message', async (msg) => {
-    const data = JSON.parse(msg);
+    let data;
+    try {
+      data = JSON.parse(msg);
+    } catch (error) {
+      console.error('❌ Failed to parse WebSocket message:', error.message);
+      return;
+    }
 
     if (data.type === 'start') {
       // PC starts
@@ -74,7 +84,7 @@ wss.on('connection', ws => {
       try {
         await db.updatePCStatus(clientId, true, formattedStart, formattedStart);
       } catch (error) {
-        console.error(`[${clientId}] Failed to update PC status:`, error.message);
+        console.error(`❌ [${clientId}] Failed to update PC status:`, error.message);
       }
     } else if (data.type === 'stop') {
       // PC stops
@@ -86,8 +96,12 @@ wss.on('connection', ws => {
         const startDate = new Date(startTime);
         const duration = Math.floor((endTime - startDate) / 1000);
         // Save to database
-        db.insertTimeLog(data.pc_name, startTime, formattedEnd, duration);
-        db.updatePCStatus(data.pc_name, false, formattedEnd, formattedEnd);
+        try {
+          await db.insertTimeLog(data.pc_name, startTime, formattedEnd, duration);
+          await db.updatePCStatus(data.pc_name, false, formattedEnd, formattedEnd);
+        } catch (error) {
+          console.error(`❌ [${data.pc_name}] Failed to save stop event:`, error.message);
+        }
         delete activeSessions[data.pc_name];
         delete appActiveSessions[data.pc_name];
       }
@@ -96,31 +110,40 @@ wss.on('connection', ws => {
     ) {
       // Start tracking a new app session for this client
       if (!appActiveSessions[clientId]) appActiveSessions[clientId] = {};
-      const now = new Date();
-      const formattedNow = now.toISOString();
-      appActiveSessions[clientId][data.app_name] = { start_time: formattedNow };
-      db.updatePCStatus(clientId, true, formattedNow, formattedNow);
+      // Use the start_time from client, or create new one if not provided
+      const startTime = data.start_time ? new Date(data.start_time).toISOString() : new Date().toISOString();
+      appActiveSessions[clientId][data.app_name] = { start_time: startTime };
+      try {
+        await db.updatePCStatus(clientId, true, startTime, startTime);
+      } catch (error) {
+        console.error(`❌ [${clientId}] Failed to update PC status on app_usage_start:`, error.message);
+      }
     } else if (
       data.type === 'app_usage_end'
     ) {
       // End the app session and log to DB
       if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
-        const startTime = appActiveSessions[clientId][data.app_name].start_time;
-        const endTime = new Date();
-        const formattedEnd = endTime.toISOString();
+        // Use client-provided times, or fall back to server-side session tracking
+        const startTime = data.start_time ? new Date(data.start_time).toISOString() : appActiveSessions[clientId][data.app_name].start_time;
+        const endTime = data.end_time ? new Date(data.end_time).toISOString() : new Date().toISOString();
         const startDate = new Date(startTime);
-        const duration = Math.floor((endTime - startDate) / 1000);
-        db.insertAppUsageLog(
-          data.pc_name,
-          data.app_name,
-          startTime,
-          formattedEnd,
-          duration,
-          data.memory_usage_bytes,
-          data.cpu_percent,
-          data.gpu_percent
-        );
-        db.updatePCStatus(clientId, true, formattedEnd, formattedEnd);
+        const endDate = new Date(endTime);
+        const duration = data.duration_seconds !== undefined ? data.duration_seconds : Math.floor((endDate - startDate) / 1000);
+        try {
+          await db.insertAppUsageLog(
+            data.pc_name,
+            data.app_name,
+            startTime,
+            endTime,
+            duration,
+            data.memory_usage_bytes,
+            data.cpu_percent,
+            data.gpu_percent
+          );
+          await db.updatePCStatus(clientId, true, endTime, endTime);
+        } catch (error) {
+          console.error(`❌ [${clientId}] Failed to save app_usage_end:`, error.message);
+        }
         delete appActiveSessions[clientId][data.app_name];
       }
     } else if (
@@ -128,29 +151,76 @@ wss.on('connection', ws => {
     ) {
       // Update the end_time and duration for the current app session
       if (appActiveSessions[clientId] && appActiveSessions[clientId][data.app_name]) {
-        const startTime = appActiveSessions[clientId][data.app_name].start_time;
-        const endTime = new Date();
-        const formattedEnd = endTime.toISOString();
+        // Use client-provided times, or fall back to server-side session tracking
+        const startTime = data.start_time ? new Date(data.start_time).toISOString() : appActiveSessions[clientId][data.app_name].start_time;
+        const endTime = data.end_time ? new Date(data.end_time).toISOString() : new Date().toISOString();
         const startDate = new Date(startTime);
-        const duration = Math.floor((endTime - startDate) / 1000);
-        db.insertAppUsageLog(
+        const endDate = new Date(endTime);
+        const duration = data.duration_seconds !== undefined ? data.duration_seconds : Math.floor((endDate - startDate) / 1000);
+        try {
+          await db.insertAppUsageLog(
+            data.pc_name,
+            data.app_name,
+            startTime,
+            endTime,
+            duration,
+            data.memory_usage_bytes,
+            data.cpu_percent,
+            data.gpu_percent
+          );
+          await db.updatePCStatus(clientId, true, endTime, endTime);
+        } catch (error) {
+          console.error(`❌ [${clientId}] Failed to save app_usage_update:`, error.message);
+        }
+      }
+    } else if (data.type === 'system_info') {
+      // Handle system information
+      try {
+        await db.upsertSystemInfo(
           data.pc_name,
-          data.app_name,
-          startTime,
-          formattedEnd,
-          duration,
-          data.memory_usage_bytes,
-          data.cpu_percent,
-          data.gpu_percent
+          data.cpu_model,
+          data.cpu_cores,
+          data.cpu_speed_ghz,
+          data.total_memory_gb,
+          data.os_platform,
+          data.os_version,
+          data.hostname
         );
-        db.updatePCStatus(clientId, true, formattedEnd, formattedEnd);
+      } catch (error) {
+        console.error(`❌ [${data.pc_name}] Failed to upsert system info:`, error.message);
+      }
+    } else if (data.type === 'idle_status') {
+      // Handle idle status
+      try {
+        await db.updatePCStatus(data.pc_name, null, null, null, data.is_idle);
+      } catch (error) {
+        console.error(`❌ [${data.pc_name}] Failed to update idle status:`, error.message);
+      }
+    } else if (data.type === 'heartbeat') {
+      // Handle heartbeat - just update last_seen to keep connection alive
+      try {
+        await db.updatePCStatus(data.pc_name, true, new Date().toISOString(), null);
+      } catch (error) {
+        // Silently ignore heartbeat errors to avoid spam
+      }
+    } else if (data.type === 'browser_activity') {
+      // Handle browser activity
+      try {
+        // Ensure timestamp is in ISO format
+        const timestamp = data.timestamp ? new Date(data.timestamp).toISOString() : new Date().toISOString();
+        await db.insertBrowserSearchLog(
+          data.pc_name,
+          data.browser,
+          data.url,
+          data.search_query,
+          data.search_engine,
+          timestamp
+        );
+      } catch (error) {
+        console.error(`❌ [${data.pc_name}] Failed to insert browser activity:`, error.message);
       }
     }
     
-   
-
-    
-  
   });
 
   ws.on('close', () => {
