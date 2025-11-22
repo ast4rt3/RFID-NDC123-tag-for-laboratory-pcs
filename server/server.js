@@ -219,8 +219,28 @@ wss.on('connection', ws => {
       } catch (error) {
         console.error(`❌ [${data.pc_name}] Failed to insert browser activity:`, error.message);
       }
+    } else if (data.type === 'idle_session') {
+      // Handle idle session log
+      try {
+        const startTime = data.start_time ? new Date(data.start_time).toISOString() : new Date().toISOString();
+        const endTime = data.end_time ? new Date(data.end_time).toISOString() : new Date().toISOString();
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
+        const duration = data.duration_seconds !== undefined ? data.duration_seconds : Math.floor((endDate - startDate) / 1000);
+
+        await db.insertIdleLog(
+          data.pc_name,
+          startTime,
+          endTime,
+          duration
+        );
+        console.log(`💤 Idle session logged for ${data.pc_name}: ${duration}s`);
+      } catch (error) {
+        console.error(`❌ [${data.pc_name}] Failed to insert idle session:`, error.message);
+      }
     }
-    
+
+
   });
 
   ws.on('close', () => {
@@ -262,7 +282,7 @@ app.get('/logs', async (req, res) => {
 // Browser logs API endpoint
 app.get('/browser-logs', async (req, res) => {
   const { pc_name, search_engine, limit = 100 } = req.query;
-  
+
   try {
     const logs = await db.getBrowserLogs(pc_name, search_engine, limit);
     res.json(logs);

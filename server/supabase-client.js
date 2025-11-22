@@ -29,12 +29,12 @@ class SupabaseDB {
         .from('time_logs')
         .select('count')
         .limit(1);
-      
+
       if (error) {
         console.error('❌ Supabase connection failed:', error.message);
         return false;
       }
-      
+
       // Connected to Supabase successfully
       return true;
     } catch (err) {
@@ -59,7 +59,7 @@ class SupabaseDB {
       console.error('❌ Error inserting time log:', error.message);
       return false;
     }
-    
+
     // Time log saved silently
     return true;
   }
@@ -133,10 +133,32 @@ class SupabaseDB {
       console.error('❌ Error inserting browser search log:', error.message);
       return false;
     }
-    
+
     // Browser search log saved silently
     return true;
   }
+
+  // Insert idle log
+  async insertIdleLog(pcName, startTime, endTime, duration) {
+    const { data, error } = await this.client
+      .from('idle_logs')
+      .insert({
+        pc_name: pcName,
+        start_time: startTime,
+        end_time: endTime,
+        duration_seconds: duration
+      })
+      .select();
+
+    if (error) {
+      console.error('❌ Error inserting idle log:', error.message);
+      return false;
+    }
+
+    // Idle log saved silently
+    return true;
+  }
+
 
   // Get time logs
   async getTimeLogs(limit = 100) {

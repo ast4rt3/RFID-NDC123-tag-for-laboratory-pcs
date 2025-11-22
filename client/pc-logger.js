@@ -10,15 +10,15 @@ const si = require('systeminformation');
 const config = require('./config');
 const logStream = fs.createWriteStream('rfid-client-debug.log', { flags: 'a' });
 const origLog = console.log;
-console.log = function(...args) {
+console.log = function (...args) {
   logStream.write(args.join(' ') + '\n');
   origLog.apply(console, args);
 };
 const origError = console.error;
-console.error = function(...args) {
+console.error = function (...args) {
   logStream.write('[ERROR] ' + args.join(' ') + '\n');
   origError.apply(console, args);
-}; 
+};
 
 const pcName = os.hostname();
 console.log('PC Name:', pcName);
@@ -57,7 +57,8 @@ let lastStart = new Date();
 let appActive = false;
 let lastActivityTime = new Date();
 let isIdle = false;
-const IDLE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+let idleStartTime = null;
+const IDLE_THRESHOLD_MS = 1 * 60 * 1000; // 1 minute
 
 // Interval references (for cleanup)
 let appUsageInterval = null;
@@ -79,15 +80,15 @@ function isBrowserApp(appName) {
 function extractBrowserData(appName, windowTitle, windowUrl) {
   let searchQuery = null;
   let searchEngine = null;
-  
+
   console.log('🔍 Extracting browser data from:', { appName, windowTitle, windowUrl });
-  
+
   // Extract search query from URL
   if (windowUrl) {
     try {
       const url = new URL(windowUrl);
       console.log('🔍 Parsed URL:', url.hostname, url.searchParams.toString());
-    
+
       // Google search (multiple variations)
       if (url.hostname.includes('google.com')) {
         searchQuery = url.searchParams.get('q');
@@ -123,59 +124,59 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
         searchQuery = url.searchParams.get('query');
         searchEngine = 'Startpage';
       }
-      
+
       console.log('🔍 URL extraction result:', { searchQuery, searchEngine });
     } catch (e) {
       console.log('🔍 Invalid URL:', e.message);
     }
   }
-  
 
-  
+
+
   // Fallback: Extract from window title (more comprehensive patterns)
   if (!searchQuery && windowTitle) {
     console.log('🔍 Trying title extraction for:', windowTitle);
-    
+
     // More comprehensive title patterns
     const titlePatterns = [
       // Google variations
       /^(.+?) - Google Search$/,
       /^(.+?) - Google$/,
       /Google Search - (.+)$/,
-      
+
       // Bing variations
       /^(.+?) - Bing$/,
       /^(.+?) - Microsoft Bing$/,
-      
+
       // Yahoo variations
       /^(.+?) - Yahoo Search$/,
       /^(.+?) - Yahoo$/,
-      
+
       // DuckDuckGo variations
       /^(.+?) - DuckDuckGo$/,
       /DuckDuckGo - (.+)$/,
-      
+
       // YouTube variations
       /^(.+?) - YouTube$/,
       /YouTube - (.+)$/,
-      
+
       // Generic search patterns
       /^(.+?) - Search$/,
       /Search results for "(.+?)"/,
       /"(.+?)" - Search results/,
-      
+
       // Browser-specific patterns
       /^(.+?) - Chrome$/,
       /^(.+?) - Firefox$/,
       /^(.+?) - Edge$/,
       /^(.+?) - Brave$/
     ];
-    
+
     for (const pattern of titlePatterns) {
       const match = windowTitle.match(pattern);
       if (match) {
         searchQuery = match[1] || match[2];
-        
+
         // Determine search engine from title
         if (windowTitle.includes('Google')) searchEngine = 'Google';
         else if (windowTitle.includes('Bing')) searchEngine = 'Bing';
@@ -184,17 +185,17 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
         else if (windowTitle.includes('YouTube')) searchEngine = 'YouTube';
         else if (windowTitle.includes('Brave')) searchEngine = 'Brave';
         else searchEngine = 'Unknown';
-        
+
         console.log('🔍 Title extraction match:', { searchQuery, searchEngine, pattern: pattern.toString() });
         break;
       }
     }
   }
-  
+
   // Final fallback: If we have a browser but no search query, still log the activity
   if (!searchQuery && appName) {
     console.log('🔍 Browser activity without search query detected');
-    
+
     // Try to extract search query from window title even if it doesn't match our patterns
     if (windowTitle && windowTitle.length > 5) {
       // If title looks like it might contain a search query, use it
@@ -206,13 +207,13 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
       }
     }
   }
-  
+
   const result = {
     searchQuery,
     searchEngine,
     isSearchPage: !!searchQuery
   };
-  
+
   console.log('🔍 Final extraction result:', result);
   return result;
 }
@@ -222,7 +223,7 @@ function extractSearchFromURL(url) {
     const urlObj = new URL(url);
     let searchQuery = null;
     let searchEngine = null;
-    
+
     if (urlObj.hostname.includes('google.com') && urlObj.searchParams.has('q')) {
       searchQuery = urlObj.searchParams.get('q');
       searchEngine = 'Google';
@@ -239,7 +240,7 @@ function extractSearchFromURL(url) {
       searchQuery = urlObj.searchParams.get('search_query');
       searchEngine = 'YouTube';
     }
-    
+
     return { searchQuery, searchEngine };
   } catch (e) {
     return { searchQuery: null, searchEngine: null };
@@ -310,18 +311,18 @@ function addToBuffer(message) {
   if (message.type === 'heartbeat') {
     return;
   }
-  
+
   buffer.messages.push({
     ...message,
     bufferedAt: new Date().toISOString()
   });
-  
+
   // Limit buffer size to prevent excessive memory usage (keep last 1000 messages)
   if (buffer.messages.length > 1000) {
     buffer.messages = buffer.messages.slice(-1000);
     console.log('⚠️ Buffer size limit reached, keeping last 1000 messages');
   }
-  
+
   writeBuffer(buffer);
   console.log(`💾 Buffered message (${buffer.messages.length} total):`, message.type);
 }
@@ -339,18 +340,18 @@ function clearBuffer() {
 
 async function sendBufferedMessages() {
   const buffer = readBuffer();
-  
+
   if (!buffer.messages || buffer.messages.length === 0) {
     return;
   }
-  
+
   console.log(`📤 Sending ${buffer.messages.length} buffered messages...`);
-  
+
   // Send messages one by one with a small delay to avoid overwhelming the server
   let sentCount = 0;
   for (let i = 0; i < buffer.messages.length; i++) {
     const message = buffer.messages[i];
-    
+
     // Check if connection is still open before sending
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       console.error(`❌ Connection lost while sending buffered messages. ${buffer.messages.length - i} messages remaining.`);
@@ -359,29 +360,29 @@ async function sendBufferedMessages() {
       writeBuffer({ messages: remainingMessages, lastUpdated: buffer.lastUpdated });
       return;
     }
-    
+
     // Remove bufferedAt timestamp before sending
     const { bufferedAt, ...messageToSend } = message;
-    
+
     // Send directly via WebSocket (don't use sendMessage to avoid re-buffering)
     try {
       ws.send(JSON.stringify(messageToSend));
       sentCount++;
       console.log(`✅ Sent buffered message ${sentCount}/${buffer.messages.length}: ${message.type}`);
-      
+
       // Small delay between messages to avoid overwhelming the server
       await new Promise(resolve => setTimeout(resolve, 50));
     } catch (error) {
       // If send fails, stop and keep remaining messages in buffer
       console.error(`❌ Failed to send buffered message ${sentCount + 1}/${buffer.messages.length}: ${error.message}`);
-      
+
       // Update buffer with remaining messages
       const remainingMessages = buffer.messages.slice(i);
       writeBuffer({ messages: remainingMessages, lastUpdated: buffer.lastUpdated });
       return;
     }
   }
-  
+
   // All messages sent successfully, clear buffer
   console.log(`✅ All ${sentCount} buffered messages sent successfully`);
   clearBuffer();
@@ -408,27 +409,27 @@ function sendMessage(message) {
 async function sendSystemInfo() {
   try {
     console.log('Collecting system information...');
-    
+
     // Collect system information (even if not connected, so we have it ready)
     const [cpu, mem, osInfo] = await Promise.all([
       si.cpu(),
       si.mem(),
       si.osInfo()
     ]);
-    
+
     // Extract CPU model and speed
     const cpuModel = cpu.manufacturer && cpu.brand ? `${cpu.manufacturer} ${cpu.brand}` : cpu.brand || 'Unknown';
     const cpuCores = cpu.cores || 0;
     const cpuSpeedGhz = cpu.speed ? (cpu.speed / 1000) : 0; // Convert MHz to GHz
-    
+
     // Extract memory (convert bytes to GB)
     const totalMemoryGb = mem.total ? (mem.total / (1024 * 1024 * 1024)) : 0;
-    
+
     // Extract OS information
     const osPlatform = osInfo.platform || os.platform();
     const osVersion = osInfo.distro || osInfo.release || 'Unknown';
     const hostname = os.hostname();
-    
+
     // Send system info to server (will be buffered if not connected)
     sendMessage({
       type: 'system_info',
@@ -441,7 +442,7 @@ async function sendSystemInfo() {
       os_version: osVersion,
       hostname: hostname
     });
-    
+
     console.log('✅ System information collected and sent:', {
       cpu_model: cpuModel,
       cpu_cores: cpuCores,
@@ -496,7 +497,7 @@ function setupAppUsageTracking() {
     const memoryUsage = result.memoryUsage; // in bytes
     const windowTitle = result.title || '';
     const windowUrl = result.url || '';
-    
+
     // Debug: Log what we're getting from active-win
     console.log('🔍 Extracted data:', {
       appName,
@@ -526,13 +527,13 @@ function setupAppUsageTracking() {
       console.log('🔍 Browser detected:', appName);
       console.log('🔍 Window title:', windowTitle);
       console.log('🔍 Window URL:', windowUrl);
-      
+
       browserData = extractBrowserData(appName, windowTitle, windowUrl);
       console.log('🔍 Extracted browser data:', browserData);
-      
+
       // Merge window title and search query into one field
       let finalSearchQuery = browserData.searchQuery || windowTitle || '';
-      
+
       // Send browser activity data immediately (even if no search query)
       sendMessage({
         type: 'browser_activity',
@@ -548,19 +549,8 @@ function setupAppUsageTracking() {
 
     // Get GPU usage and send the log inside the callback
     getSystemGpuUsage((gpuPercent) => {
-      // Update last activity time whenever there's app activity
-      lastActivityTime = now;
-      
-      // If was idle, mark as active now
-      if (isIdle) {
-        isIdle = false;
-        sendMessage({
-          type: 'idle_status',
-          pc_name: pcName,
-          is_idle: false,
-          timestamp: now.toISOString()
-        });
-      }
+      // NOTE: We DO NOT update lastActivityTime here anymore because active-win
+      // returns data even if the user is idle. We rely on checkSystemIdleTime() instead.
 
       if (!appActive) {
         // First non-ignored app seen
@@ -628,28 +618,82 @@ function setupAppUsageTracking() {
   }, 3000); // 3 seconds
 }
 
-function setupIdleDetection() {
-  // Idle detection interval
-  idleCheckInterval = setInterval(() => {
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-      return; // Skip if not connected
+function checkSystemIdleTime() {
+  const psScript = path.join(__dirname, 'check-idle.ps1');
+  const command = `powershell -ExecutionPolicy Bypass -File "${psScript}"`;
+
+  console.log('Checking idle time with command:', command);
+
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error checking idle time:', error);
+      return;
+    }
+
+    const trimmedOutput = stdout.trim();
+    console.log('Idle check output:', trimmedOutput);
+
+    const idleMillis = parseInt(trimmedOutput, 10);
+    if (isNaN(idleMillis)) {
+      console.error('Invalid idle time received:', trimmedOutput);
+      return;
     }
 
     const now = new Date();
-    const timeSinceLastActivity = now - lastActivityTime;
-    const shouldBeIdle = timeSinceLastActivity >= IDLE_THRESHOLD_MS;
+    const shouldBeIdle = idleMillis >= IDLE_THRESHOLD_MS;
+
+    // Debug log every check if close to threshold or just for visibility
+    console.log(`Idle check: ${idleMillis}ms (Threshold: ${IDLE_THRESHOLD_MS}ms) -> Idle: ${shouldBeIdle}`);
 
     // Only send update if idle state changed
     if (shouldBeIdle !== isIdle) {
       isIdle = shouldBeIdle;
+
+      if (isIdle) {
+        idleStartTime = now;
+        console.log(`💤 System is now idle (Idle time: ${idleMillis}ms)`);
+      } else {
+        // Transition from Idle -> Active
+        const idleEndTime = now;
+        // Calculate duration based on the actual idle start time we tracked
+        // If we just detected it, use the current time - duration? No, we have idleStartTime.
+
+        let duration = 0;
+        if (idleStartTime) {
+          duration = Math.floor((idleEndTime - idleStartTime) / 1000);
+        }
+
+        // Send idle session data to server
+        sendMessage({
+          type: 'idle_session',
+          pc_name: pcName,
+          start_time: idleStartTime ? idleStartTime.toISOString() : now.toISOString(),
+          end_time: idleEndTime.toISOString(),
+          duration_seconds: duration
+        });
+
+        idleStartTime = null;
+        console.log(`🏃 Active again after ${duration}s idle`);
+      }
+
       sendMessage({
         type: 'idle_status',
         pc_name: pcName,
         is_idle: isIdle,
         timestamp: now.toISOString()
       });
+
+      // Notify parent process (main.js) for UI update
+      if (process.send) {
+        process.send({ type: 'idle-status', isIdle: isIdle });
+      }
     }
-  }, 30000); // Check every 30 seconds
+  });
+}
+
+function setupIdleDetection() {
+  // Check idle time every 5 seconds
+  idleCheckInterval = setInterval(checkSystemIdleTime, 5000);
 }
 
 function setupHeartbeat() {
@@ -705,7 +749,7 @@ function connect() {
   }
 
   console.log(`🔌 Attempting to connect to ${wsUrl}...`);
-  
+
   try {
     ws = new WebSocket(wsUrl);
     isReconnecting = false;
@@ -748,22 +792,22 @@ function connect() {
 
     ws.on('close', (code, reason) => {
       console.log(`🔌 WebSocket closed (code: ${code}, reason: ${reason || 'none'})`);
-      
+
       // Cleanup intervals
       cleanupIntervals();
 
       // Attempt to reconnect (unless we're shutting down)
       if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
         reconnectAttempts++;
-        
+
         // Exponential backoff with jitter
         const baseDelay = Math.min(INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempts - 1), MAX_RECONNECT_DELAY);
         const jitter = Math.random() * 1000; // Add up to 1 second of jitter
         const delay = baseDelay + jitter;
-        
+
         console.log(`🔄 Reconnecting in ${Math.round(delay / 1000)} seconds (attempt ${reconnectAttempts})...`);
         isReconnecting = true;
-        
+
         reconnectTimeout = setTimeout(() => {
           isReconnecting = false;
           connect();
@@ -797,15 +841,15 @@ function connect() {
 // Listen for shutdown/logoff signals
 function handleExit() {
   console.log('🛑 Shutting down...');
-  
+
   // Clear reconnection timeout
   if (reconnectTimeout) {
     clearTimeout(reconnectTimeout);
   }
-  
+
   // Cleanup intervals
   cleanupIntervals();
-  
+
   // Send stop message if connected
   if (ws && ws.readyState === WebSocket.OPEN) {
     sendMessage({ type: 'stop', pc_name: pcName });
@@ -836,4 +880,4 @@ if (startupBuffer.messages && startupBuffer.messages.length > 0) {
 connect();
 
 // Keep the process alive
-setInterval(() => {}, 1000);
+setInterval(() => { }, 1000);

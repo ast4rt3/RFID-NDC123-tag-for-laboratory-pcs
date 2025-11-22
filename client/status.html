@@ -106,6 +106,11 @@
             border-left-color: #f59e0b;
         }
 
+        .status-item.idle {
+            border-left-color: #6366f1;
+            background: #e0e7ff;
+        }
+
         .refresh-btn {
             width: 100%;
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -174,6 +179,11 @@
                     <span class="status-label">Data Collection</span>
                     <span class="status-value" id="dataCollection">-</span>
                 </div>
+
+                <div class="status-item" id="idleStatusItem">
+                    <span class="status-label">User Status</span>
+                    <span class="status-value" id="idleStatus">Checking...</span>
+                </div>
             </div>
 
             <button class="refresh-btn" onclick="refreshStatus()">
@@ -202,6 +212,8 @@
                 const serverAddress = document.getElementById('serverAddress');
                 const connectionStatus = document.getElementById('connectionStatus');
                 const dataCollection = document.getElementById('dataCollection');
+                const idleStatus = document.getElementById('idleStatus');
+                const idleStatusItem = document.getElementById('idleStatusItem');
                 const lastUpdated = document.getElementById('lastUpdated');
                 
                 // Update logger status
@@ -223,6 +235,15 @@
                 // Simulate connection and data collection status
                 connectionStatus.textContent = status.isRunning ? 'Connected' : 'Disconnected';
                 dataCollection.textContent = status.isRunning ? 'Active' : 'Inactive';
+                
+                // Update idle status
+                if (status.isIdle) {
+                    idleStatus.textContent = 'Idle (Away)';
+                    idleStatusItem.className = 'status-item idle';
+                } else {
+                    idleStatus.textContent = 'Active';
+                    idleStatusItem.className = 'status-item';
+                }
                 
                 // Update last updated time
                 lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
@@ -256,6 +277,20 @@
 
         // Update status every 3 seconds
         setInterval(updateStatus, 3000);
+
+        // Listen for real-time idle updates
+        ipcRenderer.on('idle-status-update', (event, isIdle) => {
+            const idleStatus = document.getElementById('idleStatus');
+            const idleStatusItem = document.getElementById('idleStatusItem');
+            
+            if (isIdle) {
+                idleStatus.textContent = 'Idle (Away)';
+                idleStatusItem.className = 'status-item idle';
+            } else {
+                idleStatus.textContent = 'Active';
+                idleStatusItem.className = 'status-item';
+            }
+        });
 
         // Initialize
         updateStatus();

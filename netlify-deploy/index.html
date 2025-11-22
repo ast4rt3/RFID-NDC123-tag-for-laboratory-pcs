@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +28,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -67,8 +68,13 @@
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
 
@@ -99,7 +105,8 @@
             letter-spacing: 0.5px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input,
+        .form-group select {
             padding: 12px 16px;
             border: 2px solid #e5e7eb;
             border-radius: 10px;
@@ -108,7 +115,8 @@
             background: white;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
@@ -147,13 +155,13 @@
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 2px solid #e5e7eb;
             transition: all 0.3s ease;
         }
 
         .pc-status-card:hover {
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
             transform: translateY(-2px);
         }
 
@@ -216,10 +224,12 @@
                 transform: scale(1);
                 opacity: 0.6;
             }
+
             70% {
                 transform: scale(2.5);
                 opacity: 0;
             }
+
             100% {
                 transform: scale(1);
                 opacity: 0;
@@ -288,14 +298,14 @@
             padding: 25px;
             border-radius: 15px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
             border: 1px solid #e5e7eb;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
         .stat-card i {
@@ -329,7 +339,7 @@
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
         .chart-wrapper {
@@ -358,7 +368,7 @@
             background: white;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
         table {
@@ -519,7 +529,7 @@
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             border: 2px solid #e5e7eb;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -528,7 +538,7 @@
 
         .pc-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
             border-color: #4f46e5;
         }
 
@@ -706,12 +716,12 @@
             .header {
                 padding: 20px 15px;
             }
-            
+
             .header h1 {
                 font-size: 1.5rem;
                 margin-bottom: 8px;
             }
-            
+
             .header .subtitle {
                 font-size: 0.85rem;
                 display: flex;
@@ -739,7 +749,8 @@
                 font-size: 0.85rem;
             }
 
-            .form-group input, .form-group select {
+            .form-group input,
+            .form-group select {
                 width: 100%;
                 padding: 15px;
                 font-size: 1.1rem;
@@ -776,7 +787,7 @@
             .chart-container {
                 padding: 20px 15px;
             }
-            
+
             .chart-wrapper {
                 height: 300px;
             }
@@ -791,7 +802,8 @@
                 font-size: 0.75rem;
             }
 
-            th, td {
+            th,
+            td {
                 padding: 8px 6px;
                 font-size: 0.75rem;
             }
@@ -891,12 +903,12 @@
             }
 
             /* PC status card shareable link */
-            .pc-status-card > div:last-child {
+            .pc-status-card>div:last-child {
                 flex-direction: column;
                 gap: 10px;
             }
 
-            .pc-status-card > div:last-child > div {
+            .pc-status-card>div:last-child>div {
                 flex-direction: column;
                 width: 100%;
             }
@@ -913,17 +925,18 @@
                 grid-template-columns: 1fr;
             }
 
-            .pc-status-card > div:last-child input {
+            .pc-status-card>div:last-child input {
                 width: 100%;
                 min-width: auto;
             }
 
-            .pc-status-card > div:last-child button {
+            .pc-status-card>div:last-child button {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -966,540 +979,545 @@
                     <i class="fas fa-desktop"></i> PC Details
                 </button>
             </div>
-        <div class="controls">
+            <div class="controls">
                 <div class="control-group">
-            <div class="form-group">
+                    <div class="form-group">
                         <label for="pcName"><i class="fas fa-desktop"></i> PC Name</label>
                         <input type="text" id="pcName" placeholder="Enter PC name (e.g., i3S)">
-            </div>
-            <div class="form-group">
+                    </div>
+                    <div class="form-group">
                         <label for="selectedDate"><i class="fas fa-calendar"></i> Date</label>
-                <input type="date" id="selectedDate">
-            </div>
-            <button class="btn" onclick="loadData()">
+                        <input type="date" id="selectedDate">
+                    </div>
+                    <button class="btn" onclick="loadData()">
                         <i class="fas fa-search"></i>
                         Load Data
                     </button>
-                    <button class="btn" onclick="toggleTaskManager()" id="taskManagerBtn" style="background: #4f46e5; color: white;">
+                    <button class="btn" onclick="toggleTaskManager()" id="taskManagerBtn"
+                        style="background: #4f46e5; color: white;">
                         <i class="fas fa-tasks"></i>
                         <span id="taskManagerBtnText">Show Processes</span>
-            </button>
-                </div>
-        </div>
-
-        <!-- PC Status Card -->
-        <div class="pc-status-container" id="pcStatusContainer" style="display:none;">
-            <div class="pc-status-card">
-                <div class="pc-status-header">
-                    <div class="status-indicator-wrapper">
-                        <div class="status-indicator" id="statusIndicator"></div>
-                    </div>
-                    <div class="pc-info">
-                        <h2 id="pcDisplayName"></h2>
-                        <div class="status-text" id="pcStatusText">
-                            <i class="fas fa-circle"></i>
-                            <span>Loading...</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="system-info-grid" id="systemInfoGrid">
-                    <!-- System info will be populated here -->
-        </div>
-
-                <!-- Task Manager Section -->
-                <div id="taskManagerSection" style="display: none; margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
-                    <div class="task-manager-header-section">
-                        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">CPU</h3>
-                        <div class="cpu-info-header" id="cpuInfoHeader" style="font-size: 0.9rem; color: #64748b;">
-                            <span id="cpuModel">Loading...</span>
-                        </div>
-            </div>
-
-                    <div class="task-manager-graph-container">
-                        <div class="graph-header">
-                            <span class="graph-label">% Utilization</span>
-                            <span class="graph-time-label">60 seconds</span>
-                    </div>
-                        <div class="graph-wrapper">
-                            <canvas id="cpuUtilizationChart"></canvas>
-                    </div>
-                    </div>
-
-                    <div class="task-manager-stats-grid">
-                        <div class="task-manager-stats-column">
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">Utilization</div>
-                                <div class="stat-value-large" id="cpuUtilization">0%</div>
-                            </div>
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">Speed</div>
-                                <div class="stat-value-large" id="cpuSpeed">0.00 GHz</div>
+                    </button>
                 </div>
             </div>
 
-                        <div class="task-manager-stats-column">
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">Base speed</div>
-                                <div class="stat-value" id="baseSpeed">-</div>
+            <!-- PC Status Card -->
+            <div class="pc-status-container" id="pcStatusContainer" style="display:none;">
+                <div class="pc-status-card">
+                    <div class="pc-status-header">
+                        <div class="status-indicator-wrapper">
+                            <div class="status-indicator" id="statusIndicator"></div>
+                        </div>
+                        <div class="pc-info">
+                            <h2 id="pcDisplayName"></h2>
+                            <div class="status-text" id="pcStatusText">
+                                <i class="fas fa-circle"></i>
+                                <span>Loading...</span>
+                            </div>
+                        </div>
                     </div>
+                    <div class="system-info-grid" id="systemInfoGrid">
+                        <!-- System info will be populated here -->
+                    </div>
+
+                    <!-- Task Manager Section -->
+                    <div id="taskManagerSection"
+                        style="display: none; margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+                        <div class="task-manager-header-section">
+                            <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">CPU
+                            </h3>
+                            <div class="cpu-info-header" id="cpuInfoHeader" style="font-size: 0.9rem; color: #64748b;">
+                                <span id="cpuModel">Loading...</span>
+                            </div>
+                        </div>
+
+                        <div class="task-manager-graph-container">
+                            <div class="graph-header">
+                                <span class="graph-label">% Utilization</span>
+                                <span class="graph-time-label">60 seconds</span>
+                            </div>
+                            <div class="graph-wrapper">
+                                <canvas id="cpuUtilizationChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="task-manager-stats-grid">
+                            <div class="task-manager-stats-column">
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">Utilization</div>
+                                    <div class="stat-value-large" id="cpuUtilization">0%</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">Speed</div>
+                                    <div class="stat-value-large" id="cpuSpeed">0.00 GHz</div>
+                                </div>
+                            </div>
+
+                            <div class="task-manager-stats-column">
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">Base speed</div>
+                                    <div class="stat-value" id="baseSpeed">-</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">Sockets</div>
+                                    <div class="stat-value" id="sockets">-</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">Cores</div>
+                                    <div class="stat-value" id="cores">-</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">Logical processors</div>
+                                    <div class="stat-value" id="logicalProcessors">-</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">Virtualization</div>
+                                    <div class="stat-value" id="virtualization">-</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">L1 cache</div>
+                                    <div class="stat-value" id="l1Cache">-</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">L2 cache</div>
+                                    <div class="stat-value" id="l2Cache">-</div>
+                                </div>
+                                <div class="task-manager-stat-item">
+                                    <div class="stat-label">L3 cache</div>
+                                    <div class="stat-value" id="l3Cache">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="task-manager-header-section" style="margin-top: 40px;">
+                            <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">Memory
+                            </h3>
+                        </div>
+
+                        <div class="task-manager-graph-container">
+                            <div class="graph-header">
+                                <span class="graph-label">Memory Usage (GB)</span>
+                                <span class="graph-time-label">60 seconds</span>
+                            </div>
+                            <div class="graph-wrapper">
+                                <canvas id="memoryUtilizationChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="task-manager-memory-stats">
                             <div class="task-manager-stat-item">
-                                <div class="stat-label">Sockets</div>
-                                <div class="stat-value" id="sockets">-</div>
+                                <div class="stat-label">In use</div>
+                                <div class="stat-value-large" id="memoryInUse">0 GB</div>
                             </div>
                             <div class="task-manager-stat-item">
-                                <div class="stat-label">Cores</div>
-                                <div class="stat-value" id="cores">-</div>
+                                <div class="stat-label">Available</div>
+                                <div class="stat-value-large" id="memoryAvailable">0 GB</div>
                             </div>
                             <div class="task-manager-stat-item">
-                                <div class="stat-label">Logical processors</div>
-                                <div class="stat-value" id="logicalProcessors">-</div>
-                            </div>
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">Virtualization</div>
-                                <div class="stat-value" id="virtualization">-</div>
-                            </div>
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">L1 cache</div>
-                                <div class="stat-value" id="l1Cache">-</div>
-                            </div>
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">L2 cache</div>
-                                <div class="stat-value" id="l2Cache">-</div>
-                            </div>
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">L3 cache</div>
-                                <div class="stat-value" id="l3Cache">-</div>
+                                <div class="stat-label">Committed</div>
+                                <div class="stat-value" id="memoryCommitted">-</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="task-manager-header-section" style="margin-top: 40px;">
-                        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">Memory</h3>
+                    <!-- Shareable Link Section -->
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <label
+                                style="font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-link"></i> Direct Link:
+                            </label>
+                            <input type="text" id="shareableLink" readonly
+                                style="flex: 1; min-width: 200px; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; background: #f8fafc; color: #374151;"
+                                value="">
+                            <button onclick="copyLink()"
+                                style="padding: 8px 16px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 0.75rem; color: #64748b; font-style: italic;">
+                            <i class="fas fa-info-circle"></i> Use this link for RFID tags or QR codes
+                        </p>
                     </div>
-                    
-                    <div class="task-manager-graph-container">
-                        <div class="graph-header">
-                            <span class="graph-label">Memory Usage (GB)</span>
-                            <span class="graph-time-label">60 seconds</span>
-                        </div>
-                        <div class="graph-wrapper">
-                            <canvas id="memoryUtilizationChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="task-manager-memory-stats">
-                        <div class="task-manager-stat-item">
-                            <div class="stat-label">In use</div>
-                            <div class="stat-value-large" id="memoryInUse">0 GB</div>
-                        </div>
-                        <div class="task-manager-stat-item">
-                            <div class="stat-label">Available</div>
-                            <div class="stat-value-large" id="memoryAvailable">0 GB</div>
-                        </div>
-                        <div class="task-manager-stat-item">
-                            <div class="stat-label">Committed</div>
-                            <div class="stat-value" id="memoryCommitted">-</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Shareable Link Section -->
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <label style="font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
-                            <i class="fas fa-link"></i> Direct Link:
-                        </label>
-                        <input type="text" id="shareableLink" readonly 
-                            style="flex: 1; min-width: 200px; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; background: #f8fafc; color: #374151;"
-                            value="">
-                        <button onclick="copyLink()" 
-                            style="padding: 8px 16px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                    </div>
-                    <p style="margin-top: 8px; font-size: 0.75rem; color: #64748b; font-style: italic;">
-                        <i class="fas fa-info-circle"></i> Use this link for RFID tags or QR codes
-                    </p>
                 </div>
             </div>
-        </div>
 
-        <div id="statsGrid" class="stats-grid" style="display: none;"></div>
+            <div id="statsGrid" class="stats-grid" style="display: none;"></div>
 
-        <div id="apps-tab" class="tab-content" style="display: none;">
-            <div class="chart-container">
-                <div class="chart-title">App Usage Distribution</div>
+            <div id="apps-tab" class="tab-content" style="display: none;">
+                <div class="chart-container">
+                    <div class="chart-title">App Usage Distribution</div>
                     <div class="chart-wrapper">
-                    <canvas id="appUsageChart"></canvas>
+                        <canvas id="appUsageChart"></canvas>
                     </div>
                 </div>
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Application</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Duration</th>
-                            <th>Memory</th>
-                            <th>CPU</th>
-                        </tr>
-                    </thead>
-                    <tbody id="appTableBody">
-                        <!-- App data will be populated here -->
-                    </tbody>
-                </table>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Application</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Duration</th>
+                                <th>Memory</th>
+                                <th>CPU</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appTableBody">
+                            <!-- App data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Controls -->
+                <div class="pagination" id="paginationControls" style="display: none;">
+                    <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div class="pagination-page-numbers" id="pageNumbers"></div>
+                    <div class="pagination-info" id="paginationInfo"></div>
+                    <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
             </div>
-            <!-- Pagination Controls -->
-            <div class="pagination" id="paginationControls" style="display: none;">
-                <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">
-                    <i class="fas fa-chevron-left"></i> Previous
-                </button>
-                <div class="pagination-page-numbers" id="pageNumbers"></div>
-                <div class="pagination-info" id="paginationInfo"></div>
-                <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">
-                    Next <i class="fas fa-chevron-right"></i>
-                </button>
+
+
+            <div id="loadingMessage" class="loading">
+                Enter PC name and date to view activity data
             </div>
         </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+            // Supabase configuration
+            const SUPABASE_URL = 'https://uxhefdybgjluzkbodryd.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4aGVmZHliZ2psdXprYm9kcnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDExMzAsImV4cCI6MjA3NjM3NzEzMH0.jvFSOUUNiWvLFdPHplVuRgvKkvt2zlet6NA_x3mLaJM';
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        <div id="loadingMessage" class="loading">
-            Enter PC name and date to view activity data
-        </div>
-    </div>
+            // Set today's date as default
+            document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // Supabase configuration
-        const SUPABASE_URL = 'https://uxhefdybgjluzkbodryd.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4aGVmZHliZ2psdXprYm9kcnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDExMzAsImV4cCI6MjA3NjM3NzEzMH0.jvFSOUUNiWvLFdPHplVuRgvKkvt2zlet6NA_x3mLaJM';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            let appChart = null;
+            let cpuChart = null;
+            let memoryChart = null;
+            let taskManagerRefreshInterval = null;
+            let autoRefreshInterval = null;
+            let pcStatusRefreshInterval = null;
+            let lastUpdateTime = null;
+            const PC_STATUS_REFRESH_INTERVAL = 5000; // 5 seconds for PC status
+            const FULL_REFRESH_INTERVAL = 20000; // 20 seconds for full data reload
+            const TASK_MANAGER_REFRESH_INTERVAL = 3000; // 3 seconds for task manager
 
-        // Set today's date as default
-        document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+            // Pagination variables
+            let allAppData = [];
+            let currentPage = 1;
+            const itemsPerPage = 10; // Show 10 items per page
 
-        let appChart = null;
-        let cpuChart = null;
-        let memoryChart = null;
-        let taskManagerRefreshInterval = null;
-        let autoRefreshInterval = null;
-        let pcStatusRefreshInterval = null;
-        let lastUpdateTime = null;
-        const PC_STATUS_REFRESH_INTERVAL = 5000; // 5 seconds for PC status
-        const FULL_REFRESH_INTERVAL = 20000; // 20 seconds for full data reload
-        const TASK_MANAGER_REFRESH_INTERVAL = 3000; // 3 seconds for task manager
-        
-        // Pagination variables
-        let allAppData = [];
-        let currentPage = 1;
-        const itemsPerPage = 10; // Show 10 items per page
+            // Auto-refresh functionality
+            // PC status updates every 5 seconds, full data reload every 20 seconds
+            function startAutoRefresh() {
+                // Clear any existing intervals
+                stopAutoRefresh();
 
-        // Auto-refresh functionality
-        // PC status updates every 5 seconds, full data reload every 20 seconds
-        function startAutoRefresh() {
-            // Clear any existing intervals
-            stopAutoRefresh();
-            
-            const pcName = document.getElementById('pcName').value.trim();
-            if (!pcName) {
-                return; // Don't start if no PC name
-            }
-            
-            // Show indicator immediately (if it exists)
-            const refreshIndicator = document.getElementById('refreshIndicator');
-            if (refreshIndicator) {
-                refreshIndicator.style.display = 'inline-flex';
-            }
-            updateLastUpdateTime();
-            
-            // Start PC status refresh interval (every 5 seconds)
-            pcStatusRefreshInterval = setInterval(() => {
-                const currentPcName = document.getElementById('pcName').value.trim();
-                if (currentPcName) {
-                    console.log('Auto-refresh: Updating PC status...');
-                    refreshPcStatusOnly(currentPcName);
-                } else {
-                    stopAutoRefresh();
-                }
-            }, PC_STATUS_REFRESH_INTERVAL);
-            
-            // Start full data refresh interval (every 20 seconds)
-            // Skip full reload if task manager is open
-            autoRefreshInterval = setInterval(() => {
-                const currentPcName = document.getElementById('pcName').value.trim();
-                if (currentPcName) {
-                    // Check if task manager is open
-                    const taskManagerSection = document.getElementById('taskManagerSection');
-                    const isTaskManagerOpen = taskManagerSection && taskManagerSection.style.display !== 'none';
-                    
-                    if (!isTaskManagerOpen) {
-                        console.log('Auto-refresh: Full data reload...');
-                        loadData();
-                    } else {
-                        console.log('Auto-refresh: Skipping full reload (task manager is open)');
-                    }
-                } else {
-                    stopAutoRefresh();
-                }
-            }, FULL_REFRESH_INTERVAL);
-            
-            console.log('Auto-refresh started for PC:', pcName, '- PC status: 5s, Full reload: 20s');
-        }
-
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-            if (pcStatusRefreshInterval) {
-                clearInterval(pcStatusRefreshInterval);
-                pcStatusRefreshInterval = null;
-            }
-            console.log('Auto-refresh stopped');
-            const refreshIndicator = document.getElementById('refreshIndicator');
-            if (refreshIndicator) {
-                refreshIndicator.style.display = 'none';
-            }
-        }
-
-        // Refresh only PC status (faster, every 5 seconds)
-        async function refreshPcStatusOnly(pcName) {
-            try {
-                // Fetch PC status
-                let isOnline = false;
-                let statusData = null;
-                try {
-                    const { data: statusDataResult, error: statusError } = await supabase
-                        .from('pc_status')
-                        .select('*')
-                        .eq('pc_name', pcName)
-                        .single();
-
-                    if (!statusError && statusDataResult) {
-                        statusData = statusDataResult;
-                        isOnline = statusData.is_online || false;
-                    }
-                } catch (err) {
-                    console.warn('Could not fetch PC status:', err);
+                const pcName = document.getElementById('pcName').value.trim();
+                if (!pcName) {
+                    return; // Don't start if no PC name
                 }
 
-                // Fetch system info
-                let systemInfo = null;
-                try {
-                    const { data: systemInfoData, error: systemInfoError } = await supabase
-                        .from('system_info')
-                        .select('*')
-                        .eq('pc_name', pcName)
-                        .single();
-
-                    if (!systemInfoError && systemInfoData) {
-                        systemInfo = systemInfoData;
-                    }
-                } catch (err) {
-                    console.warn('Could not fetch system info:', err);
+                // Show indicator immediately (if it exists)
+                const refreshIndicator = document.getElementById('refreshIndicator');
+                if (refreshIndicator) {
+                    refreshIndicator.style.display = 'inline-flex';
                 }
-
-                // Get selected date
-                const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
-
-                // Update PC status only
-                updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
-                
-                // Update last update time
                 updateLastUpdateTime();
-            } catch (error) {
-                console.error('Error refreshing PC status:', error);
+
+                // Start PC status refresh interval (every 5 seconds)
+                pcStatusRefreshInterval = setInterval(() => {
+                    const currentPcName = document.getElementById('pcName').value.trim();
+                    if (currentPcName) {
+                        console.log('Auto-refresh: Updating PC status...');
+                        refreshPcStatusOnly(currentPcName);
+                    } else {
+                        stopAutoRefresh();
+                    }
+                }, PC_STATUS_REFRESH_INTERVAL);
+
+                // Start full data refresh interval (every 20 seconds)
+                // Skip full reload if task manager is open
+                autoRefreshInterval = setInterval(() => {
+                    const currentPcName = document.getElementById('pcName').value.trim();
+                    if (currentPcName) {
+                        // Check if task manager is open
+                        const taskManagerSection = document.getElementById('taskManagerSection');
+                        const isTaskManagerOpen = taskManagerSection && taskManagerSection.style.display !== 'none';
+
+                        if (!isTaskManagerOpen) {
+                            console.log('Auto-refresh: Full data reload...');
+                            loadData();
+                        } else {
+                            console.log('Auto-refresh: Skipping full reload (task manager is open)');
+                        }
+                    } else {
+                        stopAutoRefresh();
+                    }
+                }, FULL_REFRESH_INTERVAL);
+
+                console.log('Auto-refresh started for PC:', pcName, '- PC status: 5s, Full reload: 20s');
             }
-        }
+
+            function stopAutoRefresh() {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+                if (pcStatusRefreshInterval) {
+                    clearInterval(pcStatusRefreshInterval);
+                    pcStatusRefreshInterval = null;
+                }
+                console.log('Auto-refresh stopped');
+                const refreshIndicator = document.getElementById('refreshIndicator');
+                if (refreshIndicator) {
+                    refreshIndicator.style.display = 'none';
+                }
+            }
+
+            // Refresh only PC status (faster, every 5 seconds)
+            async function refreshPcStatusOnly(pcName) {
+                try {
+                    // Fetch PC status
+                    let isOnline = false;
+                    let statusData = null;
+                    try {
+                        const { data: statusDataResult, error: statusError } = await supabase
+                            .from('pc_status')
+                            .select('*')
+                            .eq('pc_name', pcName)
+                            .single();
+
+                        if (!statusError && statusDataResult) {
+                            statusData = statusDataResult;
+                            isOnline = statusData.is_online || false;
+                        }
+                    } catch (err) {
+                        console.warn('Could not fetch PC status:', err);
+                    }
+
+                    // Fetch system info
+                    let systemInfo = null;
+                    try {
+                        const { data: systemInfoData, error: systemInfoError } = await supabase
+                            .from('system_info')
+                            .select('*')
+                            .eq('pc_name', pcName)
+                            .single();
+
+                        if (!systemInfoError && systemInfoData) {
+                            systemInfo = systemInfoData;
+                        }
+                    } catch (err) {
+                        console.warn('Could not fetch system info:', err);
+                    }
+
+                    // Get selected date
+                    const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
+
+                    // Update PC status only
+                    updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
+
+                    // Update last update time
+                    updateLastUpdateTime();
+                } catch (error) {
+                    console.error('Error refreshing PC status:', error);
+                }
+            }
 
             function updateLastUpdateTime() {
-            // Always use the browser's actual local time (no manual offset math)
-            const now = new Date();
+                // Always use the browser's actual local time (no manual offset math)
+                const now = new Date();
 
-            const dateStr = now.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
+                const dateStr = now.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
 
-            const timeStr = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true 
-            });
+                const timeStr = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
 
-            const lastUpdateElement = document.getElementById('lastUpdateTime');
-            if (lastUpdateElement) {
-                lastUpdateElement.textContent = `Last updated: ${dateStr} • ${timeStr}`;
-            }
-            }
-
-
-
-
-        // Get URL parameters
-        function getURLParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                pc: params.get('pc') || '',
-                date: params.get('date') || ''
-            };
-        }
-
-        // Update URL without reloading page
-        function updateURL(pcName, date) {
-            const url = new URL(window.location);
-            if (pcName) {
-                url.searchParams.set('pc', pcName);
-            }
-            if (date) {
-                url.searchParams.set('date', date);
-            }
-            window.history.pushState({}, '', url);
-        }
-
-        // Check for URL parameters on page load
-        function checkURLParams() {
-            const params = getURLParams();
-            if (params.pc) {
-                document.getElementById('pcName').value = params.pc;
-                if (params.date) {
-                    document.getElementById('selectedDate').value = params.date;
-                } else {
-                    // If no date in URL, use today's date
-        document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+                const lastUpdateElement = document.getElementById('lastUpdateTime');
+                if (lastUpdateElement) {
+                    lastUpdateElement.textContent = `Last updated: ${dateStr} • ${timeStr}`;
                 }
-                // Auto-load data
+            }
+
+
+
+
+            // Get URL parameters
+            function getURLParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    pc: params.get('pc') || '',
+                    date: params.get('date') || ''
+                };
+            }
+
+            // Update URL without reloading page
+            function updateURL(pcName, date) {
+                const url = new URL(window.location);
+                if (pcName) {
+                    url.searchParams.set('pc', pcName);
+                }
+                if (date) {
+                    url.searchParams.set('date', date);
+                }
+                window.history.pushState({}, '', url);
+            }
+
+            // Check for URL parameters on page load
+            function checkURLParams() {
+                const params = getURLParams();
+                if (params.pc) {
+                    document.getElementById('pcName').value = params.pc;
+                    if (params.date) {
+                        document.getElementById('selectedDate').value = params.date;
+                    } else {
+                        // If no date in URL, use today's date
+                        document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
+                    }
+                    // Auto-load data
+                    loadData();
+                }
+            }
+
+            // Page navigation
+            function showHomePage(event) {
+                document.getElementById('homePage').classList.add('active');
+                document.getElementById('detailPage').classList.remove('active');
+                document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                } else {
+                    document.querySelectorAll('.view-toggle-btn')[0].classList.add('active');
+                }
+                loadAllPCs();
+            }
+
+            function showDetailPage(event) {
+                document.getElementById('homePage').classList.remove('active');
+                document.getElementById('detailPage').classList.add('active');
+                document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                } else {
+                    document.querySelectorAll('.view-toggle-btn')[1].classList.add('active');
+                }
+            }
+
+            function navigateToPC(pcName) {
+                document.getElementById('pcName').value = pcName;
+                showDetailPage();
+                document.querySelector('.view-toggle-btn:last-child').classList.add('active');
+                document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
                 loadData();
             }
-        }
 
-        // Page navigation
-        function showHomePage(event) {
-            document.getElementById('homePage').classList.add('active');
-            document.getElementById('detailPage').classList.remove('active');
-            document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
-            if (event && event.target) {
-                event.target.classList.add('active');
-            } else {
-                document.querySelectorAll('.view-toggle-btn')[0].classList.add('active');
-            }
-            loadAllPCs();
-        }
+            // Load all PCs for home page
+            async function loadAllPCs() {
+                const pcsGrid = document.getElementById('pcsGrid');
+                pcsGrid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading PCs...</div>';
 
-        function showDetailPage(event) {
-            document.getElementById('homePage').classList.remove('active');
-            document.getElementById('detailPage').classList.add('active');
-            document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
-            if (event && event.target) {
-                event.target.classList.add('active');
-            } else {
-                document.querySelectorAll('.view-toggle-btn')[1].classList.add('active');
-            }
-        }
+                try {
+                    // Fetch all PC statuses
+                    const { data: pcStatuses, error: statusError } = await supabase
+                        .from('pc_status')
+                        .select('*')
+                        .order('pc_name', { ascending: true });
 
-        function navigateToPC(pcName) {
-            document.getElementById('pcName').value = pcName;
-            showDetailPage();
-            document.querySelector('.view-toggle-btn:last-child').classList.add('active');
-            document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
-            loadData();
-        }
+                    if (statusError) {
+                        console.warn('Could not fetch PC statuses:', statusError);
+                    }
 
-        // Load all PCs for home page
-        async function loadAllPCs() {
-            const pcsGrid = document.getElementById('pcsGrid');
-            pcsGrid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading PCs...</div>';
+                    // Fetch all system info
+                    const { data: systemInfos, error: systemError } = await supabase
+                        .from('system_info')
+                        .select('*')
+                        .order('pc_name', { ascending: true });
 
-            try {
-                // Fetch all PC statuses
-                const { data: pcStatuses, error: statusError } = await supabase
-                    .from('pc_status')
-                    .select('*')
-                    .order('pc_name', { ascending: true });
+                    if (systemError) {
+                        console.warn('Could not fetch system info:', systemError);
+                    }
 
-                if (statusError) {
-                    console.warn('Could not fetch PC statuses:', statusError);
-                }
+                    // Combine data
+                    const pcsMap = new Map();
 
-                // Fetch all system info
-                const { data: systemInfos, error: systemError } = await supabase
-                    .from('system_info')
-                    .select('*')
-                    .order('pc_name', { ascending: true });
-
-                if (systemError) {
-                    console.warn('Could not fetch system info:', systemError);
-                }
-
-                // Combine data
-                const pcsMap = new Map();
-                
-                // Add PC statuses
-                if (pcStatuses) {
-                    pcStatuses.forEach(pc => {
-                        pcsMap.set(pc.pc_name, {
-                            pc_name: pc.pc_name,
-                            is_online: pc.is_online || false,
-                            last_seen: pc.last_seen,
-                            last_activity: pc.last_activity,
-                            systemInfo: null
-                        });
-                    });
-                }
-
-                // Add system info
-                if (systemInfos) {
-                    systemInfos.forEach(info => {
-                        if (pcsMap.has(info.pc_name)) {
-                            pcsMap.get(info.pc_name).systemInfo = info;
-                        } else {
-                            pcsMap.set(info.pc_name, {
-                                pc_name: info.pc_name,
-                                is_online: false,
-                                last_seen: null,
-                                last_activity: null,
-                                systemInfo: info
+                    // Add PC statuses
+                    if (pcStatuses) {
+                        pcStatuses.forEach(pc => {
+                            pcsMap.set(pc.pc_name, {
+                                pc_name: pc.pc_name,
+                                is_online: pc.is_online || false,
+                                last_seen: pc.last_seen,
+                                last_activity: pc.last_activity,
+                                systemInfo: null
                             });
-                        }
-                    });
-                }
+                        });
+                    }
 
-                // Display PCs
-                if (pcsMap.size === 0) {
-                    pcsGrid.innerHTML = `
+                    // Add system info
+                    if (systemInfos) {
+                        systemInfos.forEach(info => {
+                            if (pcsMap.has(info.pc_name)) {
+                                pcsMap.get(info.pc_name).systemInfo = info;
+                            } else {
+                                pcsMap.set(info.pc_name, {
+                                    pc_name: info.pc_name,
+                                    is_online: false,
+                                    last_seen: null,
+                                    last_activity: null,
+                                    systemInfo: info
+                                });
+                            }
+                        });
+                    }
+
+                    // Display PCs
+                    if (pcsMap.size === 0) {
+                        pcsGrid.innerHTML = `
                         <div class="empty-state" style="grid-column: 1 / -1;">
                             <i class="fas fa-desktop"></i>
                             <h3>No PCs Found</h3>
                             <p>No PCs have been registered yet. Start the client application on a PC to register it.</p>
                         </div>
                     `;
-                    return;
-                }
-
-                const pcsArray = Array.from(pcsMap.values());
-                pcsGrid.innerHTML = pcsArray.map(pc => {
-                    const isOnline = pc.is_online;
-                    const isIdle = pc.is_idle === true;
-                    
-                    let statusClass, statusText, statusColor;
-                    if (!isOnline) {
-                        statusClass = 'offline';
-                        statusText = 'Offline';
-                        statusColor = '#ef4444';
-                    } else if (isIdle) {
-                        statusClass = 'idle';
-                        statusText = 'Idle';
-                        statusColor = '#f59e0b';
-                    } else {
-                        statusClass = '';
-                        statusText = 'Online';
-                        statusColor = '#22c55e';
+                        return;
                     }
-                    
-                    return `
+
+                    const pcsArray = Array.from(pcsMap.values());
+                    pcsGrid.innerHTML = pcsArray.map(pc => {
+                        const isOnline = pc.is_online;
+                        const isIdle = pc.is_idle === true;
+
+                        let statusClass, statusText, statusColor;
+                        if (!isOnline) {
+                            statusClass = 'offline';
+                            statusText = 'Offline';
+                            statusColor = '#ef4444';
+                        } else if (isIdle) {
+                            statusClass = 'idle';
+                            statusText = 'Idle';
+                            statusColor = '#f59e0b';
+                        } else {
+                            statusClass = '';
+                            statusText = 'Online';
+                            statusColor = '#22c55e';
+                        }
+
+                        return `
                         <div class="pc-card" onclick="navigateToPC('${escapeHtml(pc.pc_name)}')">
                             <div class="pc-card-header">
                                 <div class="pc-card-status ${statusClass}"></div>
@@ -1531,167 +1549,195 @@
                             </div>
                         </div>
                     `;
-                }).join('');
+                    }).join('');
 
-            } catch (error) {
-                console.error('Error loading PCs:', error);
-                pcsGrid.innerHTML = `
+                } catch (error) {
+                    console.error('Error loading PCs:', error);
+                    pcsGrid.innerHTML = `
                     <div class="error" style="grid-column: 1 / -1;">
                         <i class="fas fa-exclamation-circle"></i>
                         Error loading PCs. Please check your connection and try again.
                     </div>
                 `;
+                }
             }
-        }
 
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            const params = getURLParams();
-            if (params.pc) {
-                // If URL has PC parameter, show detail page
-                showDetailPage();
-                document.querySelector('.view-toggle-btn:last-child').classList.add('active');
-                document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
-                checkURLParams();
-            } else {
-                // Otherwise show home page
-                loadAllPCs();
-            }
-        });
+            // Initialize on page load
+            window.addEventListener('DOMContentLoaded', () => {
+                const params = getURLParams();
+                if (params.pc) {
+                    // If URL has PC parameter, show detail page
+                    showDetailPage();
+                    document.querySelector('.view-toggle-btn:last-child').classList.add('active');
+                    document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
+                    checkURLParams();
+                } else {
+                    // Otherwise show home page
+                    loadAllPCs();
+                }
+            });
 
-        // Stop auto-refresh when page is hidden (tab switch)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                stopAutoRefresh();
-            } else {
+            // Stop auto-refresh when page is hidden (tab switch)
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopAutoRefresh();
+                } else {
+                    const pcName = document.getElementById('pcName').value.trim();
+                    if (pcName) {
+                        startAutoRefresh();
+                    }
+                }
+            });
+
+            async function loadData() {
                 const pcName = document.getElementById('pcName').value.trim();
-                if (pcName) {
-                    startAutoRefresh();
+                let selectedDate = document.getElementById('selectedDate').value;
+
+                if (!pcName) {
+                    alert('Please enter a PC name');
+                    return;
                 }
-            }
-        });
 
-        async function loadData() {
-            const pcName = document.getElementById('pcName').value.trim();
-            let selectedDate = document.getElementById('selectedDate').value;
+                // If no date selected, use today's date
+                if (!selectedDate) {
+                    selectedDate = new Date().toISOString().split('T')[0];
+                    document.getElementById('selectedDate').value = selectedDate;
+                }
 
-            if (!pcName) {
-                alert('Please enter a PC name');
-                return;
-            }
+                // Update URL with current parameters
+                updateURL(pcName, selectedDate);
 
-            // If no date selected, use today's date
-            if (!selectedDate) {
-                selectedDate = new Date().toISOString().split('T')[0];
-                document.getElementById('selectedDate').value = selectedDate;
-            }
+                // Update header and show loading state
+                document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
+                document.getElementById('loadingMessage').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
+                document.getElementById('loadingMessage').style.display = 'block';
+                document.getElementById('statsGrid').style.display = 'none';
+                document.getElementById('pcStatusContainer').style.display = 'none';
+                document.getElementById('apps-tab').style.display = 'none';
+                hideTaskManager();
 
-            // Update URL with current parameters
-            updateURL(pcName, selectedDate);
-
-            // Update header and show loading state
-            document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
-            document.getElementById('loadingMessage').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
-            document.getElementById('loadingMessage').style.display = 'block';
-            document.getElementById('statsGrid').style.display = 'none';
-            document.getElementById('pcStatusContainer').style.display = 'none';
-            document.getElementById('apps-tab').style.display = 'none';
-            hideTaskManager();
-
-            try {
-                // Fetch PC status (handle case where table might not exist)
-                let isOnline = false;
-                let statusData = null;
                 try {
-                    const { data: statusDataResult, error: statusError } = await supabase
-                        .from('pc_status')
+                    // Fetch PC status (handle case where table might not exist)
+                    let isOnline = false;
+                    let statusData = null;
+                    try {
+                        const { data: statusDataResult, error: statusError } = await supabase
+                            .from('pc_status')
+                            .select('*')
+                            .eq('pc_name', pcName)
+                            .single();
+
+                        if (!statusError && statusDataResult) {
+                            statusData = statusDataResult;
+                            isOnline = statusData.is_online || false;
+                        }
+                    } catch (err) {
+                        // Table might not exist, use default offline status
+                        console.warn('Could not fetch PC status:', err);
+                    }
+
+                    // Fetch system info
+                    let systemInfo = null;
+                    try {
+                        const { data: systemInfoData, error: systemInfoError } = await supabase
+                            .from('system_info')
+                            .select('*')
+                            .eq('pc_name', pcName)
+                            .single();
+
+                        if (!systemInfoError && systemInfoData) {
+                            systemInfo = systemInfoData;
+                        }
+                    } catch (err) {
+                        console.warn('Could not fetch system info:', err);
+                    }
+
+                    updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
+
+                    // Fetch app usage data
+                    // Convert selected date to UTC date range for proper querying
+                    // The selected date is in local timezone, but we need to query UTC
+                    // Create start of day in local timezone, then convert to UTC
+                    const localStart = new Date(`${selectedDate}T00:00:00`);
+                    const localEnd = new Date(`${selectedDate}T23:59:59.999`);
+                    // Convert to UTC ISO strings for database query
+                    const startDate = localStart.toISOString();
+                    const endDate = localEnd.toISOString();
+
+                    const { data: appData, error: appError } = await supabase
+                        .from('app_usage_logs')
                         .select('*')
                         .eq('pc_name', pcName)
-                        .single();
+                        .gte('start_time', startDate)
+                        .lte('start_time', endDate)
+                        .order('start_time', { ascending: false });
 
-                    if (!statusError && statusDataResult) {
-                        statusData = statusDataResult;
-                        isOnline = statusData.is_online || false;
+                    if (appError) {
+                        console.error('App data error:', appError);
+                        throw appError;
                     }
-                } catch (err) {
-                    // Table might not exist, use default offline status
-                    console.warn('Could not fetch PC status:', err);
-                }
 
-                // Fetch system info
-                let systemInfo = null;
-                try {
-                    const { data: systemInfoData, error: systemInfoError } = await supabase
-                        .from('system_info')
+                    // Fetch idle logs
+                    const { data: idleData, error: idleError } = await supabase
+                        .from('idle_logs')
                         .select('*')
                         .eq('pc_name', pcName)
-                        .single();
+                        .gte('start_time', startDate)
+                        .lte('start_time', endDate)
+                        .order('start_time', { ascending: false });
 
-                    if (!systemInfoError && systemInfoData) {
-                        systemInfo = systemInfoData;
+                    if (idleError) {
+                        console.warn('Idle data error:', idleError);
+                        // Don't throw, just continue without idle data
                     }
-                } catch (err) {
-                    console.warn('Could not fetch system info:', err);
-                }
 
-                updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
+                    // Merge and sort data
+                    let combinedData = [...(appData || [])];
+                    if (idleData) {
+                        const formattedIdleData = idleData.map(log => ({
+                            ...log,
+                            app_name: 'System Idle',
+                            is_idle_session: true
+                        }));
+                        combinedData = [...combinedData, ...formattedIdleData];
+                    }
 
-                // Fetch app usage data
-                // Convert selected date to UTC date range for proper querying
-                // The selected date is in local timezone, but we need to query UTC
-                // Create start of day in local timezone, then convert to UTC
-                const localStart = new Date(`${selectedDate}T00:00:00`);
-                const localEnd = new Date(`${selectedDate}T23:59:59.999`);
-                // Convert to UTC ISO strings for database query
-                const startDate = localStart.toISOString();
-                const endDate = localEnd.toISOString();
+                    // Sort by start time descending
+                    combinedData.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
 
-                const { data: appData, error: appError } = await supabase
-                    .from('app_usage_logs')
-                    .select('*')
-                    .eq('pc_name', pcName)
-                    .gte('start_time', startDate)
-                    .lte('start_time', endDate)
-                    .order('start_time', { ascending: false });
+                    // Process and display data
+                    processData(combinedData);
 
-                if (appError) {
-                    console.error('App data error:', appError);
-                    throw appError;
-                }
+                    // Update last update time
+                    updateLastUpdateTime();
 
-                // Process and display data
-                processData(appData || []);
+                    // Start auto-refresh (will reload data every 5 seconds)
+                    // Only start if not already running (to avoid multiple intervals)
+                    if (!autoRefreshInterval) {
+                        startAutoRefresh();
+                    }
 
-                // Update last update time
-                updateLastUpdateTime();
-
-                // Start auto-refresh (will reload data every 5 seconds)
-                // Only start if not already running (to avoid multiple intervals)
-                if (!autoRefreshInterval) {
-                    startAutoRefresh();
-                }
-
-            } catch (error) {
-                console.error('Error loading data:', error);
-                document.getElementById('loadingMessage').innerHTML = `
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    document.getElementById('loadingMessage').innerHTML = `
                     <div class="error">
                         <i class="fas fa-exclamation-circle"></i>
                         Error loading data. Please check your connection and try again.
                     </div>`;
+                }
             }
-        }
 
-        function processData(appData) {
-            console.log('Processing data:', appData.length, 'entries');
-            
-            // Calculate stats
-            const totalAppSessions = appData.length;
-            const totalAppTime = appData.reduce((sum, row) => sum + (row.duration_seconds || 0), 0);
+            function processData(appData) {
+                console.log('Processing data:', appData.length, 'entries');
 
-            // Update stats grid
-            const statsGrid = document.getElementById('statsGrid');
-            if (statsGrid) {
-            statsGrid.innerHTML = `
+                // Calculate stats
+                const totalAppSessions = appData.length;
+                const totalAppTime = appData.reduce((sum, row) => sum + (row.duration_seconds || 0), 0);
+
+                // Update stats grid
+                const statsGrid = document.getElementById('statsGrid');
+                if (statsGrid) {
+                    statsGrid.innerHTML = `
                     <div class="stat-card" id="appSessionsCard" onclick="toggleAppSessionsBreakdown()" style="cursor: pointer;">
                     <i class="fas fa-desktop"></i>
                         <div class="number">${totalAppSessions}</div>
@@ -1706,45 +1752,45 @@
                         <!-- Breakdown content injected here -->
                 </div>
             `;
-                statsGrid.style.display = 'grid';
+                    statsGrid.style.display = 'grid';
+                }
+
+                // Populate tables
+                populateAppTable(appData);
+
+                // Create/update charts
+                createAppChart(appData);
+
+                // Show content (only hide loading message if it exists)
+                const loadingMessage = document.getElementById('loadingMessage');
+                if (loadingMessage) {
+                    loadingMessage.style.display = 'none';
+                }
+
+                const appsTab = document.getElementById('apps-tab');
+                if (appsTab) {
+                    appsTab.style.display = 'block';
+                }
+
+                console.log('Data processed and displayed');
             }
 
-            // Populate tables
-            populateAppTable(appData);
-
-            // Create/update charts
-            createAppChart(appData);
-
-            // Show content (only hide loading message if it exists)
-            const loadingMessage = document.getElementById('loadingMessage');
-            if (loadingMessage) {
-                loadingMessage.style.display = 'none';
-            }
-            
-            const appsTab = document.getElementById('apps-tab');
-            if (appsTab) {
-                appsTab.style.display = 'block';
-            }
-            
-            console.log('Data processed and displayed');
-        }
-
-        function toggleAppSessionsBreakdown() {
-            const breakdownEl = document.getElementById('appSessionsBreakdown');
-            if (!breakdownEl) return;
-            if (breakdownEl.style.display === 'none' || breakdownEl.style.display === '') {
-                // Build breakdown content
-                const counts = computeAppSessionCounts();
-                if (counts.length === 0) {
-                    breakdownEl.innerHTML = `
+            function toggleAppSessionsBreakdown() {
+                const breakdownEl = document.getElementById('appSessionsBreakdown');
+                if (!breakdownEl) return;
+                if (breakdownEl.style.display === 'none' || breakdownEl.style.display === '') {
+                    // Build breakdown content
+                    const counts = computeAppSessionCounts();
+                    if (counts.length === 0) {
+                        breakdownEl.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-info-circle"></i>
                             <h3>No sessions to summarize</h3>
                         </div>
                     `;
-                } else {
-                    const total = counts.reduce((s, c) => s + c.count, 0);
-                    breakdownEl.innerHTML = `
+                    } else {
+                        const total = counts.reduce((s, c) => s + c.count, 0);
+                        breakdownEl.innerHTML = `
                         <div class="data-table">
                             <table>
                                 <thead>
@@ -1756,52 +1802,52 @@
                                 </thead>
                                 <tbody>
                                     ${counts.map(({ name, count }) => {
-                                        const pct = total ? Math.round((count / total) * 100) : 0;
-                                        return `
+                            const pct = total ? Math.round((count / total) * 100) : 0;
+                            return `
                                             <tr>
                                                 <td>${escapeHtml(name)}</td>
                                                 <td>${count}</td>
                                                 <td>${pct}%</td>
                                             </tr>
                                         `;
-                                    }).join('')}
+                        }).join('')}
                                 </tbody>
                             </table>
                         </div>
                     `;
+                    }
+                    breakdownEl.style.display = 'block';
+                } else {
+                    breakdownEl.style.display = 'none';
                 }
-                breakdownEl.style.display = 'block';
-            } else {
-                breakdownEl.style.display = 'none';
             }
-        }
 
-        function computeAppSessionCounts() {
-            try {
-                const map = new Map();
-                (allAppData || []).forEach(entry => {
-                    const name = entry && entry.app_name ? String(entry.app_name) : 'Unknown';
-                    map.set(name, (map.get(name) || 0) + 1);
-                });
-                // Sort by count desc, then name asc
-                return Array.from(map.entries())
-                    .map(([name, count]) => ({ name, count }))
-                    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-            } catch {
-                return [];
+            function computeAppSessionCounts() {
+                try {
+                    const map = new Map();
+                    (allAppData || []).forEach(entry => {
+                        const name = entry && entry.app_name ? String(entry.app_name) : 'Unknown';
+                        map.set(name, (map.get(name) || 0) + 1);
+                    });
+                    // Sort by count desc, then name asc
+                    return Array.from(map.entries())
+                        .map(([name, count]) => ({ name, count }))
+                        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+                } catch {
+                    return [];
+                }
             }
-        }
 
-        function populateAppTable(appData) {
-            const tbody = document.getElementById('appTableBody');
-            const paginationControls = document.getElementById('paginationControls');
+            function populateAppTable(appData) {
+                const tbody = document.getElementById('appTableBody');
+                const paginationControls = document.getElementById('paginationControls');
 
-            // Store all data for pagination
-            allAppData = appData;
-            currentPage = 1;
+                // Store all data for pagination
+                allAppData = appData;
+                currentPage = 1;
 
-            if (appData.length === 0) {
-                tbody.innerHTML = `
+                if (appData.length === 0) {
+                    tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="empty-state">
                             <i class="fas fa-desktop"></i>
@@ -1809,36 +1855,40 @@
                             <p>No application usage recorded for this date</p>
                         </td>
                     </tr>`;
-                paginationControls.style.display = 'none';
-                return;
+                    paginationControls.style.display = 'none';
+                    return;
+                }
+
+                // Show pagination if more than itemsPerPage
+                if (appData.length > itemsPerPage) {
+                    paginationControls.style.display = 'flex';
+                    updatePagination();
+                } else {
+                    paginationControls.style.display = 'none';
+                }
+
+                // Display current page
+                displayCurrentPage();
             }
 
-            // Show pagination if more than itemsPerPage
-            if (appData.length > itemsPerPage) {
-                paginationControls.style.display = 'flex';
-                updatePagination();
-            } else {
-                paginationControls.style.display = 'none';
-            }
+            function displayCurrentPage() {
+                const tbody = document.getElementById('appTableBody');
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const pageData = allAppData.slice(startIndex, endIndex);
 
-            // Display current page
-            displayCurrentPage();
-        }
+                tbody.innerHTML = pageData.map(entry => {
+                    const duration = formatDuration(entry.duration_seconds || 0);
+                    const memory = entry.memory_usage_bytes ? formatBytes(entry.memory_usage_bytes) : 'N/A';
+                    const cpu = entry.cpu_percent ? `${Math.round(entry.cpu_percent)}%` : 'N/A';
 
-        function displayCurrentPage() {
-            const tbody = document.getElementById('appTableBody');
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = allAppData.slice(startIndex, endIndex);
+                    const isIdle = entry.is_idle_session;
+                    const rowStyle = isIdle ? 'style="background-color: #fffbeb;"' : '';
+                    const icon = isIdle ? '<i class="fas fa-moon" style="color: #f59e0b; margin-right: 8px;"></i>' : '';
 
-            tbody.innerHTML = pageData.map(entry => {
-                const duration = formatDuration(entry.duration_seconds || 0);
-                const memory = entry.memory_usage_bytes ? formatBytes(entry.memory_usage_bytes) : 'N/A';
-                const cpu = entry.cpu_percent ? `${Math.round(entry.cpu_percent)}%` : 'N/A';
-
-                return `
-                    <tr>
-                        <td>${escapeHtml(entry.app_name)}</td>
+                    return `
+                    <tr ${rowStyle}>
+                        <td>${icon}${escapeHtml(entry.app_name)}</td>
                         <td>${formatTime(entry.start_time)}</td>
                         <td>${formatTime(entry.end_time)}</td>
                         <td>${duration}</td>
@@ -1846,220 +1896,220 @@
                         <td>${cpu}</td>
                     </tr>
                 `;
-            }).join('');
+                }).join('');
 
-            updatePagination();
-        }
-
-        function updatePagination() {
-            const totalPages = Math.ceil(allAppData.length / itemsPerPage);
-            const paginationInfo = document.getElementById('paginationInfo');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const pageNumbers = document.getElementById('pageNumbers');
-
-            // Update info
-            const startItem = (currentPage - 1) * itemsPerPage + 1;
-            const endItem = Math.min(currentPage * itemsPerPage, allAppData.length);
-            paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${allAppData.length}`;
-
-            // Update buttons
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages;
-
-            // Update page numbers
-            pageNumbers.innerHTML = '';
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-            
-            if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                updatePagination();
             }
 
-            if (startPage > 1) {
-                const firstBtn = document.createElement('button');
-                firstBtn.className = 'page-number';
-                firstBtn.textContent = '1';
-                firstBtn.onclick = () => goToPage(1);
-                pageNumbers.appendChild(firstBtn);
-                
-                if (startPage > 2) {
-                    const ellipsis = document.createElement('span');
-                    ellipsis.textContent = '...';
-                    ellipsis.style.padding = '0 5px';
-                    pageNumbers.appendChild(ellipsis);
+            function updatePagination() {
+                const totalPages = Math.ceil(allAppData.length / itemsPerPage);
+                const paginationInfo = document.getElementById('paginationInfo');
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                const pageNumbers = document.getElementById('pageNumbers');
+
+                // Update info
+                const startItem = (currentPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentPage * itemsPerPage, allAppData.length);
+                paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${allAppData.length}`;
+
+                // Update buttons
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+
+                // Update page numbers
+                pageNumbers.innerHTML = '';
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                if (endPage - startPage < maxVisiblePages - 1) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
                 }
-            }
 
-            for (let i = startPage; i <= endPage; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = 'page-number' + (i === currentPage ? ' active' : '');
-                pageBtn.textContent = i;
-                pageBtn.onclick = () => goToPage(i);
-                pageNumbers.appendChild(pageBtn);
-            }
+                if (startPage > 1) {
+                    const firstBtn = document.createElement('button');
+                    firstBtn.className = 'page-number';
+                    firstBtn.textContent = '1';
+                    firstBtn.onclick = () => goToPage(1);
+                    pageNumbers.appendChild(firstBtn);
 
-            if (endPage < totalPages) {
-                if (endPage < totalPages - 1) {
-                    const ellipsis = document.createElement('span');
-                    ellipsis.textContent = '...';
-                    ellipsis.style.padding = '0 5px';
-                    pageNumbers.appendChild(ellipsis);
-                }
-                
-                const lastBtn = document.createElement('button');
-                lastBtn.className = 'page-number';
-                lastBtn.textContent = totalPages;
-                lastBtn.onclick = () => goToPage(totalPages);
-                pageNumbers.appendChild(lastBtn);
-            }
-        }
-
-        function changePage(direction) {
-            const totalPages = Math.ceil(allAppData.length / itemsPerPage);
-            const newPage = currentPage + direction;
-            
-            if (newPage >= 1 && newPage <= totalPages) {
-                currentPage = newPage;
-                displayCurrentPage();
-                // Scroll to top of table
-                document.getElementById('appTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-        function goToPage(page) {
-            const totalPages = Math.ceil(allAppData.length / itemsPerPage);
-            if (page >= 1 && page <= totalPages) {
-                currentPage = page;
-                displayCurrentPage();
-                // Scroll to top of table
-                document.getElementById('appTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-
-        function createAppChart(appData) {
-            const chartCanvas = document.getElementById('appUsageChart');
-            if (!chartCanvas) {
-                console.warn('Chart canvas not found');
-                return;
-            }
-
-            const ctx = chartCanvas.getContext('2d');
-            const appUsage = {};
-
-            appData.forEach(entry => {
-                if (entry && entry.app_name) {
-                    if (!appUsage[entry.app_name]) {
-                        appUsage[entry.app_name] = 0;
+                    if (startPage > 2) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.textContent = '...';
+                        ellipsis.style.padding = '0 5px';
+                        pageNumbers.appendChild(ellipsis);
                     }
-                    appUsage[entry.app_name] += entry.duration_seconds || 0;
                 }
-            });
 
-            // Destroy existing chart if it exists
-            if (appChart) {
-                appChart.destroy();
-                appChart = null;
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = 'page-number' + (i === currentPage ? ' active' : '');
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => goToPage(i);
+                    pageNumbers.appendChild(pageBtn);
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.textContent = '...';
+                        ellipsis.style.padding = '0 5px';
+                        pageNumbers.appendChild(ellipsis);
+                    }
+
+                    const lastBtn = document.createElement('button');
+                    lastBtn.className = 'page-number';
+                    lastBtn.textContent = totalPages;
+                    lastBtn.onclick = () => goToPage(totalPages);
+                    pageNumbers.appendChild(lastBtn);
+                }
             }
 
-            // Create new chart
-            const labels = Object.keys(appUsage);
-            const data = Object.values(appUsage).map(seconds => Math.round(seconds / 60));
+            function changePage(direction) {
+                const totalPages = Math.ceil(allAppData.length / itemsPerPage);
+                const newPage = currentPage + direction;
 
-            if (labels.length === 0) {
-                console.log('No app data to display in chart');
-                return;
+                if (newPage >= 1 && newPage <= totalPages) {
+                    currentPage = newPage;
+                    displayCurrentPage();
+                    // Scroll to top of table
+                    document.getElementById('appTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
 
-            appChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Usage Time (minutes)',
-                        data: data,
-                        backgroundColor: '#4f46e5'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+            function goToPage(page) {
+                const totalPages = Math.ceil(allAppData.length / itemsPerPage);
+                if (page >= 1 && page <= totalPages) {
+                    currentPage = page;
+                    displayCurrentPage();
+                    // Scroll to top of table
+                    document.getElementById('appTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+
+            function createAppChart(appData) {
+                const chartCanvas = document.getElementById('appUsageChart');
+                if (!chartCanvas) {
+                    console.warn('Chart canvas not found');
+                    return;
+                }
+
+                const ctx = chartCanvas.getContext('2d');
+                const appUsage = {};
+
+                appData.forEach(entry => {
+                    if (entry && entry.app_name) {
+                        if (!appUsage[entry.app_name]) {
+                            appUsage[entry.app_name] = 0;
                         }
-                    },
-                    animation: {
-                        duration: 300
+                        appUsage[entry.app_name] += entry.duration_seconds || 0;
                     }
+                });
+
+                // Destroy existing chart if it exists
+                if (appChart) {
+                    appChart.destroy();
+                    appChart = null;
                 }
-            });
 
-            console.log('Chart updated with', labels.length, 'apps');
-        }
+                // Create new chart
+                const labels = Object.keys(appUsage);
+                const data = Object.values(appUsage).map(seconds => Math.round(seconds / 60));
 
+                if (labels.length === 0) {
+                    console.log('No app data to display in chart');
+                    return;
+                }
 
-        function updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate) {
-            const statusIndicator = document.getElementById('statusIndicator');
-            const pcDisplayName = document.getElementById('pcDisplayName');
-            const pcStatusText = document.getElementById('pcStatusText');
-            const systemInfoGrid = document.getElementById('systemInfoGrid');
-            const pcStatusContainer = document.getElementById('pcStatusContainer');
+                appChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Usage Time (minutes)',
+                            data: data,
+                            backgroundColor: '#4f46e5'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        animation: {
+                            duration: 300
+                        }
+                    }
+                });
 
-            // Make sure the container is visible
-            if (pcStatusContainer) {
-                pcStatusContainer.style.display = 'block';
+                console.log('Chart updated with', labels.length, 'apps');
             }
 
-            if (!pcDisplayName || !pcStatusText || !statusIndicator) {
-                console.error('PC status elements not found');
-                return;
-            }
 
-            pcDisplayName.textContent = pcName;
-            
-            // Check idle status
-            const isIdle = statusData && statusData.is_idle === true;
-            
-            let statusIcon, statusLabel, statusColor;
-            if (!isOnline) {
-                statusIcon = 'fa-times-circle';
-                statusLabel = 'Offline';
-                statusColor = '#ef4444';
-            } else if (isIdle) {
-                statusIcon = 'fa-moon';
-                statusLabel = 'Idle';
-                statusColor = '#f59e0b';
-            } else {
-                statusIcon = 'fa-check-circle';
-                statusLabel = 'Online';
-                statusColor = '#22c55e';
-            }
-            
-            pcStatusText.innerHTML = `
+            function updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate) {
+                const statusIndicator = document.getElementById('statusIndicator');
+                const pcDisplayName = document.getElementById('pcDisplayName');
+                const pcStatusText = document.getElementById('pcStatusText');
+                const systemInfoGrid = document.getElementById('systemInfoGrid');
+                const pcStatusContainer = document.getElementById('pcStatusContainer');
+
+                // Make sure the container is visible
+                if (pcStatusContainer) {
+                    pcStatusContainer.style.display = 'block';
+                }
+
+                if (!pcDisplayName || !pcStatusText || !statusIndicator) {
+                    console.error('PC status elements not found');
+                    return;
+                }
+
+                pcDisplayName.textContent = pcName;
+
+                // Check idle status
+                const isIdle = statusData && statusData.is_idle === true;
+
+                let statusIcon, statusLabel, statusColor;
+                if (!isOnline) {
+                    statusIcon = 'fa-times-circle';
+                    statusLabel = 'Offline';
+                    statusColor = '#ef4444';
+                } else if (isIdle) {
+                    statusIcon = 'fa-moon';
+                    statusLabel = 'Idle';
+                    statusColor = '#f59e0b';
+                } else {
+                    statusIcon = 'fa-check-circle';
+                    statusLabel = 'Online';
+                    statusColor = '#22c55e';
+                }
+
+                pcStatusText.innerHTML = `
                 <i class="fas ${statusIcon}" style="color: ${statusColor}"></i>
                 <span>${statusLabel}</span>
             `;
 
-            if (isOnline) {
-                statusIndicator.classList.remove('offline');
-                if (isIdle) {
-                    statusIndicator.classList.add('idle');
+                if (isOnline) {
+                    statusIndicator.classList.remove('offline');
+                    if (isIdle) {
+                        statusIndicator.classList.add('idle');
+                    } else {
+                        statusIndicator.classList.remove('idle');
+                    }
                 } else {
+                    statusIndicator.classList.add('offline');
                     statusIndicator.classList.remove('idle');
                 }
-            } else {
-                statusIndicator.classList.add('offline');
-                statusIndicator.classList.remove('idle');
-            }
 
-            console.log('PC Status updated:', { pcName, isOnline, hasStatusData: !!statusData, hasSystemInfo: !!systemInfo });
+                console.log('PC Status updated:', { pcName, isOnline, hasStatusData: !!statusData, hasSystemInfo: !!systemInfo });
 
-            // Display system info
-            if (systemInfo) {
-                systemInfoGrid.innerHTML = `
+                // Display system info
+                if (systemInfo) {
+                    systemInfoGrid.innerHTML = `
                     ${systemInfo.cpu_model ? `
                         <div class="system-info-item">
                             <div class="label"><i class="fas fa-microchip"></i> CPU</div>
@@ -2109,9 +2159,9 @@
                         </div>
                     ` : ''}
                 `;
-            } else {
-                // Show basic info if system_info not available
-                systemInfoGrid.innerHTML = `
+                } else {
+                    // Show basic info if system_info not available
+                    systemInfoGrid.innerHTML = `
                     ${statusData && statusData.last_seen ? `
                         <div class="system-info-item">
                             <div class="label"><i class="fas fa-clock"></i> Last Seen</div>
@@ -2125,571 +2175,572 @@
                         </div>
                     ` : ''}
                 `;
+                }
+
+                document.getElementById('pcStatusContainer').style.display = 'block';
+
+                // Update shareable link (use the selectedDate from the function parameter)
+                updateShareableLink(pcName, selectedDate);
             }
 
-            document.getElementById('pcStatusContainer').style.display = 'block';
-            
-            // Update shareable link (use the selectedDate from the function parameter)
-            updateShareableLink(pcName, selectedDate);
-        }
-
-        function updateShareableLink(pcName, date) {
-            // Use current page URL
-            const currentURL = window.location.origin + window.location.pathname;
-            const url = new URL(currentURL);
-            url.searchParams.set('pc', pcName);
-            if (date) {
-                url.searchParams.set('date', date);
+            function updateShareableLink(pcName, date) {
+                // Use current page URL
+                const currentURL = window.location.origin + window.location.pathname;
+                const url = new URL(currentURL);
+                url.searchParams.set('pc', pcName);
+                if (date) {
+                    url.searchParams.set('date', date);
+                }
+                const shareableLink = document.getElementById('shareableLink');
+                if (shareableLink) {
+                    shareableLink.value = url.toString();
+                }
             }
-            const shareableLink = document.getElementById('shareableLink');
-            if (shareableLink) {
-                shareableLink.value = url.toString();
-            }
-        }
 
-        function copyLink(event) {
-            const linkInput = document.getElementById('shareableLink');
-            if (!linkInput.value) return;
-            
-            linkInput.select();
-            linkInput.setSelectionRange(0, 99999); // For mobile devices
-            
-            const copyToClipboard = () => {
-                try {
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(linkInput.value).then(() => {
-                            showCopyFeedback(event);
-                        }).catch(() => {
-                            // Fallback to execCommand
+            function copyLink(event) {
+                const linkInput = document.getElementById('shareableLink');
+                if (!linkInput.value) return;
+
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999); // For mobile devices
+
+                const copyToClipboard = () => {
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(linkInput.value).then(() => {
+                                showCopyFeedback(event);
+                            }).catch(() => {
+                                // Fallback to execCommand
+                                document.execCommand('copy');
+                                showCopyFeedback(event);
+                            });
+                        } else {
+                            // Fallback for older browsers
                             document.execCommand('copy');
                             showCopyFeedback(event);
-                        });
-                    } else {
-                        // Fallback for older browsers
-                        document.execCommand('copy');
-                        showCopyFeedback(event);
+                        }
+                    } catch (err) {
+                        console.error('Failed to copy:', err);
                     }
-                } catch (err) {
-                    console.error('Failed to copy:', err);
-                }
-            };
-            
-            copyToClipboard();
-        }
+                };
 
-        function showCopyFeedback(event) {
-            const button = event ? event.target.closest('button') : document.querySelector('button[onclick="copyLink()"]');
-            if (!button) return;
-            
-            const originalText = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            button.style.background = '#22c55e';
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.style.background = '#4f46e5';
-            }, 2000);
-        }
+                copyToClipboard();
+            }
+
+            function showCopyFeedback(event) {
+                const button = event ? event.target.closest('button') : document.querySelector('button[onclick="copyLink()"]');
+                if (!button) return;
+
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.background = '#22c55e';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#4f46e5';
+                }, 2000);
+            }
 
 
-        function formatTime(timeString) {
-            if (!timeString) return 'N/A';
-            try {
-                let date;
-                
-                // Handle Date object
-                if (timeString instanceof Date) {
-                    date = timeString;
-                } else if (typeof timeString === 'number') {
-                    // Unix ms timestamp
-                    date = new Date(timeString);
-                } else if (typeof timeString === 'string') {
-                    // ISO with explicit timezone (Z or +/-offset)
-                    if (timeString.includes('T') && (timeString.includes('Z') || /[+-]\d{2}:\d{2}$/.test(timeString))) {
+            function formatTime(timeString) {
+                if (!timeString) return 'N/A';
+                try {
+                    let date;
+
+                    // Handle Date object
+                    if (timeString instanceof Date) {
+                        date = timeString;
+                    } else if (typeof timeString === 'number') {
+                        // Unix ms timestamp
                         date = new Date(timeString);
-                    }
-                    // Legacy format: "YYYY-MM-DD HH:MM AM/PM"
-                    else if (timeString.includes('AM') || timeString.includes('PM')) {
-                        const parts = timeString.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
-                        if (parts) {
-                            let year = parseInt(parts[1]);
-                            let month = parseInt(parts[2]) - 1;
-                            let day = parseInt(parts[3]);
-                            let hour = parseInt(parts[4]);
-                            let minute = parseInt(parts[5]);
-                            const ampm = parts[6];
-                            if (ampm === 'PM' && hour !== 12) hour += 12;
-                            if (ampm === 'AM' && hour === 12) hour = 0;
-                            date = new Date(year, month, day, hour, minute);
+                    } else if (typeof timeString === 'string') {
+                        // ISO with explicit timezone (Z or +/-offset)
+                        if (timeString.includes('T') && (timeString.includes('Z') || /[+-]\d{2}:\d{2}$/.test(timeString))) {
+                            date = new Date(timeString);
+                        }
+                        // Legacy format: "YYYY-MM-DD HH:MM AM/PM"
+                        else if (timeString.includes('AM') || timeString.includes('PM')) {
+                            const parts = timeString.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
+                            if (parts) {
+                                let year = parseInt(parts[1]);
+                                let month = parseInt(parts[2]) - 1;
+                                let day = parseInt(parts[3]);
+                                let hour = parseInt(parts[4]);
+                                let minute = parseInt(parts[5]);
+                                const ampm = parts[6];
+                                if (ampm === 'PM' && hour !== 12) hour += 12;
+                                if (ampm === 'AM' && hour === 12) hour = 0;
+                                date = new Date(year, month, day, hour, minute);
+                            } else {
+                                date = new Date(timeString);
+                            }
+                        }
+                        // ISO-like without explicit timezone
+                        else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(timeString)) {
+                            // Treat ISO-like without timezone as UTC to avoid browser local misinterpretation
+                            date = new Date(timeString.endsWith('Z') ? timeString : timeString + 'Z');
                         } else {
                             date = new Date(timeString);
                         }
                     }
-                    // ISO-like without explicit timezone
-                    else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(timeString)) {
-                        // Treat ISO-like without timezone as UTC to avoid browser local misinterpretation
-                        date = new Date(timeString.endsWith('Z') ? timeString : timeString + 'Z');
-                    } else {
-                        date = new Date(timeString);
-                    }
-                }
 
-                if (!date || isNaN(date.getTime())) {
+                    if (!date || isNaN(date.getTime())) {
+                        return timeString;
+                    }
+
+                    return date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    });
+                } catch (e) {
                     return timeString;
                 }
-
-                return date.toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true,
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                });
-            } catch (e) {
-                return timeString;
             }
-        }
 
-        function formatDateTime(dateTimeString) {
-            if (!dateTimeString) return 'N/A';
-            try {
-                // Normalize incoming string
-                if (typeof dateTimeString === 'string') {
-                    // Trim whitespace
-                    dateTimeString = dateTimeString.trim();
-                    // Pad fractional seconds to 3 digits if only 1-2 are present (e.g., .57 -> .570)
-                    dateTimeString = dateTimeString.replace(/(T\d{2}:\d{2}:\d{2})\.(\d{1,2})(?=(Z|[+-]\d{2}:\d{2}))/,
-                        (m, t, frac, tz) => `${t}.${frac.padEnd(3, '0')}${tz}`);
-                }
-                let date;
-                
-                // Check if it's an ISO string (new format from server)
-                if (typeof dateTimeString === 'string' && dateTimeString.includes('T') && dateTimeString.includes('Z')) {
-                    // ISO string with timezone - parse directly
-                    date = new Date(dateTimeString);
-                }
-                // Handle legacy format: "YYYY-MM-DD HH:MM AM/PM" (old format)
-                else if (typeof dateTimeString === 'string' && (dateTimeString.includes('AM') || dateTimeString.includes('PM'))) {
-                    // Parse the custom format: "2025-11-09 09:23 PM"
-                    const parts = dateTimeString.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
-                    if (parts) {
-                        let year = parseInt(parts[1]);
-                        let month = parseInt(parts[2]) - 1; // Month is 0-indexed
-                        let day = parseInt(parts[3]);
-                        let hour = parseInt(parts[4]);
-                        let minute = parseInt(parts[5]);
-                        let ampm = parts[6];
-                        
-                        // Convert to 24-hour format
-                        if (ampm === 'PM' && hour !== 12) {
-                            hour += 12;
-                        } else if (ampm === 'AM' && hour === 12) {
-                            hour = 0;
-                        }
-                        
-                        // Create date in local timezone (not UTC)
-                        date = new Date(year, month, day, hour, minute);
-                    } else {
-                        // Fallback to standard Date parsing
+            function formatDateTime(dateTimeString) {
+                if (!dateTimeString) return 'N/A';
+                try {
+                    // Normalize incoming string
+                    if (typeof dateTimeString === 'string') {
+                        // Trim whitespace
+                        dateTimeString = dateTimeString.trim();
+                        // Pad fractional seconds to 3 digits if only 1-2 are present (e.g., .57 -> .570)
+                        dateTimeString = dateTimeString.replace(/(T\d{2}:\d{2}:\d{2})\.(\d{1,2})(?=(Z|[+-]\d{2}:\d{2}))/,
+                            (m, t, frac, tz) => `${t}.${frac.padEnd(3, '0')}${tz}`);
+                    }
+                    let date;
+
+                    // Check if it's an ISO string (new format from server)
+                    if (typeof dateTimeString === 'string' && dateTimeString.includes('T') && dateTimeString.includes('Z')) {
+                        // ISO string with timezone - parse directly
                         date = new Date(dateTimeString);
                     }
-                } else {
-                    // Standard ISO date string (without Z) or other format
-                    // If it looks like an ISO string without timezone, treat as UTC
-                    if (typeof dateTimeString === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(dateTimeString)) {
-                        // If it already has an explicit timezone offset like +08:00 or -05:00, keep it
-                        if (/[+-]\d{2}:\d{2}$/.test(dateTimeString)) {
-                            date = new Date(dateTimeString);
+                    // Handle legacy format: "YYYY-MM-DD HH:MM AM/PM" (old format)
+                    else if (typeof dateTimeString === 'string' && (dateTimeString.includes('AM') || dateTimeString.includes('PM'))) {
+                        // Parse the custom format: "2025-11-09 09:23 PM"
+                        const parts = dateTimeString.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/);
+                        if (parts) {
+                            let year = parseInt(parts[1]);
+                            let month = parseInt(parts[2]) - 1; // Month is 0-indexed
+                            let day = parseInt(parts[3]);
+                            let hour = parseInt(parts[4]);
+                            let minute = parseInt(parts[5]);
+                            let ampm = parts[6];
+
+                            // Convert to 24-hour format
+                            if (ampm === 'PM' && hour !== 12) {
+                                hour += 12;
+                            } else if (ampm === 'AM' && hour === 12) {
+                                hour = 0;
+                            }
+
+                            // Create date in local timezone (not UTC)
+                            date = new Date(year, month, day, hour, minute);
                         } else {
-                            // No timezone info: treat as UTC
-                            date = new Date(dateTimeString.endsWith('Z') ? dateTimeString : dateTimeString + 'Z');
+                            // Fallback to standard Date parsing
+                            date = new Date(dateTimeString);
                         }
                     } else {
-                        date = new Date(dateTimeString);
+                        // Standard ISO date string (without Z) or other format
+                        // If it looks like an ISO string without timezone, treat as UTC
+                        if (typeof dateTimeString === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(dateTimeString)) {
+                            // If it already has an explicit timezone offset like +08:00 or -05:00, keep it
+                            if (/[+-]\d{2}:\d{2}$/.test(dateTimeString)) {
+                                date = new Date(dateTimeString);
+                            } else {
+                                // No timezone info: treat as UTC
+                                date = new Date(dateTimeString.endsWith('Z') ? dateTimeString : dateTimeString + 'Z');
+                            }
+                        } else {
+                            date = new Date(dateTimeString);
+                        }
                     }
-                }
-                
-                if (isNaN(date.getTime())) {
-                    // If still invalid, return as-is
+
+                    if (isNaN(date.getTime())) {
+                        // If still invalid, return as-is
+                        return dateTimeString;
+                    }
+
+                    // Format using local timezone (browser's timezone)
+                    return date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    });
+                } catch (e) {
+                    console.error('Error formatting date:', dateTimeString, e);
                     return dateTimeString;
                 }
-                
-                // Format using local timezone (browser's timezone)
-                return date.toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true,
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                });
-            } catch (e) {
-                console.error('Error formatting date:', dateTimeString, e);
-                return dateTimeString;
             }
-        }
 
-        function formatDuration(seconds) {
-            if (!seconds) return '0m';
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            if (hours > 0) {
-                return `${hours}h ${minutes}m`;
-            }
-            return `${minutes}m`;
-        }
-
-        function formatBytes(bytes) {
-            if (!bytes) return '0 B';
-            const mb = bytes / (1024 * 1024);
-            return `${Math.round(mb * 10) / 10} MB`;
-        }
-
-        function escapeHtml(unsafe) {
-            if (typeof unsafe !== 'string') return '';
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // Task Manager Functions - Fetch from Supabase
-        async function loadTaskManagerData(pcName) {
-            if (!pcName) return;
-
-            try {
-                // Get recent app usage logs from the last 60 seconds
-                const now = new Date();
-                const sixtySecondsAgo = new Date(now.getTime() - 60000);
-                
-                const { data: logs, error } = await supabase
-                    .from('app_usage_logs')
-                    .select('cpu_percent, memory_usage_bytes, end_time')
-                    .eq('pc_name', pcName)
-                    .gte('end_time', sixtySecondsAgo.toISOString())
-                    .order('end_time', { ascending: true })
-                    .limit(100);
-
-                if (error) {
-                    throw error;
+            function formatDuration(seconds) {
+                if (!seconds) return '0m';
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                if (hours > 0) {
+                    return `${hours}h ${minutes}m`;
                 }
-
-                // Get system info
-                const { data: systemInfo } = await supabase
-                    .from('system_info')
-                    .select('*')
-                    .eq('pc_name', pcName)
-                    .single();
-
-                // Get latest stats
-                const { data: latestLog } = await supabase
-                    .from('app_usage_logs')
-                    .select('cpu_percent, memory_usage_bytes')
-                    .eq('pc_name', pcName)
-                    .order('end_time', { ascending: false })
-                    .limit(1)
-                    .single();
-
-                // Format data for charts
-                const cpuData = (logs || []).map(log => ({
-                    time: new Date(log.end_time).getTime(),
-                    value: parseFloat(log.cpu_percent) || 0
-                }));
-
-                const memoryData = (logs || []).map(log => ({
-                    time: new Date(log.end_time).getTime(),
-                    value: parseInt(log.memory_usage_bytes) || 0
-                }));
-
-                const data = {
-                    cpu: cpuData,
-                    memory: memoryData,
-                    lastUpdate: Date.now(),
-                    systemInfo: systemInfo,
-                    latestStats: latestLog ? {
-                        cpuPercent: latestLog.cpu_percent,
-                        memoryBytes: latestLog.memory_usage_bytes
-                    } : null
-                };
-
-                updateTaskManager(data, pcName);
-            } catch (error) {
-                console.error('Error loading task manager data:', error);
-                // Show error state
-                const cpuUtilEl = document.getElementById('cpuUtilization');
-                const cpuSpeedEl = document.getElementById('cpuSpeed');
-                if (cpuUtilEl) cpuUtilEl.textContent = 'Error';
-                if (cpuSpeedEl) cpuSpeedEl.textContent = 'Error';
-            }
-        }
-
-        function updateTaskManager(data, pcName) {
-            // Update CPU chart
-            if (data.cpu && data.cpu.length > 0) {
-                updateCPUChart(data.cpu);
-                const latestCpu = data.cpu[data.cpu.length - 1];
-                document.getElementById('cpuUtilization').textContent = `${latestCpu.value.toFixed(1)}%`;
+                return `${minutes}m`;
             }
 
-            // Update Memory chart
-            if (data.memory && data.memory.length > 0) {
-                updateMemoryChart(data.memory, data.systemInfo);
-                const latestMemory = data.memory[data.memory.length - 1];
-                const memoryGB = (latestMemory.value / (1024 * 1024 * 1024)).toFixed(2);
-                const totalMemoryGB = data.systemInfo ? data.systemInfo.total_memory_gb : null;
-                if (totalMemoryGB) {
-                    const availableGB = (totalMemoryGB - parseFloat(memoryGB)).toFixed(2);
-                    document.getElementById('memoryInUse').textContent = `${memoryGB} GB`;
-                    document.getElementById('memoryAvailable').textContent = `${availableGB} GB`;
+            function formatBytes(bytes) {
+                if (!bytes) return '0 B';
+                const mb = bytes / (1024 * 1024);
+                return `${Math.round(mb * 10) / 10} MB`;
+            }
+
+            function escapeHtml(unsafe) {
+                if (typeof unsafe !== 'string') return '';
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            // Task Manager Functions - Fetch from Supabase
+            async function loadTaskManagerData(pcName) {
+                if (!pcName) return;
+
+                try {
+                    // Get recent app usage logs from the last 60 seconds
+                    const now = new Date();
+                    const sixtySecondsAgo = new Date(now.getTime() - 60000);
+
+                    const { data: logs, error } = await supabase
+                        .from('app_usage_logs')
+                        .select('cpu_percent, memory_usage_bytes, end_time')
+                        .eq('pc_name', pcName)
+                        .gte('end_time', sixtySecondsAgo.toISOString())
+                        .order('end_time', { ascending: true })
+                        .limit(100);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    // Get system info
+                    const { data: systemInfo } = await supabase
+                        .from('system_info')
+                        .select('*')
+                        .eq('pc_name', pcName)
+                        .single();
+
+                    // Get latest stats
+                    const { data: latestLog } = await supabase
+                        .from('app_usage_logs')
+                        .select('cpu_percent, memory_usage_bytes')
+                        .eq('pc_name', pcName)
+                        .order('end_time', { ascending: false })
+                        .limit(1)
+                        .single();
+
+                    // Format data for charts
+                    const cpuData = (logs || []).map(log => ({
+                        time: new Date(log.end_time).getTime(),
+                        value: parseFloat(log.cpu_percent) || 0
+                    }));
+
+                    const memoryData = (logs || []).map(log => ({
+                        time: new Date(log.end_time).getTime(),
+                        value: parseInt(log.memory_usage_bytes) || 0
+                    }));
+
+                    const data = {
+                        cpu: cpuData,
+                        memory: memoryData,
+                        lastUpdate: Date.now(),
+                        systemInfo: systemInfo,
+                        latestStats: latestLog ? {
+                            cpuPercent: latestLog.cpu_percent,
+                            memoryBytes: latestLog.memory_usage_bytes
+                        } : null
+                    };
+
+                    updateTaskManager(data, pcName);
+                } catch (error) {
+                    console.error('Error loading task manager data:', error);
+                    // Show error state
+                    const cpuUtilEl = document.getElementById('cpuUtilization');
+                    const cpuSpeedEl = document.getElementById('cpuSpeed');
+                    if (cpuUtilEl) cpuUtilEl.textContent = 'Error';
+                    if (cpuSpeedEl) cpuSpeedEl.textContent = 'Error';
                 }
             }
 
-            // Update system info
-            if (data.systemInfo) {
-                const info = data.systemInfo;
-                if (info.cpu_model) {
-                    document.getElementById('cpuModel').textContent = info.cpu_model;
+            function updateTaskManager(data, pcName) {
+                // Update CPU chart
+                if (data.cpu && data.cpu.length > 0) {
+                    updateCPUChart(data.cpu);
+                    const latestCpu = data.cpu[data.cpu.length - 1];
+                    document.getElementById('cpuUtilization').textContent = `${latestCpu.value.toFixed(1)}%`;
                 }
-                if (info.cpu_speed_ghz) {
-                    document.getElementById('baseSpeed').textContent = `${info.cpu_speed_ghz.toFixed(2)} GHz`;
-                    // Use latest stats for current speed if available
-                    if (data.latestStats && data.latestStats.cpuPercent) {
-                        // Estimate current speed based on utilization (rough estimate)
-                        const estimatedSpeed = info.cpu_speed_ghz * (1 + (data.latestStats.cpuPercent / 100) * 0.1);
-                        document.getElementById('cpuSpeed').textContent = `${estimatedSpeed.toFixed(2)} GHz`;
-                    } else {
-                        document.getElementById('cpuSpeed').textContent = `${info.cpu_speed_ghz.toFixed(2)} GHz`;
+
+                // Update Memory chart
+                if (data.memory && data.memory.length > 0) {
+                    updateMemoryChart(data.memory, data.systemInfo);
+                    const latestMemory = data.memory[data.memory.length - 1];
+                    const memoryGB = (latestMemory.value / (1024 * 1024 * 1024)).toFixed(2);
+                    const totalMemoryGB = data.systemInfo ? data.systemInfo.total_memory_gb : null;
+                    if (totalMemoryGB) {
+                        const availableGB = (totalMemoryGB - parseFloat(memoryGB)).toFixed(2);
+                        document.getElementById('memoryInUse').textContent = `${memoryGB} GB`;
+                        document.getElementById('memoryAvailable').textContent = `${availableGB} GB`;
                     }
                 }
-                if (info.cpu_cores) {
-                    document.getElementById('cores').textContent = info.cpu_cores;
-                    document.getElementById('logicalProcessors').textContent = info.cpu_cores * 2; // Estimate
-                }
-                document.getElementById('sockets').textContent = '1';
-                document.getElementById('virtualization').textContent = 'Enabled';
-                document.getElementById('l1Cache').textContent = '128 KB';
-                document.getElementById('l2Cache').textContent = '512 KB';
-                document.getElementById('l3Cache').textContent = '4.0 MB';
-            }
 
-            // Update stats (these would need to come from the client, for now show placeholders)
-            const memoryCommittedEl = document.getElementById('memoryCommitted');
-            if (memoryCommittedEl) {
-                memoryCommittedEl.textContent = '-';
-            }
-        }
-
-        function updateCPUChart(cpuData) {
-            const ctx = document.getElementById('cpuUtilizationChart');
-            if (!ctx) return;
-
-            const labels = cpuData.map((point, index) => {
-                const secondsAgo = Math.floor((Date.now() - point.time) / 1000);
-                return `${secondsAgo}s`;
-            });
-            const values = cpuData.map(point => point.value);
-
-            if (cpuChart) {
-                cpuChart.data.labels = labels;
-                cpuChart.data.datasets[0].data = values;
-                cpuChart.update('none');
-            } else {
-                cpuChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'CPU Utilization',
-                            data: values,
-                            borderColor: '#00d4ff',
-                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
+                // Update system info
+                if (data.systemInfo) {
+                    const info = data.systemInfo;
+                    if (info.cpu_model) {
+                        document.getElementById('cpuModel').textContent = info.cpu_model;
+                    }
+                    if (info.cpu_speed_ghz) {
+                        document.getElementById('baseSpeed').textContent = `${info.cpu_speed_ghz.toFixed(2)} GHz`;
+                        // Use latest stats for current speed if available
+                        if (data.latestStats && data.latestStats.cpuPercent) {
+                            // Estimate current speed based on utilization (rough estimate)
+                            const estimatedSpeed = info.cpu_speed_ghz * (1 + (data.latestStats.cpuPercent / 100) * 0.1);
+                            document.getElementById('cpuSpeed').textContent = `${estimatedSpeed.toFixed(2)} GHz`;
+                        } else {
+                            document.getElementById('cpuSpeed').textContent = `${info.cpu_speed_ghz.toFixed(2)} GHz`;
                         }
+                    }
+                    if (info.cpu_cores) {
+                        document.getElementById('cores').textContent = info.cpu_cores;
+                        document.getElementById('logicalProcessors').textContent = info.cpu_cores * 2; // Estimate
+                    }
+                    document.getElementById('sockets').textContent = '1';
+                    document.getElementById('virtualization').textContent = 'Enabled';
+                    document.getElementById('l1Cache').textContent = '128 KB';
+                    document.getElementById('l2Cache').textContent = '512 KB';
+                    document.getElementById('l3Cache').textContent = '4.0 MB';
+                }
+
+                // Update stats (these would need to come from the client, for now show placeholders)
+                const memoryCommittedEl = document.getElementById('memoryCommitted');
+                if (memoryCommittedEl) {
+                    memoryCommittedEl.textContent = '-';
+                }
+            }
+
+            function updateCPUChart(cpuData) {
+                const ctx = document.getElementById('cpuUtilizationChart');
+                if (!ctx) return;
+
+                const labels = cpuData.map((point, index) => {
+                    const secondsAgo = Math.floor((Date.now() - point.time) / 1000);
+                    return `${secondsAgo}s`;
+                });
+                const values = cpuData.map(point => point.value);
+
+                if (cpuChart) {
+                    cpuChart.data.labels = labels;
+                    cpuChart.data.datasets[0].data = values;
+                    cpuChart.update('none');
+                } else {
+                    cpuChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'CPU Utilization',
+                                data: values,
+                                borderColor: '#00d4ff',
+                                backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                                ticks: {
-                                    color: '#64748b',
-                                    font: {
-                                        size: 11
-                                    }
-                                },
-                                grid: {
-                                    color: '#e5e7eb'
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
                                 }
                             },
-                            x: {
-                                ticks: {
-                                    color: '#64748b',
-                                    font: {
-                                        size: 11
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    grid: {
+                                        color: '#e5e7eb'
                                     }
                                 },
-                                grid: {
-                                    color: '#e5e7eb'
+                                x: {
+                                    ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    grid: {
+                                        color: '#e5e7eb'
+                                    }
                                 }
                             }
-                    }
+                        }
+                    });
                 }
-            });
-        }
-        }
+            }
 
-        function updateMemoryChart(memoryData, systemInfo) {
-            const ctx = document.getElementById('memoryUtilizationChart');
-            if (!ctx) return;
+            function updateMemoryChart(memoryData, systemInfo) {
+                const ctx = document.getElementById('memoryUtilizationChart');
+                if (!ctx) return;
 
-            const labels = memoryData.map((point, index) => {
-                const secondsAgo = Math.floor((Date.now() - point.time) / 1000);
-                return `${secondsAgo}s`;
-            });
-            const values = memoryData.map(point => (point.value / (1024 * 1024 * 1024)).toFixed(2));
-            const maxMemory = systemInfo && systemInfo.total_memory_gb ? systemInfo.total_memory_gb : Math.max(...values) * 1.2;
+                const labels = memoryData.map((point, index) => {
+                    const secondsAgo = Math.floor((Date.now() - point.time) / 1000);
+                    return `${secondsAgo}s`;
+                });
+                const values = memoryData.map(point => (point.value / (1024 * 1024 * 1024)).toFixed(2));
+                const maxMemory = systemInfo && systemInfo.total_memory_gb ? systemInfo.total_memory_gb : Math.max(...values) * 1.2;
 
-            if (memoryChart) {
-                memoryChart.data.labels = labels;
-                memoryChart.data.datasets[0].data = values;
-                memoryChart.options.scales.y.max = maxMemory;
-                memoryChart.update('none');
-            } else {
-                memoryChart = new Chart(ctx, {
-                    type: 'line',
-                data: {
-                        labels: labels,
-                    datasets: [{
-                            label: 'Memory Usage',
-                            data: values,
-                            borderColor: '#00d4ff',
-                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                        borderWidth: 2,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                                display: false
-                            }
+                if (memoryChart) {
+                    memoryChart.data.labels = labels;
+                    memoryChart.data.datasets[0].data = values;
+                    memoryChart.options.scales.y.max = maxMemory;
+                    memoryChart.update('none');
+                } else {
+                    memoryChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Memory Usage',
+                                data: values,
+                                borderColor: '#00d4ff',
+                                backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: maxMemory,
-                                ticks: {
-                                    color: '#64748b',
-                                    font: {
-                                        size: 11
-                                    }
-                                },
-                                grid: {
-                                    color: '#e5e7eb'
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
                                 }
                             },
-                            x: {
-                                ticks: {
-                                    color: '#64748b',
-                                    font: {
-                                        size: 11
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: maxMemory,
+                                    ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    grid: {
+                                        color: '#e5e7eb'
                                     }
                                 },
-                                grid: {
-                                    color: '#e5e7eb'
+                                x: {
+                                    ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    grid: {
+                                        color: '#e5e7eb'
+                                    }
                                 }
                             }
-                    }
+                        }
+                    });
                 }
-            });
             }
-        }
 
-        function startTaskManagerRefresh(pcName) {
-            stopTaskManagerRefresh();
-            if (!pcName) return;
-            
-            // Load immediately
-            loadTaskManagerData(pcName);
-            
-            // Then refresh every 3 seconds
-            taskManagerRefreshInterval = setInterval(() => {
-                loadTaskManagerData(pcName);
-            }, TASK_MANAGER_REFRESH_INTERVAL);
-        }
-
-        function stopTaskManagerRefresh() {
-            if (taskManagerRefreshInterval) {
-                clearInterval(taskManagerRefreshInterval);
-                taskManagerRefreshInterval = null;
-            }
-        }
-
-        function showTaskManager(pcName) {
-            if (!pcName) {
-                alert('Please enter a PC name first');
-                return;
-            }
-            
-            // Show task manager section in status card
-            const taskManagerSection = document.getElementById('taskManagerSection');
-            if (taskManagerSection) {
-                taskManagerSection.style.display = 'block';
-                
-                // Scroll to task manager section
-                taskManagerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                
-                // Start refreshing
-                startTaskManagerRefresh(pcName);
-            }
-        }
-
-        function hideTaskManager() {
-            const taskManagerSection = document.getElementById('taskManagerSection');
-            if (taskManagerSection) {
-                taskManagerSection.style.display = 'none';
+            function startTaskManagerRefresh(pcName) {
                 stopTaskManagerRefresh();
-            }
-            const btn = document.getElementById('taskManagerBtn');
-            const btnText = document.getElementById('taskManagerBtnText');
-            if (btn && btnText) {
-                btnText.textContent = 'Show Processes';
-            }
-        }
+                if (!pcName) return;
 
-        function toggleTaskManager() {
-            const pcName = document.getElementById('pcName').value.trim();
-            if (!pcName) {
-                alert('Please enter a PC name first');
-                return;
+                // Load immediately
+                loadTaskManagerData(pcName);
+
+                // Then refresh every 3 seconds
+                taskManagerRefreshInterval = setInterval(() => {
+                    loadTaskManagerData(pcName);
+                }, TASK_MANAGER_REFRESH_INTERVAL);
             }
-            
-            const taskManagerSection = document.getElementById('taskManagerSection');
-            const btnText = document.getElementById('taskManagerBtnText');
-            
-            if (taskManagerSection && taskManagerSection.style.display === 'none') {
-                showTaskManager(pcName);
-                if (btnText) btnText.textContent = 'Hide Processes';
-            } else {
-                hideTaskManager();
+
+            function stopTaskManagerRefresh() {
+                if (taskManagerRefreshInterval) {
+                    clearInterval(taskManagerRefreshInterval);
+                    taskManagerRefreshInterval = null;
+                }
             }
-        }
-    </script>
+
+            function showTaskManager(pcName) {
+                if (!pcName) {
+                    alert('Please enter a PC name first');
+                    return;
+                }
+
+                // Show task manager section in status card
+                const taskManagerSection = document.getElementById('taskManagerSection');
+                if (taskManagerSection) {
+                    taskManagerSection.style.display = 'block';
+
+                    // Scroll to task manager section
+                    taskManagerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                    // Start refreshing
+                    startTaskManagerRefresh(pcName);
+                }
+            }
+
+            function hideTaskManager() {
+                const taskManagerSection = document.getElementById('taskManagerSection');
+                if (taskManagerSection) {
+                    taskManagerSection.style.display = 'none';
+                    stopTaskManagerRefresh();
+                }
+                const btn = document.getElementById('taskManagerBtn');
+                const btnText = document.getElementById('taskManagerBtnText');
+                if (btn && btnText) {
+                    btnText.textContent = 'Show Processes';
+                }
+            }
+
+            function toggleTaskManager() {
+                const pcName = document.getElementById('pcName').value.trim();
+                if (!pcName) {
+                    alert('Please enter a PC name first');
+                    return;
+                }
+
+                const taskManagerSection = document.getElementById('taskManagerSection');
+                const btnText = document.getElementById('taskManagerBtnText');
+
+                if (taskManagerSection && taskManagerSection.style.display === 'none') {
+                    showTaskManager(pcName);
+                    if (btnText) btnText.textContent = 'Hide Processes';
+                } else {
+                    hideTaskManager();
+                }
+            }
+        </script>
 </body>
+
 </html>

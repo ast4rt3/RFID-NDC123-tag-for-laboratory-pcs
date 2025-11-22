@@ -10,21 +10,23 @@ let tray;
 let settingsWindow;
 let licensingWindow;
 let autoUpdater;
+
 let hardwareMonitor;
+let currentIdleStatus = false;
 
 // Create system tray icon
 function createTray() {
   // Create tray icon (use existing icon or create a simple one)
   const iconPath = path.join(__dirname, 'assets', 'icon.ico');
   let trayIcon;
-  
+
   try {
     trayIcon = nativeImage.createFromPath(iconPath);
   } catch (error) {
     // Create a simple icon if the file doesn't exist
     trayIcon = nativeImage.createEmpty();
   }
-  
+
   // If icon is empty, create a simple colored icon
   if (trayIcon.isEmpty()) {
     const size = 16;
@@ -35,10 +37,10 @@ function createTray() {
       </svg>
     `).toString('base64')}`);
   }
-  
+
   tray = new Tray(trayIcon);
   tray.setToolTip('RFID Laboratory Monitor');
-  
+
   // Create context menu
   updateTrayMenu();
 }
@@ -62,7 +64,7 @@ function updateTrayMenu() {
         showLicensingWindow();
       }
     },*/
-    
+
     { type: 'separator' },
     {
       label: 'View Status',
@@ -73,37 +75,39 @@ function updateTrayMenu() {
   ];
 
   // Add update options if available - DISABLED for now
-  // if (autoUpdater) {
-  //   const updateStatus = autoUpdater.getUpdateStatus();
-  //   
-  //   if (updateStatus.updateAvailable || updateStatus.updateDownloaded) {
-  //     menuItems.push({ type: 'separator' });
-  //     
-  //     if (updateStatus.updateDownloaded) {
-  //       menuItems.push({
-  //         label: '🔄 Restart to Update',
-  //         click: () => {
-  //           autoUpdater.quitAndInstall();
-  //         }
-  //       });
-  //     } else if (updateStatus.updateAvailable) {
-  //       menuItems.push({
-  //         label: '⬇️ Download Update',
-  //         click: () => {
-  //           autoUpdater.checkForUpdates();
-  //         }
-  //       });
-  //     }
-  //   } else {
-  //     menuItems.push({ type: 'separator' });
-  //     menuItems.push({
-  //       label: '🔍 Check for Updates',
-  //       click: () => {
-  //         autoUpdater.checkForUpdates();
-  //       }
-  //     });
-  //   }
-  // }
+  /*
+  if (autoUpdater) {
+    const updateStatus = autoUpdater.getUpdateStatus();
+    
+    if (updateStatus.updateAvailable || updateStatus.updateDownloaded) {
+      menuItems.push({ type: 'separator' });
+      
+      if (updateStatus.updateDownloaded) {
+        menuItems.push({
+          label: '🔄 Restart to Update',
+          click: () => {
+            autoUpdater.quitAndInstall();
+          }
+        });
+      } else if (updateStatus.updateAvailable) {
+        menuItems.push({
+          label: '⬇️ Download Update',
+          click: () => {
+            autoUpdater.checkForUpdates();
+          }
+        });
+      }
+    } else {
+      menuItems.push({ type: 'separator' });
+      menuItems.push({
+        label: '🔍 Check for Updates',
+        click: () => {
+          autoUpdater.checkForUpdates();
+        }
+      });
+    }
+  }
+  */
 
   menuItems.push(
     { type: 'separator' },
@@ -114,7 +118,7 @@ function updateTrayMenu() {
       }
     }
   );
-  
+
   const contextMenu = Menu.buildFromTemplate(menuItems);
   tray.setContextMenu(contextMenu);
 }
@@ -146,34 +150,6 @@ function showSettingsWindow() {
   });
 }
 
-/*function showLicensingWindow() {
-  if (licensingWindow) {
-    licensingWindow.focus();
-    return;
-  }
-
-  licensingWindow = new BrowserWindow({
-    width: 700,
-    height: 600,
-    resizable: true,
-    frame: true,
-    title: 'RFID Monitor - Licensing & Documentation',
-    icon: path.join(__dirname, 'assets', 'icon.ico'),
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  });
-
-  licensingWindow.setMenuBarVisibility(false);
-  licensingWindow.loadFile(path.join(__dirname, 'licensing.html'));
-
-  licensingWindow.on('closed', () => {
-    licensingWindow = null;
-  });
-}
-*/
-
 function showStatusWindow() {
   const statusWindow = new BrowserWindow({
     width: 400,
@@ -190,16 +166,6 @@ function showStatusWindow() {
 
   statusWindow.setMenuBarVisibility(false);
   statusWindow.loadFile(path.join(__dirname, 'status.html'));
-
-  // Send status data to the window
-  ipcMain.once('get-status', (event) => {
-    event.reply('status-data', {
-      isRunning: loggerProcess && !loggerProcess.killed,
-      uptime: process.uptime(),
-      version: app.getVersion(),
-      config: getConfig()
-    });
-  });
 }
 
 function getConfig() {
@@ -229,31 +195,23 @@ function saveConfig(config) {
 ipcMain.handle('get-config', () => {
   return getConfig();
 });
-
 ipcMain.handle('save-config', (event, config) => {
   return saveConfig(config);
 });
 
-ipcMain.handle('restart-logger', () => {
-  if (loggerProcess) {
-    loggerProcess.kill();
-  }
-  startLoggerProcess();
-  return true;
-});
-
+// IPC handler for status
 ipcMain.handle('get-status', () => {
   return {
-    isRunning: loggerProcess && !loggerProcess.killed,
+    isRunning: !!loggerProcess,
     uptime: process.uptime(),
     version: app.getVersion(),
-    config: getConfig()
+    config: getConfig(),
+    isIdle: currentIdleStatus
   };
 });
 
 function startLoggerProcess() {
-  // Determine correct path for pc-logger.js
-  const isPackaged = __dirname.includes('app.asar');
+  const isPackaged = app.isPackaged;
   const loggerPath = isPackaged
     ? path.join(process.resourcesPath, 'app.asar.unpacked', 'client', 'pc-logger.js')
     : path.join(__dirname, 'pc-logger.js');
@@ -263,8 +221,9 @@ function startLoggerProcess() {
     ? path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules')
     : path.join(__dirname, '..', 'node_modules');
 
-  // Start the logger process with proper environment
+  // Start the logger process with proper environment and IPC channel
   loggerProcess = spawn('node', [loggerPath], {
+    stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
     env: {
       ...process.env,
       NODE_PATH: nodeModulesPath
@@ -290,6 +249,20 @@ function startLoggerProcess() {
           startLoggerProcess();
         }
       }, 5000);
+    });
+
+    // Listen for messages from the logger process
+    loggerProcess.on('message', (msg) => {
+      if (msg && msg.type === 'idle-status') {
+        currentIdleStatus = msg.isIdle;
+        // If status window is open, send update immediately
+        const wins = BrowserWindow.getAllWindows();
+        wins.forEach(win => {
+          if (win.title === 'RFID Monitor - Status') {
+            win.webContents.send('idle-status-update', currentIdleStatus);
+          }
+        });
+      }
     });
   }
 }

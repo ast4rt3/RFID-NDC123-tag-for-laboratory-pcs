@@ -125,6 +125,7 @@ class Database {
         timeLogs: [],
         appUsageLogs: [],
         browserSearchLogs: [],
+        idleLogs: [],
         pcStatus: {}  // Initialize pcStatus storage
       };
       console.log('📦 Using in-memory storage (data will not persist)');
@@ -183,6 +184,17 @@ class Database {
         CREATE INDEX IF NOT EXISTS idx_app_usage_logs_start_time ON app_usage_logs(start_time);
         CREATE INDEX IF NOT EXISTS idx_browser_search_logs_pc_name ON browser_search_logs(pc_name);
         CREATE INDEX IF NOT EXISTS idx_browser_search_logs_timestamp ON browser_search_logs(timestamp);
+
+        CREATE TABLE IF NOT EXISTS idle_logs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          pc_name TEXT NOT NULL,
+          start_time DATETIME NOT NULL,
+          end_time DATETIME NOT NULL,
+          duration_seconds INTEGER NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE INDEX IF NOT EXISTS idx_idle_logs_pc_name ON idle_logs(pc_name);
+        CREATE INDEX IF NOT EXISTS idx_idle_logs_start_time ON idle_logs(start_time);
       `;
   // Helper to format date in 12-hour format with AM/PM
 
@@ -276,6 +288,29 @@ class Database {
       };
       this.db.browserSearchLogs.push(log);
       // Browser activity saved silently
+      return Promise.resolve();
+    }
+  }
+
+  async insertIdleLog(pcName, startTime, endTime, duration) {
+    // Convert to ISO strings to preserve timezone
+    const formattedStartTime = new Date(startTime).toISOString();
+    const formattedEndTime = new Date(endTime).toISOString();
+
+    if (this.type === 'supabase') {
+      return await this.db.insertIdleLog(pcName, formattedStartTime, formattedEndTime, duration);
+    } else {
+      // In-memory storage
+      const log = {
+        id: this.db.idleLogs.length + 1,
+        pc_name: pcName,
+        start_time: formattedStartTime,
+        end_time: formattedEndTime,
+        duration_seconds: duration,
+        created_at: new Date().toISOString()
+      };
+      this.db.idleLogs.push(log);
+      // Idle log saved silently
       return Promise.resolve();
     }
   }
