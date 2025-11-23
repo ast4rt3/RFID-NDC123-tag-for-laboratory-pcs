@@ -256,118 +256,96 @@
             <h1><i class="fas fa-qrcode"></i> RFID Scanner</h1>
             <p>Scan to view PC status</p>
         </div>
-
         <div class="scan-card" id="scanCard">
-            <div class="loading">
-                <i class="fas fa-spinner"></i>
+            <div class="loading"><i class="fas fa-spinner"></i>
                 <p>Loading PC information...</p>
             </div>
         </div>
-
         <div class="pc-info" id="pcInfo"></div>
     </div>
-
     <script>
         const SUPABASE_URL = 'https://uxhefdybgjluzkbodryd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4aGVmZHliZ2psdXprYm9kcnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDExMzAsImV4cCI6MjA3NjM3NzEzMH0.jvFSOUUNiWvLFdPHplVuRgvKkvt2zlet6NA_x3mLaJM';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         let currentPcName = '';
-
-        function getPcNameFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('pc');
-        }
+        let refreshInterval = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            const pcName = getPcNameFromUrl();
+            const pcName = new URLSearchParams(window.location.search).get('pc');
             if (!pcName) {
                 showError('No PC specified. Please scan an RFID tag or use a valid link.');
                 return;
             }
             currentPcName = pcName;
             loadPCInfo();
+            refreshInterval = setInterval(() => loadPCInfo(true), 5000);
         });
 
-        async function loadPCInfo() {
+        async function loadPCInfo(isBackgroundRefresh = false) {
             try {
-                const { data: statusData, error: statusError } = await supabase
-                    .from('pc_status')
-                    .select('*')
-                    .eq('pc_name', currentPcName)
-                    .single();
-
+                const { data: statusData, error: statusError } = await supabase.from('pc_status').select('*').eq('pc_name', currentPcName).single();
                 if (statusError || !statusData) {
-                    showError(`PC "${currentPcName}" not found in the system.`);
+                    if (!isBackgroundRefresh) showError(`PC "${currentPcName}" not found in the system.`);
                     return;
                 }
+                const { data: sysInfo } = await supabase.from('system_info').select('*').eq('pc_name', currentPcName).single();
 
-                const { data: sysInfo } = await supabase
-                    .from('system_info')
-                    .select('*')
-                    .eq('pc_name', currentPcName)
-                    .single();
+                // Fetch app usage data using select('*') to avoid column errors
+                let currentApp = null;
+                let recentApps = [];
+                try {
+                    const { data: currentAppData } = await supabase
+                        .from('app_usage_logs')
+                        .select('*')
+                        .eq('pc_name', currentPcName)
+                        .order('start_time', { ascending: false })
+                        .limit(1)
+                        .single();
+                    currentApp = currentAppData;
 
-                const { data: currentApp } = await supabase
-                    .from('app_usage_logs')
-                    .select('*')
-                    .eq('pc_name', currentPcName)
-                    .order('start_time', { ascending: false })
-                    .limit(1)
-                    .single();
-
-                const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-                const { data: recentApps } = await supabase
-                    .from('app_usage_logs')
-                    .select('app_name, window_title, start_time')
-                    .eq('pc_name', currentPcName)
-                    .gte('start_time', oneHourAgo)
-                    .order('start_time', { ascending: false })
-                    .limit(10);
+                    const { data: recentAppsData } = await supabase
+                        .from('app_usage_logs')
+                        .select('*')
+                        .eq('pc_name', currentPcName)
+                        .order('start_time', { ascending: false })
+                        .limit(4); // Limited to 4 apps
+                    recentApps = recentAppsData || [];
+                } catch (e) {
+                    console.warn('Error fetching app data:', e);
+                }
 
                 displayPCInfo(statusData, sysInfo, currentApp, recentApps);
             } catch (error) {
                 console.error('Error:', error);
-                showError('Failed to fetch PC information. Please try again.');
+                if (!isBackgroundRefresh) showError('Failed to fetch PC information. Please try again.');
             }
         }
 
         function displayPCInfo(status, sysInfo, currentApp, recentApps) {
             document.getElementById('scanCard').style.display = 'none';
             const pcInfo = document.getElementById('pcInfo');
-
             const isOnline = status.is_online;
             const isIdle = status.is_idle;
-
-            let statusClass, statusText;
-            if (!isOnline) {
-                statusClass = 'offline';
-                statusText = 'Offline';
-            } else if (isIdle) {
-                statusClass = 'idle';
-                statusText = 'Idle';
-            } else {
-                statusClass = 'online';
-                statusText = 'Online';
-            }
+            let statusClass = !isOnline ? 'offline' : (isIdle ? 'idle' : 'online');
+            let statusText = !isOnline ? 'Offline' : (isIdle ? 'Idle' : 'Online');
 
             const currentAppName = currentApp ? currentApp.app_name : 'None';
-            const currentAppWindow = currentApp ? currentApp.window_title : 'N/A';
+            // Use window_title if available, otherwise fallback or empty
+            const currentAppWindow = currentApp && currentApp.window_title ? currentApp.window_title : '';
 
             let recentAppsHtml = '';
             if (recentApps && recentApps.length > 0) {
                 recentAppsHtml = recentApps.map(app => {
                     const startTime = new Date(app.start_time);
-                    const timeStr = startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    const timeStr = startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    const windowTitle = app.window_title || '';
                     return `
                         <div style="padding: 10px; background: white; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #667eea;">
                             <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">
                                 <i class="fas fa-window-maximize" style="color: #667eea; margin-right: 6px;"></i>
                                 ${app.app_name}
                             </div>
-                            <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 2px;">
-                                ${app.window_title || 'No title'}
-                            </div>
+                            ${windowTitle ? `<div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 2px;">${windowTitle}</div>` : ''}
                             <div style="font-size: 0.75rem; color: #9ca3af;">
                                 <i class="fas fa-clock"></i> ${timeStr}
                             </div>
@@ -378,6 +356,33 @@
                 recentAppsHtml = '<div style="text-align: center; color: #9ca3af; padding: 20px;">No recent activity</div>';
             }
 
+            // System Info Section
+            const systemInfoHtml = sysInfo ? `
+                <div style="margin-top: 25px; border-top: 2px solid #f3f4f6; padding-top: 20px;">
+                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 15px; font-size: 1.1rem;">
+                        <i class="fas fa-server"></i> System Specs
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                        <div class="info-item" style="padding: 12px; border-left: 3px solid #10b981;">
+                            <div class="info-label"><i class="fas fa-microchip"></i> CPU Model</div>
+                            <div class="info-value" style="font-size: 0.95rem;">${sysInfo.cpu_model || 'N/A'}</div>
+                        </div>
+                        <div class="info-item" style="padding: 12px; border-left: 3px solid #10b981;">
+                            <div class="info-label"><i class="fas fa-memory"></i> RAM Size</div>
+                            <div class="info-value" style="font-size: 0.95rem;">${sysInfo.total_memory_gb || 'N/A'} GB</div>
+                        </div>
+                        <div class="info-item" style="padding: 12px; border-left: 3px solid #10b981;">
+                            <div class="info-label"><i class="fab fa-windows"></i> OS</div>
+                            <div class="info-value" style="font-size: 0.95rem;">${sysInfo.os_platform || 'N/A'}</div>
+                        </div>
+                        <div class="info-item" style="padding: 12px; border-left: 3px solid #10b981;">
+                            <div class="info-label"><i class="fas fa-code-branch"></i> OS Version</div>
+                            <div class="info-value" style="font-size: 0.95rem;">${sysInfo.os_version || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            ` : '';
+
             pcInfo.innerHTML = `
                 <div class="pc-header">
                     <div class="pc-name">${currentPcName}</div>
@@ -386,41 +391,27 @@
                         <span>${statusText}</span>
                     </div>
                 </div>
-
                 <div class="info-grid">
                     <div class="info-item">
                         <div class="info-label"><i class="fas fa-desktop"></i> Currently Opened</div>
                         <div class="info-value">${currentAppName}</div>
                         <div style="font-size: 0.85rem; color: #6b7280; margin-top: 5px;">${currentAppWindow}</div>
                     </div>
-
                     <div class="info-item">
                         <div class="info-label"><i class="fas fa-heartbeat"></i> Last Activity</div>
                         <div class="info-value">${formatDateTime(status.last_activity)}</div>
                     </div>
                 </div>
-
                 <div style="margin-top: 25px;">
                     <div style="font-weight: 600; color: #1f2937; margin-bottom: 15px; font-size: 1.1rem;">
-                        <i class="fas fa-history"></i> Recent Apps (Last Hour)
+                        <i class="fas fa-history"></i> Recent Apps
                     </div>
                     <div style="max-height: 300px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 12px;">
                         ${recentAppsHtml}
                     </div>
                 </div>
-
-                <div class="quick-actions">
-                    <button class="quick-btn" onclick="viewDetails()">
-                        <i class="fas fa-chart-line"></i>
-                        View Full Dashboard
-                    </button>
-                    <button class="quick-btn" onclick="loadPCInfo()">
-                        <i class="fas fa-sync"></i>
-                        Refresh
-                    </button>
-                </div>
+                ${systemInfoHtml}
             `;
-
             pcInfo.classList.add('show');
         }
 
@@ -429,41 +420,23 @@
             const date = new Date(dateString);
             const now = new Date();
             const diff = now - date;
-
             if (diff < 60000) return 'Just now';
-            if (diff < 3600000) {
-                const mins = Math.floor(diff / 60000);
-                return `${mins} min${mins > 1 ? 's' : ''} ago`;
-            }
-            if (diff < 86400000) {
-                const hours = Math.floor(diff / 3600000);
-                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-            }
-            return date.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            if (diff < 3600000) return `${Math.floor(diff / 60000)} min${Math.floor(diff / 60000) > 1 ? 's' : ''} ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} hour${Math.floor(diff / 3600000) > 1 ? 's' : ''} ago`;
+            return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
         function showError(message) {
-            const scanCard = document.getElementById('scanCard');
-            scanCard.innerHTML = `
+            document.getElementById('scanCard').innerHTML = `
                 <div style="text-align: center; padding: 20px;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
                     <h3 style="color: #991b1b; margin-bottom: 10px;">Error</h3>
                     <p style="color: #6b7280;">${message}</p>
                     <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px;">
-                        <i class="fas fa-home"></i>
-                        Go to Dashboard
+                        <i class="fas fa-home"></i> Go to Dashboard
                     </button>
                 </div>
             `;
-        }
-
-        function viewDetails() {
-            window.location.href = `index.html?pc=${encodeURIComponent(currentPcName)}`;
         }
     </script>
 </body>
