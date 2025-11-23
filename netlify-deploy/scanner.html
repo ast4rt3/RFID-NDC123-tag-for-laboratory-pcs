@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RFID Scanner - Lab Monitor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .scan-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .pc-info {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 0.6s ease;
+            display: none;
+        }
+
+        .pc-info.show {
+            display: block;
+        }
+
+        .pc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .pc-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge.online {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.idle {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quick-btn {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .quick-btn:active {
+            transform: scale(0.95);
+            background: #f3f4f6;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-qrcode"></i> RFID Scanner</h1>
+            <p>Scan to view PC status</p>
+        </div>
+
+        <div class="scan-card" id="scanCard">
+            <div class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Loading PC information...</p>
+            </div>
+        </div>
+
+        <div class="pc-info" id="pcInfo"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uxhefdybgjluzkbodryd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4aGVmZHliZ2psdXprYm9kcnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDExMzAsImV4cCI6MjA3NjM3NzEzMH0.jvFSOUUNiWvLFdPHplVuRgvKkvt2zlet6NA_x3mLaJM';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentPcName = '';
+
+        function getPcNameFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('pc');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const pcName = getPcNameFromUrl();
+            if (!pcName) {
+                showError('No PC specified. Please scan an RFID tag or use a valid link.');
+                return;
+            }
+            currentPcName = pcName;
+            loadPCInfo();
+        });
+
+        async function loadPCInfo() {
+            try {
+                const { data: statusData, error: statusError } = await supabase
+                    .from('pc_status')
+                    .select('*')
+                    .eq('pc_name', currentPcName)
+                    .single();
+
+                if (statusError || !statusData) {
+                    showError(`PC "${currentPcName}" not found in the system.`);
+                    return;
+                }
+
+                const { data: sysInfo } = await supabase
+                    .from('system_info')
+                    .select('*')
+                    .eq('pc_name', currentPcName)
+                    .single();
+
+                const { data: currentApp } = await supabase
+                    .from('app_usage_logs')
+                    .select('*')
+                    .eq('pc_name', currentPcName)
+                    .order('start_time', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+                const { data: recentApps } = await supabase
+                    .from('app_usage_logs')
+                    .select('app_name, window_title, start_time')
+                    .eq('pc_name', currentPcName)
+                    .gte('start_time', oneHourAgo)
+                    .order('start_time', { ascending: false })
+                    .limit(10);
+
+                displayPCInfo(statusData, sysInfo, currentApp, recentApps);
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to fetch PC information. Please try again.');
+            }
+        }
+
+        function displayPCInfo(status, sysInfo, currentApp, recentApps) {
+            document.getElementById('scanCard').style.display = 'none';
+            const pcInfo = document.getElementById('pcInfo');
+
+            const isOnline = status.is_online;
+            const isIdle = status.is_idle;
+
+            let statusClass, statusText;
+            if (!isOnline) {
+                statusClass = 'offline';
+                statusText = 'Offline';
+            } else if (isIdle) {
+                statusClass = 'idle';
+                statusText = 'Idle';
+            } else {
+                statusClass = 'online';
+                statusText = 'Online';
+            }
+
+            const currentAppName = currentApp ? currentApp.app_name : 'None';
+            const currentAppWindow = currentApp ? currentApp.window_title : 'N/A';
+
+            let recentAppsHtml = '';
+            if (recentApps && recentApps.length > 0) {
+                recentAppsHtml = recentApps.map(app => {
+                    const startTime = new Date(app.start_time);
+                    const timeStr = startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <div style="padding: 10px; background: white; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #667eea;">
+                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">
+                                <i class="fas fa-window-maximize" style="color: #667eea; margin-right: 6px;"></i>
+                                ${app.app_name}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 2px;">
+                                ${app.window_title || 'No title'}
+                            </div>
+                            <div style="font-size: 0.75rem; color: #9ca3af;">
+                                <i class="fas fa-clock"></i> ${timeStr}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                recentAppsHtml = '<div style="text-align: center; color: #9ca3af; padding: 20px;">No recent activity</div>';
+            }
+
+            pcInfo.innerHTML = `
+                <div class="pc-header">
+                    <div class="pc-name">${currentPcName}</div>
+                    <div class="status-badge ${statusClass}">
+                        <span class="pulse"></span>
+                        <span>${statusText}</span>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-desktop"></i> Currently Opened</div>
+                        <div class="info-value">${currentAppName}</div>
+                        <div style="font-size: 0.85rem; color: #6b7280; margin-top: 5px;">${currentAppWindow}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-heartbeat"></i> Last Activity</div>
+                        <div class="info-value">${formatDateTime(status.last_activity)}</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 15px; font-size: 1.1rem;">
+                        <i class="fas fa-history"></i> Recent Apps (Last Hour)
+                    </div>
+                    <div style="max-height: 300px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 12px;">
+                        ${recentAppsHtml}
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="viewDetails()">
+                        <i class="fas fa-chart-line"></i>
+                        View Full Dashboard
+                    </button>
+                    <button class="quick-btn" onclick="loadPCInfo()">
+                        <i class="fas fa-sync"></i>
+                        Refresh
+                    </button>
+                </div>
+            `;
+
+            pcInfo.classList.add('show');
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'Never';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) {
+                const mins = Math.floor(diff / 60000);
+                return `${mins} min${mins > 1 ? 's' : ''} ago`;
+            }
+            if (diff < 86400000) {
+                const hours = Math.floor(diff / 3600000);
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            }
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showError(message) {
+            const scanCard = document.getElementById('scanCard');
+            scanCard.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
+                    <h3 style="color: #991b1b; margin-bottom: 10px;">Error</h3>
+                    <p style="color: #6b7280;">${message}</p>
+                    <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px;">
+                        <i class="fas fa-home"></i>
+                        Go to Dashboard
+                    </button>
+                </div>
+            `;
+        }
+
+        function viewDetails() {
+            window.location.href = `index.html?pc=${encodeURIComponent(currentPcName)}`;
+        }
+    </script>
+</body>
+
+</html>

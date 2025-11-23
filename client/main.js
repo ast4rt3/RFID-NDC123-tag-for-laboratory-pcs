@@ -8,6 +8,7 @@ const HardwareMonitorManager = require('./hardware-monitor-manager');
 let loggerProcess;
 let tray;
 let settingsWindow;
+let statusWindow;
 let licensingWindow;
 let autoUpdater;
 
@@ -58,13 +59,6 @@ function updateTrayMenu() {
         showSettingsWindow();
       }
     },
-    /*{
-      label: 'Licensing & Documentation',
-      click: () => {
-        showLicensingWindow();
-      }
-    },*/
-
     { type: 'separator' },
     {
       label: 'View Status',
@@ -73,41 +67,6 @@ function updateTrayMenu() {
       }
     }
   ];
-
-  // Add update options if available - DISABLED for now
-  /*
-  if (autoUpdater) {
-    const updateStatus = autoUpdater.getUpdateStatus();
-    
-    if (updateStatus.updateAvailable || updateStatus.updateDownloaded) {
-      menuItems.push({ type: 'separator' });
-      
-      if (updateStatus.updateDownloaded) {
-        menuItems.push({
-          label: '🔄 Restart to Update',
-          click: () => {
-            autoUpdater.quitAndInstall();
-          }
-        });
-      } else if (updateStatus.updateAvailable) {
-        menuItems.push({
-          label: '⬇️ Download Update',
-          click: () => {
-            autoUpdater.checkForUpdates();
-          }
-        });
-      }
-    } else {
-      menuItems.push({ type: 'separator' });
-      menuItems.push({
-        label: '🔍 Check for Updates',
-        click: () => {
-          autoUpdater.checkForUpdates();
-        }
-      });
-    }
-  }
-  */
 
   menuItems.push(
     { type: 'separator' },
@@ -125,6 +84,7 @@ function updateTrayMenu() {
 
 function showSettingsWindow() {
   if (settingsWindow) {
+    settingsWindow.show();
     settingsWindow.focus();
     return;
   }
@@ -145,13 +105,21 @@ function showSettingsWindow() {
   settingsWindow.setMenuBarVisibility(false);
   settingsWindow.loadFile(path.join(__dirname, 'settings.html'));
 
-  settingsWindow.on('closed', () => {
-    settingsWindow = null;
+  // Hide window instead of closing
+  settingsWindow.on('close', (event) => {
+    event.preventDefault();
+    settingsWindow.hide();
   });
 }
 
 function showStatusWindow() {
-  const statusWindow = new BrowserWindow({
+  if (statusWindow) {
+    statusWindow.show();
+    statusWindow.focus();
+    return;
+  }
+
+  statusWindow = new BrowserWindow({
     width: 400,
     height: 300,
     resizable: true,
@@ -166,6 +134,12 @@ function showStatusWindow() {
 
   statusWindow.setMenuBarVisibility(false);
   statusWindow.loadFile(path.join(__dirname, 'status.html'));
+
+  // Hide window instead of closing
+  statusWindow.on('close', (event) => {
+    event.preventDefault();
+    statusWindow.hide();
+  });
 }
 
 function getConfig() {
@@ -195,6 +169,7 @@ function saveConfig(config) {
 ipcMain.handle('get-config', () => {
   return getConfig();
 });
+
 ipcMain.handle('save-config', (event, config) => {
   return saveConfig(config);
 });
@@ -208,6 +183,28 @@ ipcMain.handle('get-status', () => {
     config: getConfig(),
     isIdle: currentIdleStatus
   };
+});
+
+// IPC handler for restarting logger
+ipcMain.handle('restart-logger', () => {
+  if (loggerProcess) {
+    console.log('Killing existing logger process...');
+    loggerProcess.kill();
+  }
+
+  // Clear the config module cache so it reloads on next start
+  const configPath = path.join(__dirname, 'config.js');
+  if (require.cache[configPath]) {
+    delete require.cache[configPath];
+  }
+
+  // Wait a moment before restarting to ensure clean shutdown
+  setTimeout(() => {
+    console.log('Starting logger process with new config...');
+    startLoggerProcess();
+  }, 1000);
+
+  return true;
 });
 
 function startLoggerProcess() {
@@ -271,9 +268,6 @@ app.whenReady().then(async () => {
   // Create system tray
   createTray();
 
-  // Initialize auto-updater
-  // autoUpdater = new AutoUpdater({ tray, updateTrayMenu }); // Disabled for now
-
   // Initialize and start hardware monitor (LibreHardwareMonitor)
   hardwareMonitor = new HardwareMonitorManager();
   const hwMonitorStarted = await hardwareMonitor.start();
@@ -306,6 +300,12 @@ app.whenReady().then(async () => {
       }
     });
   }
+});
+
+// Prevent closing all windows from quitting the app
+app.on('window-all-closed', (event) => {
+  // Do nothing - keep app running in tray
+  event.preventDefault();
 });
 
 app.on('before-quit', (event) => {
