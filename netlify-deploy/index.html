@@ -1144,6 +1144,53 @@
 
             <div id="statsGrid" class="stats-grid" style="display: none;"></div>
 
+            <div class="tabs-nav"
+                style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+                <button class="tab-btn active" onclick="switchTab('apps')" id="tab-btn-apps"
+                    style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #4f46e5; border-bottom: 2px solid #4f46e5; cursor: pointer;">
+                    <i class="fas fa-window-maximize"></i> App Usage
+                </button>
+                <button class="tab-btn" onclick="switchTab('browser')" id="tab-btn-browser"
+                    style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
+                    <i class="fas fa-search"></i> Browser Searches
+                </button>
+            </div>
+
+            <div id="browser-tab" class="tab-content" style="display: none;">
+                <div class="chart-container">
+                    <div class="chart-title">Search Query Distribution</div>
+                    <div class="chart-wrapper">
+                        <canvas id="searchDistributionChart"></canvas>
+                    </div>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>URL</th>
+                                <th>Search Engine</th>
+                                <th>Query</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchTableBody">
+                            <!-- Search data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Controls for Search -->
+                <div class="pagination" id="searchPaginationControls" style="display: none;">
+                    <button class="pagination-btn" id="searchPrevBtn" onclick="changeSearchPage(-1)">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div class="pagination-page-numbers" id="searchPageNumbers"></div>
+                    <div class="pagination-info" id="searchPaginationInfo"></div>
+                    <button class="pagination-btn" id="searchNextBtn" onclick="changeSearchPage(1)">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
             <div id="apps-tab" class="tab-content" style="display: none;">
                 <div class="chart-container">
                     <div class="chart-title">App Usage Distribution</div>
@@ -1198,6 +1245,7 @@
             document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
 
             let appChart = null;
+            let searchChart = null;
             let cpuChart = null;
             let memoryChart = null;
             let taskManagerRefreshInterval = null;
@@ -1211,6 +1259,8 @@
             // Pagination variables
             let allAppData = [];
             let currentPage = 1;
+            let allSearchData = [];
+            let currentSearchPage = 1;
             const itemsPerPage = 10; // Show 10 items per page
 
             // Auto-refresh functionality
@@ -1694,6 +1744,19 @@
                         // Don't throw, just continue without idle data
                     }
 
+                    // Fetch browser search logs
+                    const { data: searchData, error: searchError } = await supabase
+                        .from('browser_search_logs')
+                        .select('*')
+                        .eq('pc_name', pcName)
+                        .gte('timestamp', startDate)
+                        .lte('timestamp', endDate)
+                        .order('timestamp', { ascending: false });
+
+                    if (searchError) {
+                        console.warn('Search data error:', searchError);
+                    }
+
                     // Merge and sort data
                     let combinedData = [...(appData || [])];
                     if (idleData) {
@@ -1719,6 +1782,7 @@
 
                     // Process and display data
                     processData(combinedData);
+                    processSearchData(searchData || []);
 
                     // Update last update time
                     updateLastUpdateTime();
@@ -1785,6 +1849,9 @@
                 }
 
                 console.log('Data processed and displayed');
+
+                // Show only the App Usage tab by default
+                switchTab('apps');
             }
 
             function toggleAppSessionsBreakdown() {
@@ -2065,6 +2132,212 @@
                 });
 
                 console.log('Chart updated with', labels.length, 'apps');
+            }
+
+            function processSearchData(searchData) {
+                // Store all data for pagination
+                allSearchData = searchData;
+                currentSearchPage = 1;
+
+                const paginationControls = document.getElementById('searchPaginationControls');
+                const tbody = document.getElementById('searchTableBody');
+
+                if (searchData.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <i class="fas fa-search"></i>
+                                <h3>No Search Data</h3>
+                                <p>No browser searches recorded for this date</p>
+                            </td>
+                        </tr>`;
+                    paginationControls.style.display = 'none';
+                } else {
+                    // Show pagination if more than itemsPerPage
+                    if (searchData.length > itemsPerPage) {
+                        paginationControls.style.display = 'flex';
+                        updateSearchPagination();
+                    } else {
+                        paginationControls.style.display = 'none';
+                    }
+
+                    // Display current page
+                    displayCurrentSearchPage();
+                }
+
+                // Create chart
+                createSearchChart(searchData);
+            }
+
+            function displayCurrentSearchPage() {
+                const tbody = document.getElementById('searchTableBody');
+                const startIndex = (currentSearchPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const pageData = allSearchData.slice(startIndex, endIndex);
+
+                tbody.innerHTML = pageData.map(entry => {
+                    const urlDisplay = entry.url ? `<a href="${escapeHtml(entry.url)}" target="_blank" style="color: #4f46e5; text-decoration: none; max-width: 300px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(entry.url)}</a>` : '<span style="color: #9ca3af;">No URL</span>';
+                    return `
+                    <tr>
+                        <td>${formatTime(entry.timestamp)}</td>
+                        <td>${urlDisplay}</td>
+                        <td>${escapeHtml(entry.search_engine)}</td>
+                        <td>${escapeHtml(entry.search_query)}</td>
+                    </tr>
+                `;
+                }).join('');
+
+                updateSearchPagination();
+            }
+
+            function updateSearchPagination() {
+                const totalPages = Math.ceil(allSearchData.length / itemsPerPage);
+                const paginationInfo = document.getElementById('searchPaginationInfo');
+                const prevBtn = document.getElementById('searchPrevBtn');
+                const nextBtn = document.getElementById('searchNextBtn');
+                const pageNumbers = document.getElementById('searchPageNumbers');
+
+                // Update info
+                const startItem = (currentSearchPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentSearchPage * itemsPerPage, allSearchData.length);
+                paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${allSearchData.length}`;
+
+                // Update buttons
+                prevBtn.disabled = currentSearchPage === 1;
+                nextBtn.disabled = currentSearchPage === totalPages;
+
+                // Update page numbers
+                pageNumbers.innerHTML = '';
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentSearchPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                if (endPage - startPage < maxVisiblePages - 1) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+
+                if (startPage > 1) {
+                    const firstBtn = document.createElement('button');
+                    firstBtn.className = 'page-number';
+                    firstBtn.textContent = '1';
+                    firstBtn.onclick = () => goToSearchPage(1);
+                    pageNumbers.appendChild(firstBtn);
+
+                    if (startPage > 2) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.textContent = '...';
+                        ellipsis.style.padding = '0 5px';
+                        pageNumbers.appendChild(ellipsis);
+                    }
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = 'page-number' + (i === currentSearchPage ? ' active' : '');
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => goToSearchPage(i);
+                    pageNumbers.appendChild(pageBtn);
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.textContent = '...';
+                        ellipsis.style.padding = '0 5px';
+                        pageNumbers.appendChild(ellipsis);
+                    }
+
+                    const lastBtn = document.createElement('button');
+                    lastBtn.className = 'page-number';
+                    lastBtn.textContent = totalPages;
+                    lastBtn.onclick = () => goToSearchPage(totalPages);
+                    pageNumbers.appendChild(lastBtn);
+                }
+            }
+
+            function changeSearchPage(direction) {
+                const totalPages = Math.ceil(allSearchData.length / itemsPerPage);
+                const newPage = currentSearchPage + direction;
+
+                if (newPage >= 1 && newPage <= totalPages) {
+                    currentSearchPage = newPage;
+                    displayCurrentSearchPage();
+                    // Scroll to top of table
+                    document.getElementById('searchTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            function goToSearchPage(page) {
+                const totalPages = Math.ceil(allSearchData.length / itemsPerPage);
+                if (page >= 1 && page <= totalPages) {
+                    currentSearchPage = page;
+                    displayCurrentSearchPage();
+                    // Scroll to top of table
+                    document.getElementById('searchTableBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            function createSearchChart(searchData) {
+                const chartCanvas = document.getElementById('searchDistributionChart');
+                if (!chartCanvas) return;
+
+                const ctx = chartCanvas.getContext('2d');
+                const queryUsage = {};
+
+                searchData.forEach(entry => {
+                    const query = entry.search_query || 'Unknown';
+                    queryUsage[query] = (queryUsage[query] || 0) + 1;
+                });
+
+                // Destroy existing chart
+                if (searchChart) {
+                    searchChart.destroy();
+                    searchChart = null;
+                }
+
+                const labels = Object.keys(queryUsage);
+                const data = Object.values(queryUsage);
+
+                if (labels.length === 0) return;
+
+                searchChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            function switchTab(tabName) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.color = '#64748b';
+                    btn.style.borderBottomColor = 'transparent';
+                });
+
+                // Show selected tab
+                document.getElementById(`${tabName}-tab`).style.display = 'block';
+                const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+                activeBtn.classList.add('active');
+                activeBtn.style.color = '#4f46e5';
+                activeBtn.style.borderBottomColor = '#4f46e5';
             }
 
 

@@ -139,6 +139,11 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
 
     // More comprehensive title patterns
     const titlePatterns = [
+      // Microsoft Edge variations (with profile names)
+      /^(.+?) - Search - (?:Personal|Work|Profile \d+) - Microsoft​? Edge$/,
+      /^(.+?) - Search and \d+ more pages? - (?:Personal|Work|Profile \d+) - Microsoft​? Edge$/,
+      /^(.+?) - Microsoft​? Edge$/,
+
       // Google variations
       /^(.+?) - Google Search$/,
       /^(.+?) - Google$/,
@@ -165,11 +170,15 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
       /Search results for "(.+?)"/,
       /"(.+?)" - Search results/,
 
-      // Browser-specific patterns
+      // Browser-specific patterns (generic)
       /^(.+?) - Chrome$/,
       /^(.+?) - Firefox$/,
       /^(.+?) - Edge$/,
-      /^(.+?) - Brave$/
+      /^(.+?) - Brave$/,
+
+      // Brave specific
+      /^(.+?) - Brave$/,
+      /^(.+?) and \d+ more pages? - Brave$/
     ];
 
     for (const pattern of titlePatterns) {
@@ -192,21 +201,8 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
     }
   }
 
-  // Final fallback: If we have a browser but no search query, still log the activity
-  if (!searchQuery && appName) {
-    console.log('🔍 Browser activity without search query detected');
-
-    // Try to extract search query from window title even if it doesn't match our patterns
-    if (windowTitle && windowTitle.length > 5) {
-      // If title looks like it might contain a search query, use it
-      const suspiciousTitles = ['search', 'google', 'bing', 'yahoo', 'duckduckgo', 'youtube'];
-      if (suspiciousTitles.some(sus => windowTitle.toLowerCase().includes(sus))) {
-        searchQuery = windowTitle; // Use the full title as search query
-        searchEngine = 'Unknown';
-        console.log('🔍 Using full title as search query:', searchQuery);
-      }
-    }
-  }
+  // Don't use full window title as fallback - it's too noisy
+  // Only log browser activity if we have a proper search query or URL
 
   const result = {
     searchQuery,
@@ -531,20 +527,43 @@ function setupAppUsageTracking() {
       browserData = extractBrowserData(appName, windowTitle, windowUrl);
       console.log('🔍 Extracted browser data:', browserData);
 
-      // Merge window title and search query into one field
-      let finalSearchQuery = browserData.searchQuery || windowTitle || '';
+      // Blacklist specific patterns that should not be logged
+      const blacklistPatterns = [
+        /^New tab - Personal$/i,
+        /^New tab and \d+ more pages? - Personal$/i,
+        /^New tab$/i,
+        /^New Tab$/i
+      ];
 
-      // Send browser activity data immediately (even if no search query)
-      sendMessage({
-        type: 'browser_activity',
-        pc_name: pcName,
-        browser: appName,
-        url: windowUrl,
-        search_query: finalSearchQuery,
-        search_engine: browserData.searchEngine,
-        timestamp: now.toISOString()
-      });
-      console.log('🔍 Sent browser activity to server');
+      const isBlacklisted = browserData.searchQuery &&
+        blacklistPatterns.some(pattern => pattern.test(browserData.searchQuery));
+
+      // Only log if we have a valid search query and it's not blacklisted
+      const hasValidSearchQuery = browserData.searchQuery &&
+        browserData.searchQuery.trim().length > 0 &&
+        !isBlacklisted;
+
+      const hasValidUrl = windowUrl && windowUrl.trim().length > 0 && !windowUrl.includes('newtab');
+
+      if (hasValidSearchQuery || hasValidUrl) {
+        // Send browser activity data only if we have meaningful data
+        sendMessage({
+          type: 'browser_activity',
+          pc_name: pcName,
+          browser: appName,
+          url: windowUrl || '',
+          search_query: browserData.searchQuery || '',
+          search_engine: browserData.searchEngine,
+          timestamp: now.toISOString()
+        });
+        console.log('🔍 Sent browser activity to server:', {
+          query: browserData.searchQuery,
+          engine: browserData.searchEngine,
+          url: windowUrl
+        });
+      } else {
+        console.log('🔍 Skipping browser activity - blacklisted or no valid data:', browserData.searchQuery);
+      }
     }
 
     // Get GPU usage and send the log inside the callback
