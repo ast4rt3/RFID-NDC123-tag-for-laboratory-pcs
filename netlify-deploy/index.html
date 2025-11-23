@@ -1232,35 +1232,38 @@
                 updateLastUpdateTime();
 
                 // Start PC status refresh interval (every 5 seconds)
-                pcStatusRefreshInterval = setInterval(() => {
-                    const currentPcName = document.getElementById('pcName').value.trim();
-                    if (currentPcName) {
-                        console.log('Auto-refresh: Updating PC status...');
-                        refreshPcStatusOnly(currentPcName);
-                    } else {
-                        stopAutoRefresh();
-                    }
-                }, PC_STATUS_REFRESH_INTERVAL);
+                // pcStatusRefreshInterval = setInterval(() => {
+                //     if (document.hidden) return;
+
+                //     const currentPcName = document.getElementById('pcName').value.trim();
+                //     if (currentPcName) {
+                //         console.log('Auto-refresh: Updating PC status...');
+                //         refreshPcStatusOnly(currentPcName);
+                //     } else {
+                //         stopAutoRefresh();
+                //     }
+                // }, PC_STATUS_REFRESH_INTERVAL);
 
                 // Start full data refresh interval (every 20 seconds)
-                // Skip full reload if task manager is open
-                autoRefreshInterval = setInterval(() => {
-                    const currentPcName = document.getElementById('pcName').value.trim();
-                    if (currentPcName) {
-                        // Check if task manager is open
-                        const taskManagerSection = document.getElementById('taskManagerSection');
-                        const isTaskManagerOpen = taskManagerSection && taskManagerSection.style.display !== 'none';
+                // autoRefreshInterval = setInterval(() => {
+                //     if (document.hidden) return;
 
-                        if (!isTaskManagerOpen) {
-                            console.log('Auto-refresh: Full data reload...');
-                            loadData();
-                        } else {
-                            console.log('Auto-refresh: Skipping full reload (task manager is open)');
-                        }
-                    } else {
-                        stopAutoRefresh();
-                    }
-                }, FULL_REFRESH_INTERVAL);
+                //     const currentPcName = document.getElementById('pcName').value.trim();
+                //     if (currentPcName) {
+                //         // Check if task manager is open
+                //         const taskManagerSection = document.getElementById('taskManagerSection');
+                //         const isTaskManagerOpen = taskManagerSection && taskManagerSection.style.display !== 'none';
+
+                //         if (!isTaskManagerOpen) {
+                //             console.log('Auto-refresh: Full data reload...');
+                //             loadData();
+                //         } else {
+                //             console.log('Auto-refresh: Skipping full reload (task manager is open)');
+                //         }
+                //     } else {
+                //         stopAutoRefresh();
+                //     }
+                // }, FULL_REFRESH_INTERVAL);
 
                 console.log('Auto-refresh started for PC:', pcName, '- PC status: 5s, Full reload: 20s');
             }
@@ -2198,13 +2201,14 @@
             }
 
             function updateShareableLink(pcName, date) {
-                // Use current page URL
-                const currentURL = window.location.origin + window.location.pathname;
+                // Use hardcoded URL as requested
+                const currentURL = 'https://ast4rt3.github.io/scanner_mobile/index.html';
                 const url = new URL(currentURL);
                 url.searchParams.set('pc', pcName);
-                if (date) {
-                    url.searchParams.set('date', date);
-                }
+                // Date parameter removed as requested
+                // if (date) {
+                //     url.searchParams.set('date', date);
+                // }
                 const shareableLink = document.getElementById('shareableLink');
                 if (shareableLink) {
                     shareableLink.value = url.toString();
