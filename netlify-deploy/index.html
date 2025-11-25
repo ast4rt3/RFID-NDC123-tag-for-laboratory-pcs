@@ -591,28 +591,6 @@
             border-bottom: none;
         }
 
-        .view-toggle {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .view-toggle-btn {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #64748b;
-            transition: all 0.3s ease;
-        }
-
-        .view-toggle-btn.active {
-            background: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-        }
 
         .page-title {
             font-size: 2rem;
@@ -882,15 +860,6 @@
                 gap: 10px;
             }
 
-            .view-toggle {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .view-toggle-btn {
-                width: 100%;
-                padding: 12px 20px;
-            }
 
             .pc-card-info-item {
                 font-size: 0.8rem;
@@ -942,7 +911,7 @@
         <div class="header">
             <h1><i class="fas fa-desktop"></i> ICS Lab Monitor</h1>
             <div class="subtitle" id="headerSubtitle">
-                <span id="headerText">Enter PC name to get started</span>
+
                 <span class="auto-refresh-indicator" id="refreshIndicator" style="display: none;">
                     <i class="fas fa-sync-alt"></i>
                     <span id="lastUpdateTime">Auto-refreshing...</span>
@@ -952,36 +921,15 @@
 
         <!-- Home/Dashboard Page -->
         <div class="home-container active" id="homePage">
-            <div class="view-toggle">
-                <button class="view-toggle-btn active" onclick="showHomePage()">
-                    <i class="fas fa-home"></i> Home
-                </button>
-                <button class="view-toggle-btn" onclick="showDetailPage()">
-                    <i class="fas fa-desktop"></i> PC Details
-                </button>
-            </div>
-            <h2 class="page-title">Available PCs</h2>
-            <p class="page-subtitle">Click on a PC to view its details and activity</p>
-            <div class="pcs-grid" id="pcsGrid">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Loading PCs...
-                </div>
-            </div>
-        </div>
 
-        <!-- Detail Page -->
-        <div class="home-container" id="detailPage">
-            <div class="view-toggle">
-                <button class="view-toggle-btn" onclick="showHomePage()">
-                    <i class="fas fa-home"></i> Home
-                </button>
-                <button class="view-toggle-btn active" onclick="showDetailPage()">
-                    <i class="fas fa-desktop"></i> PC Details
-                </button>
-            </div>
-            <div class="controls">
+
+            <div class="controls" style="margin-bottom: 25px;">
+
                 <div class="control-group">
+
                     <div class="form-group">
+                        <h2 class="page-title">Available PCs</h2>
+                        <p class="page-subtitle">Click on a PC or search manually to view its details and activity</p>
                         <label for="pcName"><i class="fas fa-desktop"></i> PC Name</label>
                         <input type="text" id="pcName" placeholder="Enter PC name (e.g., i3S)">
                     </div>
@@ -993,13 +941,21 @@
                         <i class="fas fa-search"></i>
                         Load Data
                     </button>
-                    <button class="btn" onclick="toggleTaskManager()" id="taskManagerBtn"
-                        style="background: #4f46e5; color: white;">
-                        <i class="fas fa-tasks"></i>
-                        <span id="taskManagerBtnText">Show Processes</span>
-                    </button>
                 </div>
             </div>
+            <div class="pcs-grid" id="pcsGrid">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading PCs...
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Section -->
+        <div class="home-container" id="detailPage">
+            <button class="btn" onclick="showHome()"
+                style="margin-bottom: 20px; background: transparent; color: #4f46e5; border: 2px solid #4f46e5; padding: 8px 20px; font-size: 0.9rem;">
+                <i class="fas fa-arrow-left"></i> Home
+            </button>
 
             <!-- PC Status Card -->
             <div class="pc-status-container" id="pcStatusContainer" style="display:none;">
@@ -1018,106 +974,6 @@
                     </div>
                     <div class="system-info-grid" id="systemInfoGrid">
                         <!-- System info will be populated here -->
-                    </div>
-
-                    <!-- Task Manager Section -->
-                    <div id="taskManagerSection"
-                        style="display: none; margin-top: 30px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
-                        <div class="task-manager-header-section">
-                            <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">CPU
-                            </h3>
-                            <div class="cpu-info-header" id="cpuInfoHeader" style="font-size: 0.9rem; color: #64748b;">
-                                <span id="cpuModel">Loading...</span>
-                            </div>
-                        </div>
-
-                        <div class="task-manager-graph-container">
-                            <div class="graph-header">
-                                <span class="graph-label">% Utilization</span>
-                                <span class="graph-time-label">60 seconds</span>
-                            </div>
-                            <div class="graph-wrapper">
-                                <canvas id="cpuUtilizationChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="task-manager-stats-grid">
-                            <div class="task-manager-stats-column">
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">Utilization</div>
-                                    <div class="stat-value-large" id="cpuUtilization">0%</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">Speed</div>
-                                    <div class="stat-value-large" id="cpuSpeed">0.00 GHz</div>
-                                </div>
-                            </div>
-
-                            <div class="task-manager-stats-column">
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">Base speed</div>
-                                    <div class="stat-value" id="baseSpeed">-</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">Sockets</div>
-                                    <div class="stat-value" id="sockets">-</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">Cores</div>
-                                    <div class="stat-value" id="cores">-</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">Logical processors</div>
-                                    <div class="stat-value" id="logicalProcessors">-</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">Virtualization</div>
-                                    <div class="stat-value" id="virtualization">-</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">L1 cache</div>
-                                    <div class="stat-value" id="l1Cache">-</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">L2 cache</div>
-                                    <div class="stat-value" id="l2Cache">-</div>
-                                </div>
-                                <div class="task-manager-stat-item">
-                                    <div class="stat-label">L3 cache</div>
-                                    <div class="stat-value" id="l3Cache">-</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="task-manager-header-section" style="margin-top: 40px;">
-                            <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">Memory
-                            </h3>
-                        </div>
-
-                        <div class="task-manager-graph-container">
-                            <div class="graph-header">
-                                <span class="graph-label">Memory Usage (GB)</span>
-                                <span class="graph-time-label">60 seconds</span>
-                            </div>
-                            <div class="graph-wrapper">
-                                <canvas id="memoryUtilizationChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="task-manager-memory-stats">
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">In use</div>
-                                <div class="stat-value-large" id="memoryInUse">0 GB</div>
-                            </div>
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">Available</div>
-                                <div class="stat-value-large" id="memoryAvailable">0 GB</div>
-                            </div>
-                            <div class="task-manager-stat-item">
-                                <div class="stat-label">Committed</div>
-                                <div class="stat-value" id="memoryCommitted">-</div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Shareable Link Section -->
@@ -1154,13 +1010,20 @@
                     style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
                     <i class="fas fa-search"></i> Browser Searches
                 </button>
+                <button class="tab-btn" onclick="switchTab('processes')" id="tab-btn-processes"
+                    style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
+                    <i class="fas fa-tasks"></i> Processes
+                </button>
             </div>
 
             <div id="browser-tab" class="tab-content" style="display: none;">
-                <div class="chart-container">
-                    <div class="chart-title">Top Sites Visited</div>
-                    <div class="chart-wrapper">
-                        <canvas id="searchDistributionChart"></canvas>
+                <div class="card" id="topSearchList"
+                    style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <div class="chart-title" style="text-align: left; margin-bottom: 15px;">
+                        <i class="fas fa-arrow-trend-up"></i> Top Sites Visited
+                    </div>
+                    <div id="topSearchListBody">
+                        <div style="text-align: center; color: #9ca3af;">No data yet</div>
                     </div>
                 </div>
                 <div class="data-table">
@@ -1225,6 +1088,106 @@
                     <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">
                         Next <i class="fas fa-chevron-right"></i>
                     </button>
+                </div>
+            </div>
+
+            <div id="processes-tab" class="tab-content" style="display: none;">
+                <div id="taskManagerSection" style="margin-top: 0; padding-top: 0; border-top: none;">
+                    <div class="task-manager-header-section">
+                        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">CPU
+                        </h3>
+                        <div class="cpu-info-header" id="cpuInfoHeader" style="font-size: 0.9rem; color: #64748b;">
+                            <span id="cpuModel">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="task-manager-graph-container">
+                        <div class="graph-header">
+                            <span class="graph-label">% Utilization</span>
+                            <span class="graph-time-label">60 seconds</span>
+                        </div>
+                        <div class="graph-wrapper">
+                            <canvas id="cpuUtilizationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="task-manager-stats-grid">
+                        <div class="task-manager-stats-column">
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Utilization</div>
+                                <div class="stat-value-large" id="cpuUtilization">0%</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Speed</div>
+                                <div class="stat-value-large" id="cpuSpeed">0.00 GHz</div>
+                            </div>
+                        </div>
+
+                        <div class="task-manager-stats-column">
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Base speed</div>
+                                <div class="stat-value" id="baseSpeed">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Sockets</div>
+                                <div class="stat-value" id="sockets">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Cores</div>
+                                <div class="stat-value" id="cores">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Logical processors</div>
+                                <div class="stat-value" id="logicalProcessors">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">Virtualization</div>
+                                <div class="stat-value" id="virtualization">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">L1 cache</div>
+                                <div class="stat-value" id="l1Cache">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">L2 cache</div>
+                                <div class="stat-value" id="l2Cache">-</div>
+                            </div>
+                            <div class="task-manager-stat-item">
+                                <div class="stat-label">L3 cache</div>
+                                <div class="stat-value" id="l3Cache">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-manager-header-section" style="margin-top: 40px;">
+                        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 5px;">Memory
+                        </h3>
+                    </div>
+
+                    <div class="task-manager-graph-container">
+                        <div class="graph-header">
+                            <span class="graph-label">Memory Usage (GB)</span>
+                            <span class="graph-time-label">60 seconds</span>
+                        </div>
+                        <div class="graph-wrapper">
+                            <canvas id="memoryUtilizationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="task-manager-memory-stats">
+                        <div class="task-manager-stat-item">
+                            <div class="stat-label">In use</div>
+                            <div class="stat-value-large" id="memoryInUse">0 GB</div>
+                        </div>
+                        <div class="task-manager-stat-item">
+                            <div class="stat-label">Available</div>
+                            <div class="stat-value-large" id="memoryAvailable">0 GB</div>
+                        </div>
+                        <div class="task-manager-stat-item">
+                            <div class="stat-label">Committed</div>
+                            <div class="stat-value" id="memoryCommitted">-</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1464,35 +1427,14 @@
                 }
             }
 
-            // Page navigation
-            function showHomePage(event) {
-                document.getElementById('homePage').classList.add('active');
-                document.getElementById('detailPage').classList.remove('active');
-                document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
-                if (event && event.target) {
-                    event.target.classList.add('active');
-                } else {
-                    document.querySelectorAll('.view-toggle-btn')[0].classList.add('active');
-                }
-                loadAllPCs();
-            }
-
-            function showDetailPage(event) {
-                document.getElementById('homePage').classList.remove('active');
-                document.getElementById('detailPage').classList.add('active');
-                document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
-                if (event && event.target) {
-                    event.target.classList.add('active');
-                } else {
-                    document.querySelectorAll('.view-toggle-btn')[1].classList.add('active');
-                }
-            }
-
             function navigateToPC(pcName) {
-                document.getElementById('pcName').value = pcName;
-                showDetailPage();
-                document.querySelector('.view-toggle-btn:last-child').classList.add('active');
-                document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
+                if (!pcName) return;
+                const pcInput = document.getElementById('pcName');
+                pcInput.value = pcName;
+                const dateInput = document.getElementById('selectedDate');
+                if (!dateInput.value) {
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                }
                 loadData();
             }
 
@@ -1588,7 +1530,7 @@
                         }
 
                         return `
-                        <div class="pc-card" onclick="navigateToPC('${escapeHtml(pc.pc_name)}')">
+                        <div class="pc-card" data-pc-name="${escapeHtml(pc.pc_name)}">
                             <div class="pc-card-header">
                                 <div class="pc-card-status ${statusClass}"></div>
                                 <div class="pc-card-name">${escapeHtml(pc.pc_name)}</div>
@@ -1634,16 +1576,21 @@
 
             // Initialize on page load
             window.addEventListener('DOMContentLoaded', () => {
-                const params = getURLParams();
-                if (params.pc) {
-                    // If URL has PC parameter, show detail page
-                    showDetailPage();
-                    document.querySelector('.view-toggle-btn:last-child').classList.add('active');
-                    document.querySelector('.view-toggle-btn:first-child').classList.remove('active');
-                    checkURLParams();
-                } else {
-                    // Otherwise show home page
-                    loadAllPCs();
+                loadAllPCs();
+                checkURLParams();
+
+                // Add event delegation for PC cards
+                const pcsGrid = document.getElementById('pcsGrid');
+                if (pcsGrid) {
+                    pcsGrid.addEventListener('click', (e) => {
+                        const card = e.target.closest('.pc-card');
+                        if (card) {
+                            const pcName = card.getAttribute('data-pc-name');
+                            if (pcName) {
+                                navigateToPC(pcName);
+                            }
+                        }
+                    });
                 }
             });
 
@@ -1679,6 +1626,12 @@
 
                 // Update URL with current parameters
                 updateURL(pcName, selectedDate);
+
+                // Switch views
+                document.getElementById('homePage').classList.remove('active');
+                const detailPage = document.getElementById('detailPage');
+                detailPage.classList.add('active');
+                detailPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                 // Update header and show loading state
                 const headerSubtitleEl = document.getElementById('headerSubtitle');
@@ -2182,8 +2135,8 @@
                     displayCurrentSearchPage();
                 }
 
-                // Create chart
-                createSearchChart(searchData);
+                // Update top sites list
+                updateTopSearchList(searchData);
             }
 
             function displayCurrentSearchPage() {
@@ -2294,74 +2247,64 @@
                 }
             }
 
-            function createSearchChart(searchData) {
-                const chartCanvas = document.getElementById('searchDistributionChart');
-                if (!chartCanvas) return;
+            function updateTopSearchList(searchData) {
+                const listContainer = document.getElementById('topSearchListBody');
+                if (!listContainer) return;
 
-                const ctx = chartCanvas.getContext('2d');
-                const engineUsage = {};
-
-                searchData.forEach(entry => {
-                    const engineName = (entry.search_engine && entry.search_engine.trim()) ||
-                        (entry.browser && entry.browser.trim()) ||
-                        'Unknown Source';
-                    engineUsage[engineName] = (engineUsage[engineName] || 0) + 1;
-                });
-
-                const sortedUsage = Object.entries(engineUsage)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 8);
-
-                const labels = sortedUsage.map(([label]) => label);
-                const data = sortedUsage.map(([, count]) => count);
-
-                if (labels.length === 0) {
-                    if (searchChart) {
-                        searchChart.destroy();
-                        searchChart = null;
-                    }
+                if (!searchData || searchData.length === 0) {
+                    listContainer.innerHTML = '<div style="text-align: center; color: #9ca3af;">No browser activity for this date</div>';
                     return;
                 }
 
-                // Destroy existing chart
-                if (searchChart) {
-                    searchChart.destroy();
-                    searchChart = null;
-                }
-
-                searchChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Visits',
-                            data: data,
-                            backgroundColor: '#10b981'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    precision: 0
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.dataset.label}: ${context.parsed.y || context.parsed}`
-                                }
-                            }
+                const hostUsage = {};
+                searchData.forEach(entry => {
+                    const url = entry.url || '';
+                    let host;
+                    if (url) {
+                        try {
+                            const parsed = new URL(url);
+                            host = parsed.hostname || url;
+                        } catch {
+                            host = url;
                         }
+                    } else {
+                        host = entry.search_engine || entry.browser || 'Unknown Source';
+                    }
+                    const key = host || 'Unknown Source';
+                    if (!hostUsage[key]) {
+                        hostUsage[key] = { count: 0, lastEntry: entry };
+                    }
+                    hostUsage[key].count += 1;
+                    if (entry.timestamp && (!hostUsage[key].lastEntry.timestamp || new Date(entry.timestamp) > new Date(hostUsage[key].lastEntry.timestamp))) {
+                        hostUsage[key].lastEntry = entry;
                     }
                 });
+
+                const topHosts = Object.entries(hostUsage)
+                    .sort((a, b) => b[1].count - a[1].count)
+                    .slice(0, 5);
+
+                listContainer.innerHTML = topHosts.map(([host, data], index) => {
+                    const url = data.lastEntry.url || '';
+                    const rawTitle = data.lastEntry.search_query || host;
+                    const title = rawTitle.length > 80 ? `${rawTitle.slice(0, 77)}...` : rawTitle;
+                    const timestamp = data.lastEntry.timestamp ? formatTime(data.lastEntry.timestamp) : 'Unknown time';
+                    const link = url ? `<a href="${escapeHtml(url)}" target="_blank" style="color:#4f46e5;text-decoration:none;word-break:break-all;">${escapeHtml(url)}</a>` : '<span style="color:#9ca3af;">No URL captured</span>';
+
+                    return `
+                        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;border-bottom:1px solid #f3f4f6;">
+                            <div style="font-weight:700;color:#4f46e5;">${index + 1}.</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;color:#1f2937;">${escapeHtml(host)}</div>
+                                <div style="font-size:0.9rem;color:#6b7280;margin:4px 0;">${escapeHtml(title)}</div>
+                                <div style="font-size:0.8rem;color:#9ca3af;margin-bottom:6px;">
+                                    <i class="fas fa-clock"></i> ${timestamp} • ${data.count} visit${data.count > 1 ? 's' : ''}
+                                </div>
+                                <div style="font-size:0.85rem;">${link}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
 
             function switchTab(tabName) {
@@ -2374,8 +2317,29 @@
                 });
 
                 // Show selected tab
-                document.getElementById(`${tabName}-tab`).style.display = 'block';
+                const targetTab = document.getElementById(`${tabName}-tab`);
                 const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+
+                if (!targetTab || !activeBtn) return;
+
+                if (tabName === 'processes') {
+                    const pcName = document.getElementById('pcName').value.trim();
+                    if (!pcName) {
+                        alert('Please enter a PC name first');
+                        // Fallback to apps tab
+                        document.getElementById('apps-tab').style.display = 'block';
+                        const appsBtn = document.getElementById('tab-btn-apps');
+                        appsBtn.classList.add('active');
+                        appsBtn.style.color = '#4f46e5';
+                        appsBtn.style.borderBottomColor = '#4f46e5';
+                        return;
+                    }
+                    showTaskManager(pcName);
+                } else {
+                    hideTaskManager();
+                }
+
+                targetTab.style.display = 'block';
                 activeBtn.classList.add('active');
                 activeBtn.style.color = '#4f46e5';
                 activeBtn.style.borderBottomColor = '#4f46e5';
@@ -3026,49 +2990,34 @@
                     alert('Please enter a PC name first');
                     return;
                 }
-
-                // Show task manager section in status card
-                const taskManagerSection = document.getElementById('taskManagerSection');
-                if (taskManagerSection) {
-                    taskManagerSection.style.display = 'block';
-
-                    // Scroll to task manager section
-                    taskManagerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-                    // Start refreshing
-                    startTaskManagerRefresh(pcName);
-                }
+                startTaskManagerRefresh(pcName);
             }
 
             function hideTaskManager() {
-                const taskManagerSection = document.getElementById('taskManagerSection');
-                if (taskManagerSection) {
-                    taskManagerSection.style.display = 'none';
-                    stopTaskManagerRefresh();
-                }
-                const btn = document.getElementById('taskManagerBtn');
-                const btnText = document.getElementById('taskManagerBtnText');
-                if (btn && btnText) {
-                    btnText.textContent = 'Show Processes';
-                }
+                stopTaskManagerRefresh();
             }
 
-            function toggleTaskManager() {
-                const pcName = document.getElementById('pcName').value.trim();
-                if (!pcName) {
-                    alert('Please enter a PC name first');
-                    return;
+            function showHome() {
+                // Stop any active refreshes
+                stopAutoRefresh();
+                hideTaskManager();
+
+                // Switch views
+                document.getElementById('detailPage').classList.remove('active');
+                document.getElementById('homePage').classList.add('active');
+                document.getElementById('homePage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Reset header
+                const headerSubtitleEl = document.getElementById('headerSubtitle');
+                if (headerSubtitleEl) {
+                    headerSubtitleEl.innerHTML = '<span id="headerText">Enter PC name to get started</span><span class="auto-refresh-indicator" id="refreshIndicator" style="display: none;"><i class="fas fa-sync-alt"></i><span id="lastUpdateTime">Auto-refreshing...</span></span>';
                 }
 
-                const taskManagerSection = document.getElementById('taskManagerSection');
-                const btnText = document.getElementById('taskManagerBtnText');
-
-                if (taskManagerSection && taskManagerSection.style.display === 'none') {
-                    showTaskManager(pcName);
-                    if (btnText) btnText.textContent = 'Hide Processes';
-                } else {
-                    hideTaskManager();
-                }
+                // Clear URL params
+                const url = new URL(window.location);
+                url.searchParams.delete('pc');
+                url.searchParams.delete('date');
+                window.history.pushState({}, '', url);
             }
         </script>
 </body>
