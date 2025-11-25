@@ -1158,7 +1158,7 @@
 
             <div id="browser-tab" class="tab-content" style="display: none;">
                 <div class="chart-container">
-                    <div class="chart-title">Search Query Distribution</div>
+                    <div class="chart-title">Top Sites Visited</div>
                     <div class="chart-wrapper">
                         <canvas id="searchDistributionChart"></canvas>
                     </div>
@@ -1240,6 +1240,29 @@
             const SUPABASE_URL = 'https://uxhefdybgjluzkbodryd.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4aGVmZHliZ2psdXprYm9kcnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDExMzAsImV4cCI6MjA3NjM3NzEzMH0.jvFSOUUNiWvLFdPHplVuRgvKkvt2zlet6NA_x3mLaJM';
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            function sanitizePcNameInput(value) {
+                return (value || '').trim();
+            }
+
+            function buildCaseInsensitiveFilter(value) {
+                if (!value) return value;
+                return value
+                    .replace(/\\/g, '\\\\')
+                    .replace(/%/g, '\\%')
+                    .replace(/_/g, '\\_');
+            }
+
+            async function fetchPcRowCaseInsensitive(tableName, pcNameFilter) {
+                if (!pcNameFilter) return null;
+                const { data, error } = await supabase
+                    .from(tableName)
+                    .select('*')
+                    .ilike('pc_name', pcNameFilter)
+                    .limit(1);
+                if (error) throw error;
+                return data && data.length ? data[0] : null;
+            }
 
             // Set today's date as default
             document.getElementById('selectedDate').value = new Date().toISOString().split('T')[0];
@@ -1337,19 +1360,17 @@
             // Refresh only PC status (faster, every 5 seconds)
             async function refreshPcStatusOnly(pcName) {
                 try {
+                    const sanitizedPcName = sanitizePcNameInput(pcName);
+                    const pcNameFilter = buildCaseInsensitiveFilter(sanitizedPcName);
+                    let resolvedPcName = sanitizedPcName;
                     // Fetch PC status
                     let isOnline = false;
                     let statusData = null;
                     try {
-                        const { data: statusDataResult, error: statusError } = await supabase
-                            .from('pc_status')
-                            .select('*')
-                            .eq('pc_name', pcName)
-                            .single();
-
-                        if (!statusError && statusDataResult) {
-                            statusData = statusDataResult;
+                        statusData = await fetchPcRowCaseInsensitive('pc_status', pcNameFilter);
+                        if (statusData) {
                             isOnline = statusData.is_online || false;
+                            resolvedPcName = statusData.pc_name || resolvedPcName;
                         }
                     } catch (err) {
                         console.warn('Could not fetch PC status:', err);
@@ -1358,14 +1379,9 @@
                     // Fetch system info
                     let systemInfo = null;
                     try {
-                        const { data: systemInfoData, error: systemInfoError } = await supabase
-                            .from('system_info')
-                            .select('*')
-                            .eq('pc_name', pcName)
-                            .single();
-
-                        if (!systemInfoError && systemInfoData) {
-                            systemInfo = systemInfoData;
+                        systemInfo = await fetchPcRowCaseInsensitive('system_info', pcNameFilter);
+                        if (systemInfo && !resolvedPcName) {
+                            resolvedPcName = systemInfo.pc_name || resolvedPcName;
                         }
                     } catch (err) {
                         console.warn('Could not fetch system info:', err);
@@ -1375,7 +1391,8 @@
                     const selectedDate = document.getElementById('selectedDate').value || new Date().toISOString().split('T')[0];
 
                     // Update PC status only
-                    updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
+                    const displayName = resolvedPcName || sanitizedPcName;
+                    updatePcStatus(displayName, isOnline, statusData, systemInfo, selectedDate);
 
                     // Update last update time
                     updateLastUpdateTime();
@@ -1643,7 +1660,10 @@
             });
 
             async function loadData() {
-                const pcName = document.getElementById('pcName').value.trim();
+                const pcNameInput = document.getElementById('pcName').value;
+                const pcName = sanitizePcNameInput(pcNameInput);
+                const pcNameFilter = buildCaseInsensitiveFilter(pcName);
+                let resolvedPcName = pcName;
                 let selectedDate = document.getElementById('selectedDate').value;
 
                 if (!pcName) {
@@ -1661,7 +1681,10 @@
                 updateURL(pcName, selectedDate);
 
                 // Update header and show loading state
-                document.getElementById('headerSubtitle').textContent = `PC: ${pcName} • ${selectedDate}`;
+                const headerSubtitleEl = document.getElementById('headerSubtitle');
+                if (headerSubtitleEl) {
+                    headerSubtitleEl.textContent = `PC: ${pcName || 'Unknown'} • ${selectedDate}`;
+                }
                 document.getElementById('loadingMessage').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
                 document.getElementById('loadingMessage').style.display = 'block';
                 document.getElementById('statsGrid').style.display = 'none';
@@ -1674,15 +1697,10 @@
                     let isOnline = false;
                     let statusData = null;
                     try {
-                        const { data: statusDataResult, error: statusError } = await supabase
-                            .from('pc_status')
-                            .select('*')
-                            .eq('pc_name', pcName)
-                            .single();
-
-                        if (!statusError && statusDataResult) {
-                            statusData = statusDataResult;
+                        statusData = await fetchPcRowCaseInsensitive('pc_status', pcNameFilter);
+                        if (statusData) {
                             isOnline = statusData.is_online || false;
+                            resolvedPcName = statusData.pc_name || resolvedPcName;
                         }
                     } catch (err) {
                         // Table might not exist, use default offline status
@@ -1692,20 +1710,19 @@
                     // Fetch system info
                     let systemInfo = null;
                     try {
-                        const { data: systemInfoData, error: systemInfoError } = await supabase
-                            .from('system_info')
-                            .select('*')
-                            .eq('pc_name', pcName)
-                            .single();
-
-                        if (!systemInfoError && systemInfoData) {
-                            systemInfo = systemInfoData;
+                        systemInfo = await fetchPcRowCaseInsensitive('system_info', pcNameFilter);
+                        if (systemInfo && !resolvedPcName) {
+                            resolvedPcName = systemInfo.pc_name || resolvedPcName;
                         }
                     } catch (err) {
                         console.warn('Could not fetch system info:', err);
                     }
 
-                    updatePcStatus(pcName, isOnline, statusData, systemInfo, selectedDate);
+                    const displayPcName = resolvedPcName || pcName;
+                    if (headerSubtitleEl) {
+                        headerSubtitleEl.textContent = `PC: ${displayPcName || 'Unknown'} • ${selectedDate}`;
+                    }
+                    updatePcStatus(displayPcName, isOnline, statusData, systemInfo, selectedDate);
 
                     // Fetch app usage data
                     // Convert selected date to UTC date range for proper querying
@@ -1720,7 +1737,7 @@
                     const { data: appData, error: appError } = await supabase
                         .from('app_usage_logs')
                         .select('*')
-                        .eq('pc_name', pcName)
+                        .ilike('pc_name', pcNameFilter)
                         .gte('start_time', startDate)
                         .lte('start_time', endDate)
                         .order('start_time', { ascending: false });
@@ -1734,7 +1751,7 @@
                     const { data: idleData, error: idleError } = await supabase
                         .from('idle_logs')
                         .select('*')
-                        .eq('pc_name', pcName)
+                        .ilike('pc_name', pcNameFilter)
                         .gte('start_time', startDate)
                         .lte('start_time', endDate)
                         .order('start_time', { ascending: false });
@@ -1748,7 +1765,7 @@
                     const { data: searchData, error: searchError } = await supabase
                         .from('browser_search_logs')
                         .select('*')
-                        .eq('pc_name', pcName)
+                        .ilike('pc_name', pcNameFilter)
                         .gte('timestamp', startDate)
                         .lte('timestamp', endDate)
                         .order('timestamp', { ascending: false });
@@ -2282,12 +2299,29 @@
                 if (!chartCanvas) return;
 
                 const ctx = chartCanvas.getContext('2d');
-                const queryUsage = {};
+                const engineUsage = {};
 
                 searchData.forEach(entry => {
-                    const query = entry.search_query || 'Unknown';
-                    queryUsage[query] = (queryUsage[query] || 0) + 1;
+                    const engineName = (entry.search_engine && entry.search_engine.trim()) ||
+                        (entry.browser && entry.browser.trim()) ||
+                        'Unknown Source';
+                    engineUsage[engineName] = (engineUsage[engineName] || 0) + 1;
                 });
+
+                const sortedUsage = Object.entries(engineUsage)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 8);
+
+                const labels = sortedUsage.map(([label]) => label);
+                const data = sortedUsage.map(([, count]) => count);
+
+                if (labels.length === 0) {
+                    if (searchChart) {
+                        searchChart.destroy();
+                        searchChart = null;
+                    }
+                    return;
+                }
 
                 // Destroy existing chart
                 if (searchChart) {
@@ -2295,28 +2329,35 @@
                     searchChart = null;
                 }
 
-                const labels = Object.keys(queryUsage);
-                const data = Object.values(queryUsage);
-
-                if (labels.length === 0) return;
-
                 searchChart = new Chart(ctx, {
-                    type: 'doughnut',
+                    type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [{
+                            label: 'Visits',
                             data: data,
-                            backgroundColor: [
-                                '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
-                            ]
+                            backgroundColor: '#10b981'
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
                         plugins: {
                             legend: {
-                                position: 'right'
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.dataset.label}: ${context.parsed.y || context.parsed}`
+                                }
                             }
                         }
                     }
@@ -2698,7 +2739,9 @@
 
             // Task Manager Functions - Fetch from Supabase
             async function loadTaskManagerData(pcName) {
-                if (!pcName) return;
+                const sanitizedPcName = sanitizePcNameInput(pcName);
+                if (!sanitizedPcName) return;
+                const pcNameFilter = buildCaseInsensitiveFilter(sanitizedPcName);
 
                 try {
                     // Get recent app usage logs from the last 60 seconds
@@ -2708,7 +2751,7 @@
                     const { data: logs, error } = await supabase
                         .from('app_usage_logs')
                         .select('cpu_percent, memory_usage_bytes, end_time')
-                        .eq('pc_name', pcName)
+                        .ilike('pc_name', pcNameFilter)
                         .gte('end_time', sixtySecondsAgo.toISOString())
                         .order('end_time', { ascending: true })
                         .limit(100);
@@ -2718,17 +2761,13 @@
                     }
 
                     // Get system info
-                    const { data: systemInfo } = await supabase
-                        .from('system_info')
-                        .select('*')
-                        .eq('pc_name', pcName)
-                        .single();
+                    const systemInfo = await fetchPcRowCaseInsensitive('system_info', pcNameFilter);
 
                     // Get latest stats
                     const { data: latestLog } = await supabase
                         .from('app_usage_logs')
                         .select('cpu_percent, memory_usage_bytes')
-                        .eq('pc_name', pcName)
+                        .ilike('pc_name', pcNameFilter)
                         .order('end_time', { ascending: false })
                         .limit(1)
                         .single();

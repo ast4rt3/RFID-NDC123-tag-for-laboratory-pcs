@@ -22,6 +22,26 @@ class SupabaseDB {
     this.client = supabase;
   }
 
+  // Helper for retrying operations with exponential backoff
+  async retryOperation(operation, maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (err) {
+        const isLastAttempt = attempt === maxRetries;
+        const isNetworkError = err.message && err.message.includes('fetch failed');
+
+        if (isNetworkError && !isLastAttempt) {
+          const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
+          console.warn(`⚠️ Network error, retrying in ${delay}ms (attempt ${attempt}/${maxRetries})...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          throw err; // Re-throw if not a network error or last attempt
+        }
+      }
+    }
+  }
+
   // Test connection
   async testConnection() {
     try {
@@ -35,7 +55,6 @@ class SupabaseDB {
         return false;
       }
 
-      // Connected to Supabase successfully
       return true;
     } catch (err) {
       console.error('❌ Supabase connection error:', err.message);
@@ -45,28 +64,29 @@ class SupabaseDB {
 
   // Insert time log
   async insertTimeLog(pcName, startTime, endTime, duration) {
-    const { data, error } = await this.client
-      .from('time_logs')
-      .insert({
-        pc_name: pcName,
-        start_time: startTime,
-        end_time: endTime,
-        duration_seconds: duration
-      })
-      .select();
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('time_logs')
+          .insert({
+            pc_name: pcName,
+            start_time: startTime,
+            end_time: endTime,
+            duration_seconds: duration
+          })
+          .select();
 
-    if (error) {
+        if (error) throw error;
+        return true;
+      });
+    } catch (error) {
       console.error('❌ Error inserting time log:', error.message);
       return false;
     }
-
-    // Time log saved silently
-    return true;
   }
 
   // Insert app usage log
   async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent, cpuTemperature, isCpuOverclocked, isRamOverclocked) {
-    // Build the data object, conditionally including optional fields
     const logData = {
       pc_name: pcName,
       app_name: appName,
@@ -77,88 +97,86 @@ class SupabaseDB {
       cpu_percent: cpuPercent
     };
 
-    // Only include gpu_percent if it's provided (for backward compatibility)
     if (gpuPercent !== null && gpuPercent !== undefined) {
       logData.gpu_percent = gpuPercent;
     }
-
-    // Only include cpu_temperature if it's provided
     if (cpuTemperature !== null && cpuTemperature !== undefined) {
       logData.cpu_temperature = cpuTemperature;
     }
-
-    // Only include is_cpu_overclocked if it's provided
     if (isCpuOverclocked !== null && isCpuOverclocked !== undefined) {
       logData.is_cpu_overclocked = isCpuOverclocked;
     }
-
-    // Only include is_ram_overclocked if it's provided
     if (isRamOverclocked !== null && isRamOverclocked !== undefined) {
       logData.is_ram_overclocked = isRamOverclocked;
     }
 
-    const { data, error } = await this.client
-      .from('app_usage_logs')
-      .upsert(logData, {
-        onConflict: 'pc_name,app_name,start_time'
-      })
-      .select();
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('app_usage_logs')
+          .upsert(logData, {
+            onConflict: 'pc_name,app_name,start_time'
+          })
+          .select();
 
-    if (error) {
+        if (error) throw error;
+        return true;
+      });
+    } catch (error) {
       console.error('❌ Error inserting app usage log:', error.message);
       return false;
     }
-
-    // App usage log saved silently
-    return true;
   }
 
   // Insert browser search log
   async insertBrowserSearchLog(pcName, browser, url, searchQuery, searchEngine, timestamp) {
-    const { data, error } = await this.client
-      .from('browser_search_logs')
-      .upsert({
-        pc_name: pcName,
-        browser: browser,
-        url: url,
-        search_query: searchQuery,
-        search_engine: searchEngine,
-        timestamp: timestamp
-      }, {
-        onConflict: 'pc_name,browser,url,timestamp'
-      })
-      .select();
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('browser_search_logs')
+          .upsert({
+            pc_name: pcName,
+            browser: browser,
+            url: url,
+            search_query: searchQuery,
+            search_engine: searchEngine,
+            timestamp: timestamp
+          }, {
+            onConflict: 'pc_name,browser,url,timestamp'
+          })
+          .select();
 
-    if (error) {
+        if (error) throw error;
+        return true;
+      });
+    } catch (error) {
       console.error('❌ Error inserting browser search log:', error.message);
       return false;
     }
-
-    // Browser search log saved silently
-    return true;
   }
 
   // Insert idle log
   async insertIdleLog(pcName, startTime, endTime, duration) {
-    const { data, error } = await this.client
-      .from('idle_logs')
-      .insert({
-        pc_name: pcName,
-        start_time: startTime,
-        end_time: endTime,
-        duration_seconds: duration
-      })
-      .select();
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('idle_logs')
+          .insert({
+            pc_name: pcName,
+            start_time: startTime,
+            end_time: endTime,
+            duration_seconds: duration
+          })
+          .select();
 
-    if (error) {
+        if (error) throw error;
+        return true;
+      });
+    } catch (error) {
       console.error('❌ Error inserting idle log:', error.message);
       return false;
     }
-
-    // Idle log saved silently
-    return true;
   }
-
 
   // Get time logs
   async getTimeLogs(limit = 100) {
@@ -240,7 +258,6 @@ class SupabaseDB {
 
   // Get summary statistics
   async getSummaryStats(pcName, selectedDate) {
-    // Get app usage stats
     const { data: appStats, error: appError } = await this.client
       .from('app_usage_logs')
       .select('duration_seconds, memory_usage_bytes, cpu_percent')
@@ -248,7 +265,6 @@ class SupabaseDB {
       .gte('start_time', `${selectedDate} 00:00:00`)
       .lte('start_time', `${selectedDate} 23:59:59`);
 
-    // Get browser search stats
     const { data: searchStats, error: searchError } = await this.client
       .from('browser_search_logs')
       .select('search_query, search_engine')
@@ -267,7 +283,7 @@ class SupabaseDB {
     };
   }
 
-  // Upsert system information (insert or update)
+  // Upsert system information
   async upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname) {
     const systemData = {
       pc_name: pcName,
@@ -280,38 +296,42 @@ class SupabaseDB {
       hostname: hostname
     };
 
-    const { data, error } = await this.client
-      .from('system_info')
-      .upsert(systemData, {
-        onConflict: 'pc_name'
-      })
-      .select();
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('system_info')
+          .upsert(systemData, {
+            onConflict: 'pc_name'
+          })
+          .select();
 
-    if (error) {
+        if (error) throw error;
+        return data;
+      });
+    } catch (error) {
       console.error('❌ Error upserting system info:', error.message);
       throw error;
     }
-
-    // System info upserted silently
-    return data;
   }
 
   // Update PC status
   async updatePCStatus(pcStatus) {
-    const { data, error } = await this.client
-      .from('pc_status')
-      .upsert(pcStatus, {
-        onConflict: 'pc_name'
-      })
-      .select();
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('pc_status')
+          .upsert(pcStatus, {
+            onConflict: 'pc_name'
+          })
+          .select();
 
-    if (error) {
+        if (error) throw error;
+        return data;
+      });
+    } catch (error) {
       console.error('❌ Error updating PC status:', error.message);
       throw error;
     }
-
-    // PC status updated silently
-    return data;
   }
 
   // Get all PC statuses

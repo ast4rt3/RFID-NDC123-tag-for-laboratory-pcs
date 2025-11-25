@@ -6,6 +6,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const si = require('systeminformation');
+const sqlite3 = require('sqlite3');
 
 const config = require('./config');
 const logStream = fs.createWriteStream('rfid-client-debug.log', { flags: 'a' });
@@ -60,16 +61,51 @@ let isIdle = false;
 let idleStartTime = null;
 const IDLE_THRESHOLD_MS = 1 * 60 * 1000; // 1 minute
 
+// Browser tracking to prevent duplicate logs
+let lastBrowserActivityKey = null;
+
 // Interval references (for cleanup)
 let appUsageInterval = null;
 let idleCheckInterval = null;
 let heartbeatInterval = null;
 let heartbeatTimeout = null;
 let systemInfoTimeout = null;
+let browserHistoryInterval = null;
 
 const IGNORED_APPS = [
   // Add more as needed
 ];
+
+const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+const browserHistoryTempDir = path.join(os.tmpdir(), 'rfid-browser-history');
+if (!fs.existsSync(browserHistoryTempDir)) {
+  try {
+    fs.mkdirSync(browserHistoryTempDir, { recursive: true });
+  } catch (err) {
+    console.error('❌ Failed to create temp dir for browser history:', err.message);
+  }
+}
+
+const CHROME_EPOCH_OFFSET_MS = 11644473600000;
+const BROWSER_HISTORY_POLL_INTERVAL = 7000;
+const CHROMIUM_HISTORY_SOURCES = [
+  {
+    key: 'chrome',
+    label: 'Google Chrome',
+    path: path.join(localAppData, 'Google', 'Chrome', 'User Data', 'Default', 'History')
+  },
+  {
+    key: 'edge',
+    label: 'Microsoft Edge',
+    path: path.join(localAppData, 'Microsoft', 'Edge', 'User Data', 'Default', 'History')
+  },
+  {
+    key: 'brave',
+    label: 'Brave Browser',
+    path: path.join(localAppData, 'BraveSoftware', 'Brave-Browser', 'User Data', 'Default', 'History')
+  }
+];
+const browserHistoryState = new Map();
 
 // Browser detection and data extraction functions
 function isBrowserApp(appName) {
@@ -212,6 +248,134 @@ function extractBrowserData(appName, windowTitle, windowUrl) {
 
   console.log('🔍 Final extraction result:', result);
   return result;
+}
+
+function chromeTimeToUnixMs(chromeTime) {
+  if (!chromeTime) return 0;
+  return Math.round(chromeTime / 1000 - CHROME_EPOCH_OFFSET_MS);
+}
+
+function getHostnameFromUrl(url) {
+  if (!url) return '';
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
+function copyFileSafely(source, destination) {
+  return new Promise((resolve, reject) => {
+    const dir = path.dirname(destination);
+    fs.promises.mkdir(dir, { recursive: true }).catch(() => { /* ignore */ }).finally(() => {
+      const readStream = fs.createReadStream(source);
+      readStream.on('error', reject);
+      const writeStream = fs.createWriteStream(destination);
+      writeStream.on('error', reject);
+      writeStream.on('close', resolve);
+      readStream.pipe(writeStream);
+    });
+  });
+}
+
+async function readBrowserHistoryRows(source) {
+  if (!source.path || !fs.existsSync(source.path)) {
+    return [];
+  }
+
+  const tempPath = path.join(browserHistoryTempDir, `${source.key}-history.sqlite`);
+  try {
+    await copyFileSafely(source.path, tempPath);
+  } catch (error) {
+    console.warn(`⚠️ Unable to copy history for ${source.label}:`, error.message);
+    return [];
+  }
+
+  return new Promise((resolve) => {
+    const rowsResult = [];
+    const db = new sqlite3.Database(tempPath, sqlite3.OPEN_READONLY, (err) => {
+      if (err) {
+        console.warn(`⚠️ Unable to open history DB for ${source.label}:`, err.message);
+        return resolve([]);
+      }
+
+      const query = `
+        SELECT urls.url AS url, urls.title AS title, visits.visit_time AS visit_time
+        FROM visits
+        JOIN urls ON visits.url = urls.id
+        WHERE urls.url NOT LIKE 'chrome://%' AND urls.url NOT LIKE 'edge://%' AND urls.url NOT LIKE 'brave://%'
+        ORDER BY visits.visit_time DESC
+        LIMIT 25;
+      `;
+
+      db.all(query, [], (error, rows) => {
+        db.close();
+        if (error) {
+          console.warn(`⚠️ Failed to read history for ${source.label}:`, error.message);
+          return resolve([]);
+        }
+        resolve(rows || rowsResult);
+      });
+    });
+  });
+}
+
+async function pollBrowserHistory() {
+  for (const source of CHROMIUM_HISTORY_SOURCES) {
+    try {
+      const rows = await readBrowserHistoryRows(source);
+      if (!rows.length) {
+        continue;
+      }
+
+      const latestVisit = rows[0]?.visit_time || 0;
+      if (!browserHistoryState.has(source.key)) {
+        browserHistoryState.set(source.key, latestVisit);
+        continue;
+      }
+
+      const lastProcessed = browserHistoryState.get(source.key) || 0;
+      const newRows = rows.filter(row => row.visit_time > lastProcessed);
+      if (!newRows.length) {
+        continue;
+      }
+
+      browserHistoryState.set(source.key, Math.max(latestVisit, lastProcessed));
+      newRows.reverse().forEach(row => {
+        const visitMs = chromeTimeToUnixMs(row.visit_time);
+        if (!visitMs || Number.isNaN(visitMs)) {
+          return;
+        }
+        const timestamp = new Date(visitMs).toISOString();
+        const url = row.url || '';
+        const hostname = getHostnameFromUrl(url);
+        const title = row.title && row.title.trim().length ? row.title : (hostname || 'Unknown page');
+
+        sendMessage({
+          type: 'browser_activity',
+          pc_name: pcName,
+          browser: source.label,
+          url,
+          search_query: title,
+          search_engine: hostname || source.label,
+          timestamp
+        });
+        console.log(`🌐 Logged browser visit from ${source.label}:`, { title, url, timestamp });
+      });
+    } catch (error) {
+      console.warn(`⚠️ Browser history poll failed for ${source.label}:`, error.message);
+    }
+  }
+}
+
+function setupBrowserHistoryTracking() {
+  if (browserHistoryInterval) {
+    return;
+  }
+  pollBrowserHistory();
+  browserHistoryInterval = setInterval(() => {
+    pollBrowserHistory();
+  }, BROWSER_HISTORY_POLL_INTERVAL);
 }
 
 function extractSearchFromURL(url) {
@@ -474,6 +638,10 @@ function cleanupIntervals() {
     clearTimeout(systemInfoTimeout);
     systemInfoTimeout = null;
   }
+  if (browserHistoryInterval) {
+    clearInterval(browserHistoryInterval);
+    browserHistoryInterval = null;
+  }
 }
 
 function setupAppUsageTracking() {
@@ -529,14 +697,17 @@ function setupAppUsageTracking() {
 
       // Blacklist specific patterns that should not be logged
       const blacklistPatterns = [
-        /^New tab - Personal$/i,
-        /^New tab and \d+ more pages? - Personal$/i,
-        /^New tab$/i,
-        /^New Tab$/i
+        /^New tab(?: - (?:Personal|Work|Default|Profile \d+))?$/i,
+        /^New tab and \d+ more pages? - (?:Personal|Work|Default|Profile \d+)$/i,
+        /^New private tab$/i,
+        /^New tab - \[InPrivate\]$/i,
+        /^New (?:Incognito|InPrivate) window$/i,
+        /^Start page$/i,
+        /^Home$/i
       ];
 
       const isBlacklisted = browserData.searchQuery &&
-        blacklistPatterns.some(pattern => pattern.test(browserData.searchQuery));
+        blacklistPatterns.some(pattern => pattern.test(browserData.searchQuery.trim()));
 
       // Only log if we have a valid search query and it's not blacklisted
       const hasValidSearchQuery = browserData.searchQuery &&
@@ -545,8 +716,10 @@ function setupAppUsageTracking() {
 
       const hasValidUrl = windowUrl && windowUrl.trim().length > 0 && !windowUrl.includes('newtab');
 
-      if (hasValidSearchQuery || hasValidUrl) {
-        // Send browser activity data only if we have meaningful data
+      const activityKey = `${appName}::${browserData.searchQuery || ''}::${windowUrl || ''}`;
+
+      if ((hasValidSearchQuery || hasValidUrl) && activityKey !== lastBrowserActivityKey) {
+        // Send browser activity data only if we have meaningful data AND the URL changed
         sendMessage({
           type: 'browser_activity',
           pc_name: pcName,
@@ -556,11 +729,16 @@ function setupAppUsageTracking() {
           search_engine: browserData.searchEngine,
           timestamp: now.toISOString()
         });
-        console.log('🔍 Sent browser activity to server:', {
+        console.log('🔍 Sent browser activity to server (URL changed):', {
           query: browserData.searchQuery,
           engine: browserData.searchEngine,
           url: windowUrl
         });
+
+        // Update last activity signature
+        lastBrowserActivityKey = activityKey;
+      } else if (activityKey === lastBrowserActivityKey) {
+        console.log('🔍 Skipping browser activity - no change in URL/title signature');
       } else {
         console.log('🔍 Skipping browser activity - blacklisted or no valid data:', browserData.searchQuery);
       }
@@ -785,6 +963,7 @@ function connect() {
       setupAppUsageTracking();
       setupIdleDetection();
       setupHeartbeat();
+      setupBrowserHistoryTracking();
 
       // Send buffered messages first (if any)
       await sendBufferedMessages();

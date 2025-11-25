@@ -293,6 +293,7 @@
                 // Fetch app usage data using select('*') to avoid column errors
                 let currentApp = null;
                 let recentApps = [];
+                let recentSearches = [];
                 try {
                     const { data: currentAppData } = await supabase
                         .from('app_usage_logs')
@@ -308,20 +309,28 @@
                         .select('*')
                         .eq('pc_name', currentPcName)
                         .order('start_time', { ascending: false })
-                        .limit(4); // Limited to 4 apps
+                        .limit(10); // Grab more rows to filter duplicates
                     recentApps = recentAppsData || [];
+
+                    const { data: recentSearchesData } = await supabase
+                        .from('browser_search_logs')
+                        .select('*')
+                        .eq('pc_name', currentPcName)
+                        .order('timestamp', { ascending: false })
+                        .limit(4);
+                    recentSearches = recentSearchesData || [];
                 } catch (e) {
                     console.warn('Error fetching app data:', e);
                 }
 
-                displayPCInfo(statusData, sysInfo, currentApp, recentApps);
+                displayPCInfo(statusData, sysInfo, currentApp, recentApps, recentSearches);
             } catch (error) {
                 console.error('Error:', error);
                 if (!isBackgroundRefresh) showError('Failed to fetch PC information. Please try again.');
             }
         }
 
-        function displayPCInfo(status, sysInfo, currentApp, recentApps) {
+        function displayPCInfo(status, sysInfo, currentApp, recentApps, recentSearches) {
             document.getElementById('scanCard').style.display = 'none';
             const pcInfo = document.getElementById('pcInfo');
             const isOnline = status.is_online;
@@ -333,9 +342,24 @@
             // Use window_title if available, otherwise fallback or empty
             const currentAppWindow = currentApp && currentApp.window_title ? currentApp.window_title : '';
 
-            let recentAppsHtml = '';
+            const uniqueRecentApps = [];
             if (recentApps && recentApps.length > 0) {
-                recentAppsHtml = recentApps.map(app => {
+                for (const app of recentApps) {
+                    const currentName = (app.app_name || 'Unknown').trim();
+                    if (!currentName) continue;
+                    const lastEntry = uniqueRecentApps[uniqueRecentApps.length - 1];
+                    if (lastEntry && lastEntry.app_name === currentName) {
+                        continue;
+                    }
+                    uniqueRecentApps.push({ ...app, app_name: currentName });
+                    if (uniqueRecentApps.length === 4) break;
+                }
+            }
+
+            let recentAppsHtml = '';
+            const appsForDisplay = uniqueRecentApps.length > 0 ? uniqueRecentApps : (recentApps || []);
+            if (appsForDisplay && appsForDisplay.length > 0) {
+                recentAppsHtml = appsForDisplay.slice(0, 4).map(app => {
                     const startTime = new Date(app.start_time);
                     const timeStr = startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     const windowTitle = app.window_title || '';
@@ -354,6 +378,37 @@
                 }).join('');
             } else {
                 recentAppsHtml = '<div style="text-align: center; color: #9ca3af; padding: 20px;">No recent activity</div>';
+            }
+
+            let recentSearchesHtml = '';
+            if (recentSearches && recentSearches.length > 0) {
+                recentSearchesHtml = recentSearches.map(search => {
+                    const timestamp = search.timestamp ? new Date(search.timestamp) : null;
+                    const timeStr = timestamp ? timestamp.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    }) : 'No time recorded';
+                    const query = search.search_query && search.search_query.trim() ? search.search_query : 'No query captured';
+                    const engine = search.search_engine || search.browser || 'Unknown source';
+                    const urlLink = search.url ? `<a href="${search.url}" target="_blank" style="color:#4f46e5; text-decoration:none; word-break:break-all;">Open link</a>` : '<span style="color:#9ca3af;">No URL captured</span>';
+                    return `
+                        <div style="padding: 10px; background: white; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #10b981;">
+                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">
+                                <i class="fas fa-search" style="color: #10b981; margin-right: 6px;"></i>
+                                ${query}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 4px;">
+                                ${engine} • ${urlLink}
+                            </div>
+                            <div style="font-size: 0.75rem; color: #9ca3af;">
+                                <i class="fas fa-clock"></i> ${timeStr}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                recentSearchesHtml = '<div style="text-align: center; color: #9ca3af; padding: 20px;">No browser searches recorded</div>';
             }
 
             // System Info Section
@@ -408,6 +463,14 @@
                     </div>
                     <div style="max-height: 300px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 12px;">
                         ${recentAppsHtml}
+                    </div>
+                </div>
+                <div style="margin-top: 25px;">
+                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 15px; font-size: 1.1rem;">
+                        <i class="fas fa-search"></i> Recent Browser Searches
+                    </div>
+                    <div style="max-height: 300px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 12px;">
+                        ${recentSearchesHtml}
                     </div>
                 </div>
                 ${systemInfoHtml}
