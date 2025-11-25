@@ -9,6 +9,48 @@
     <link rel="icon" href="icon.ico">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            /* Light mode colors */
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --container-bg: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #64748b;
+            --text-heading: #1f2937;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --navbar-bg: #ffffff;
+            --navbar-shadow: rgba(0, 0, 0, 0.1);
+            --input-bg: #ffffff;
+            --input-border: #e5e7eb;
+            --stat-card-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            --controls-bg: #f8fafc;
+            --table-header-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --pc-card-bg: #ffffff;
+            --empty-state-bg: #f8fafc;
+        }
+
+        body.dark-mode {
+            /* Dark mode colors */
+            --bg-gradient-start: #1f2937;
+            --bg-gradient-end: #111827;
+            --container-bg: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-heading: #f9fafb;
+            --card-bg: #374151;
+            --card-border: #4b5563;
+            --navbar-bg: #1f2937;
+            --navbar-shadow: rgba(0, 0, 0, 0.3);
+            --input-bg: #374151;
+            --input-border: #4b5563;
+            --stat-card-bg: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            --controls-bg: #1f2937;
+            --table-header-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --pc-card-bg: #374151;
+            --empty-state-bg: #1f2937;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,21 +59,23 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-primary);
             padding: 0;
             padding-top: 60px;
+            transition: all 0.3s ease;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: var(--container-bg);
             border-radius: 0;
             box-shadow: none;
             overflow: hidden;
             padding: 20px;
+            transition: all 0.3s ease;
         }
 
         .header {
@@ -110,11 +154,12 @@
         .form-group input,
         .form-group select {
             padding: 12px 16px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--input-border);
             border-radius: 10px;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-primary);
         }
 
         .form-group input:focus,
@@ -154,11 +199,11 @@
         }
 
         .pc-status-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--card-border);
             transition: all 0.3s ease;
         }
 
@@ -337,11 +382,12 @@
         }
 
         .chart-container {
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
 
         .chart-wrapper {
@@ -367,10 +413,11 @@
         }
 
         .data-table {
-            background: white;
+            background: var(--card-bg);
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
 
         table {
@@ -528,11 +575,11 @@
         }
 
         .pc-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            background: var(--pc-card-bg);
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--card-border);
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
@@ -913,12 +960,13 @@
             left: 0;
             right: 0;
             height: 60px;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: var(--navbar-bg);
+            box-shadow: 0 2px 4px var(--navbar-shadow);
             z-index: 1000;
             display: flex;
             align-items: center;
             padding: 0 20px;
+            transition: all 0.3s ease;
         }
 
         .navbar-container {
@@ -1015,6 +1063,69 @@
                 padding: 8px 20px;
             }
         }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background-color: #4f46e5;
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Navbar input styles */
+        .navbar-input {
+            padding: 8px 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-right: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
     </style>
 </head>
 
@@ -1029,19 +1140,27 @@
                 </a>
             </div>
             <div class="navbar-center">
-                <button class="navbar-item active" id="nav-home" onclick="showHome()" title="Home">
+                <button class="navbar-item active" id="nav-home" onclick="showPage('home')" title="Home">
                     <i class="fas fa-home"></i>
                 </button>
                 <button class="navbar-item" id="nav-dashboard" onclick="return false;" title="Dashboard"
                     style="display: none;">
                     <i class="fas fa-chart-line"></i>
                 </button>
+                <button class="navbar-item" id="nav-analytics" onclick="showPage('analytics')" title="Analytics">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+                <button class="navbar-item" id="nav-notifications" onclick="showPage('notifications')"
+                    title="Notifications">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="navbar-item" id="nav-settings" onclick="showPage('settings')" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
             </div>
             <div class="navbar-right">
-                <input type="text" id="pcName" placeholder="PC Name"
-                    style="padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; width: 150px; margin-right: 8px;">
-                <input type="date" id="selectedDate"
-                    style="padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; margin-right: 8px;">
+                <input type="text" id="pcName" placeholder="PC Name" class="navbar-input" style="width: 150px;">
+                <input type="date" id="selectedDate" class="navbar-input">
                 <button onclick="loadData()"
                     style="padding: 8px 16px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;">
                     <i class="fas fa-search"></i> Search
@@ -1064,6 +1183,57 @@
             <div class="pcs-grid" id="pcsGrid">
                 <div class="loading">
                     <i class="fas fa-spinner fa-spin"></i> Loading PCs...
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Page -->
+        <div class="home-container" id="analyticsPage">
+            <div class="form-group">
+                <h2 class="page-title">Analytics</h2>
+                <p class="page-subtitle">System-wide analytics and insights</p>
+            </div>
+            <div style="padding: 60px 20px; text-align: center; color: #64748b;">
+                <i class="fas fa-chart-bar" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                <h3>Analytics Coming Soon</h3>
+                <p>This section will display system-wide analytics and insights.</p>
+            </div>
+        </div>
+
+        <!-- Notifications Page -->
+        <div class="home-container" id="notificationsPage">
+            <div class="form-group">
+                <h2 class="page-title">Notifications</h2>
+                <p class="page-subtitle">System alerts and updates</p>
+            </div>
+            <div style="padding: 60px 20px; text-align: center; color: #64748b;">
+                <i class="fas fa-bell" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                <h3>No Notifications</h3>
+                <p>You're all caught up! No new notifications at this time.</p>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="home-container" id="settingsPage">
+            <div class="form-group">
+                <h2 class="page-title">Settings</h2>
+                <p class="page-subtitle">Customize your experience</p>
+            </div>
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div
+                    style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom: 20px; color: #1f2937;">Appearance</h3>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #e5e7eb;">
+                        <div>
+                            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Dark Mode</div>
+                            <div style="font-size: 0.85rem; color: #64748b;">Toggle between light and dark theme</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3137,6 +3307,73 @@
                 url.searchParams.delete('pc');
                 url.searchParams.delete('date');
                 window.history.pushState({}, '', url);
+            }
+
+            // Page navigation function
+            function showPage(pageName) {
+                // Stop any active refreshes
+                stopAutoRefresh();
+                hideTaskManager();
+
+                // Hide all pages
+                document.getElementById('homePage').classList.remove('active');
+                document.getElementById('detailPage').classList.remove('active');
+                document.getElementById('analyticsPage').classList.remove('active');
+                document.getElementById('notificationsPage').classList.remove('active');
+                document.getElementById('settingsPage').classList.remove('active');
+
+                // Update navbar
+                document.querySelectorAll('.navbar-item').forEach(item => item.classList.remove('active'));
+
+                // Show selected page
+                if (pageName === 'home') {
+                    document.getElementById('homePage').classList.add('active');
+                    document.getElementById('nav-home').classList.add('active');
+                    document.getElementById('homePage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Clear URL params
+                    const url = new URL(window.location);
+                    url.searchParams.delete('pc');
+                    url.searchParams.delete('date');
+                    window.history.pushState({}, '', url);
+                } else if (pageName === 'analytics') {
+                    document.getElementById('analyticsPage').classList.add('active');
+                    document.getElementById('nav-analytics').classList.add('active');
+                    document.getElementById('analyticsPage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else if (pageName === 'notifications') {
+                    document.getElementById('notificationsPage').classList.add('active');
+                    document.getElementById('nav-notifications').classList.add('active');
+                    document.getElementById('notificationsPage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else if (pageName === 'settings') {
+                    document.getElementById('settingsPage').classList.add('active');
+                    document.getElementById('nav-settings').classList.add('active');
+                    document.getElementById('settingsPage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            // Dark mode toggle
+            function toggleDarkMode() {
+                const isDark = document.getElementById('darkModeToggle').checked;
+                if (isDark) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            }
+
+            // Load dark mode preference on page load
+            window.addEventListener('DOMContentLoaded', () => {
+                const darkMode = localStorage.getItem('darkMode');
+                if (darkMode === 'enabled') {
+                    document.getElementById('darkModeToggle').checked = true;
+                    toggleDarkMode();
+                }
+            });
+
+            // Update showHome to use showPage
+            function showHome() {
+                showPage('home');
             }
         </script>
 </body>
