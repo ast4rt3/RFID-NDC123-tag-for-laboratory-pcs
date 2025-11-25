@@ -2731,17 +2731,30 @@
                 activeBtn.style.color = '#4f46e5';
                 activeBtn.style.borderBottomColor = '#4f46e5';
 
-                // Scroll to tabs navigation
+                // Scroll to tabs navigation if we are below it
+                // Scroll to tabs navigation if we are below it
                 const tabsNav = document.querySelector('.tabs-nav');
-                const container = document.getElementById('detailPage');
-                if (tabsNav && container) {
-                    const offset = 400; // Height of sticky header/navbar offset
-                    // Calculate true document position
-                    const targetPosition = container.offsetTop + tabsNav.offsetTop - offset;
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: 'smooth'
-                    });
+                if (tabsNav) {
+                    const stickyOffset = 70; // Matches CSS top: 70px
+
+                    // Calculate absolute position by traversing offset parents
+                    let el = tabsNav;
+                    let tabsTop = 0;
+                    while (el) {
+                        tabsTop += el.offsetTop;
+                        el = el.offsetParent;
+                    }
+
+                    const targetPosition = tabsTop - stickyOffset;
+
+                    // Only scroll if we are currently scrolled PAST this point (deeper in the page)
+                    // Add a small buffer (10px) to prevent jitter if close
+                    if (window.pageYOffset > (targetPosition + 10)) {
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             }
 
