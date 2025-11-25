@@ -20,16 +20,18 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
-            padding: 20px;
+            padding: 0;
+            padding-top: 60px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+            box-shadow: none;
             overflow: hidden;
+            padding: 20px;
         }
 
         .header {
@@ -903,45 +905,161 @@
                 width: 100%;
             }
         }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .navbar-logo i {
+            font-size: 1.8rem;
+        }
+
+        .navbar-center {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            max-width: 600px;
+        }
+
+        .navbar-item {
+            padding: 8px 40px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #65676b;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .navbar-item:hover {
+            background: #f0f2f5;
+        }
+
+        .navbar-item.active {
+            color: #4f46e5;
+        }
+
+        .navbar-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #4f46e5;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 10px;
+            }
+
+            .navbar-logo span {
+                display: none;
+            }
+
+            .navbar-center {
+                gap: 4px;
+            }
+
+            .navbar-item {
+                padding: 8px 20px;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-desktop"></i> ICS Lab Monitor</h1>
-            <div class="subtitle" id="headerSubtitle">
-
-                <span class="auto-refresh-indicator" id="refreshIndicator" style="display: none;">
-                    <i class="fas fa-sync-alt"></i>
-                    <span id="lastUpdateTime">Auto-refreshing...</span>
-                </span>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="navbar-logo" onclick="showHome(); return false;">
+                    <i class="fas fa-desktop"></i>
+                    <span>ICS Lab Monitor</span>
+                </a>
+            </div>
+            <div class="navbar-center">
+                <button class="navbar-item active" id="nav-home" onclick="showHome()" title="Home">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button class="navbar-item" id="nav-dashboard" onclick="return false;" title="Dashboard"
+                    style="display: none;">
+                    <i class="fas fa-chart-line"></i>
+                </button>
+            </div>
+            <div class="navbar-right">
+                <input type="text" id="pcName" placeholder="PC Name"
+                    style="padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; width: 150px; margin-right: 8px;">
+                <input type="date" id="selectedDate"
+                    style="padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; margin-right: 8px;">
+                <button onclick="loadData()"
+                    style="padding: 8px 16px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-search"></i> Search
+                </button>
             </div>
         </div>
+    </nav>
+
+    <div class="container">
+
 
         <!-- Home/Dashboard Page -->
         <div class="home-container active" id="homePage">
 
 
-            <div class="controls" style="margin-bottom: 25px;">
-
-                <div class="control-group">
-
-                    <div class="form-group">
-                        <h2 class="page-title">Available PCs</h2>
-                        <p class="page-subtitle">Click on a PC or search manually to view its details and activity</p>
-                        <label for="pcName"><i class="fas fa-desktop"></i> PC Name</label>
-                        <input type="text" id="pcName" placeholder="Enter PC name (e.g., i3S)">
-                    </div>
-                    <div class="form-group">
-                        <label for="selectedDate"><i class="fas fa-calendar"></i> Date</label>
-                        <input type="date" id="selectedDate">
-                    </div>
-                    <button class="btn" onclick="loadData()">
-                        <i class="fas fa-search"></i>
-                        Load Data
-                    </button>
-                </div>
+            <div class="form-group">
+                <h2 class="page-title">Available PCs</h2>
+                <p class="page-subtitle">Click on a PC or search manually to view its details and activity</p>
             </div>
             <div class="pcs-grid" id="pcsGrid">
                 <div class="loading">
@@ -952,10 +1070,6 @@
 
         <!-- Detail Section -->
         <div class="home-container" id="detailPage">
-            <button class="btn" onclick="showHome()"
-                style="margin-bottom: 20px; background: transparent; color: #4f46e5; border: 2px solid #4f46e5; padding: 8px 20px; font-size: 0.9rem;">
-                <i class="fas fa-arrow-left"></i> Home
-            </button>
 
             <!-- PC Status Card -->
             <div class="pc-status-container" id="pcStatusContainer" style="display:none;">
@@ -1012,7 +1126,7 @@
                 </button>
                 <button class="tab-btn" onclick="switchTab('processes')" id="tab-btn-processes"
                     style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
-                    <i class="fas fa-tasks"></i> Processes
+                    <i class="fas fa-tasks"></i> Performance
                 </button>
             </div>
 
@@ -1632,6 +1746,12 @@
                 const detailPage = document.getElementById('detailPage');
                 detailPage.classList.add('active');
                 detailPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Update navbar
+                document.getElementById('nav-home').classList.remove('active');
+                document.getElementById('nav-dashboard').classList.add('active');
+                document.getElementById('nav-dashboard').style.display = 'flex';
+                // navbarSubtitle removed - search inputs are in navbar now
 
                 // Update header and show loading state
                 const headerSubtitleEl = document.getElementById('headerSubtitle');
@@ -3007,11 +3127,10 @@
                 document.getElementById('homePage').classList.add('active');
                 document.getElementById('homePage').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                // Reset header
-                const headerSubtitleEl = document.getElementById('headerSubtitle');
-                if (headerSubtitleEl) {
-                    headerSubtitleEl.innerHTML = '<span id="headerText">Enter PC name to get started</span><span class="auto-refresh-indicator" id="refreshIndicator" style="display: none;"><i class="fas fa-sync-alt"></i><span id="lastUpdateTime">Auto-refreshing...</span></span>';
-                }
+                // Update navbar
+                document.getElementById('nav-home').classList.add('active');
+                document.getElementById('nav-dashboard').classList.remove('active');
+                // navbarSubtitle removed - search inputs are in navbar now
 
                 // Clear URL params
                 const url = new URL(window.location);
