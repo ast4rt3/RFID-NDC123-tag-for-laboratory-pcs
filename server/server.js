@@ -256,6 +256,18 @@ wss.on('connection', ws => {
       } catch (error) {
         console.error(`❌ [${data.pc_name || clientId}] Failed to insert temperature log:`, error.message);
       }
+    } else if (data.type === 'power_voltage_log') {
+      try {
+        const pcName = data.pc_name || clientId;
+        if (!pcName) {
+          console.warn('⚠️ Received power_voltage_log without pc_name, skipping');
+          return;
+        }
+        const timestamp = data.timestamp ? new Date(data.timestamp).toISOString() : new Date().toISOString();
+        await db.insertPowerVoltageLog(pcName, data.cpu_voltage, data.cpu_power, timestamp);
+      } catch (error) {
+        console.error(`❌ [${data.pc_name || clientId}] Failed to insert power/voltage log:`, error.message);
+      }
     }
 
 

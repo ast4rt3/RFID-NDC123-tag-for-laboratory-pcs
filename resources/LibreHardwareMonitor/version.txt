@@ -1,2 +1,2 @@
 LibreHardwareMonitor v0.9.4
-Downloaded: 2025-11-26T12:26:35.375Z
+Downloaded: 2025-11-26T15:43:26.818Z

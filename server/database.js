@@ -348,6 +348,26 @@ class Database {
     }
   }
 
+  async insertPowerVoltageLog(pcName, cpuVoltage, cpuPower, timestamp) {
+    const createdAt = timestamp ? new Date(timestamp).toISOString() : new Date().toISOString();
+
+    if (this.type === 'supabase') {
+      return await this.db.insertPowerVoltageLog(pcName, cpuVoltage, cpuPower, createdAt);
+    } else {
+      // In-memory storage: just push onto an array
+      if (!this.db.powerVoltageLogs) this.db.powerVoltageLogs = [];
+      const log = {
+        id: this.db.powerVoltageLogs.length + 1,
+        pc_name: pcName,
+        cpu_voltage: cpuVoltage,
+        cpu_power: cpuPower,
+        created_at: createdAt
+      };
+      this.db.powerVoltageLogs.push(log);
+      return Promise.resolve();
+    }
+  }
+
   async getTemperatureLogs(pcName = null, limit = 100) {
     if (this.type === 'supabase') {
       return await this.db.getTemperatureLogs(pcName, limit);

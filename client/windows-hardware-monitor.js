@@ -46,6 +46,7 @@ class WindowsHardwareMonitor {
       // Method 1: Try WMI MSAcpi_ThermalZoneTemperature (works on some systems)
       const wmiTemp = await this.getCpuTempFromWMI();
       if (wmiTemp !== null) {
+        console.log('[HWMonitor] CPU temp from WMI:', wmiTemp);
         this.lastCpuTemp = { value: wmiTemp, timestamp: Date.now() };
         return wmiTemp;
       }
@@ -53,6 +54,7 @@ class WindowsHardwareMonitor {
       // Method 2: Try Open Hardware Monitor WMI namespace (if installed)
       const ohmTemp = await this.getCpuTempFromOHM();
       if (ohmTemp !== null) {
+        console.log('[HWMonitor] CPU temp from OHM WMI:', ohmTemp);
         this.lastCpuTemp = { value: ohmTemp, timestamp: Date.now() };
         return ohmTemp;
       }
@@ -60,6 +62,7 @@ class WindowsHardwareMonitor {
       // Method 3: Try reading from LibreHardwareMonitor WMI (if installed)
       const lhmTemp = await this.getCpuTempFromLHM();
       if (lhmTemp !== null) {
+        console.log('[HWMonitor] CPU temp from LHM WMI:', lhmTemp);
         this.lastCpuTemp = { value: lhmTemp, timestamp: Date.now() };
         return lhmTemp;
       }
@@ -67,10 +70,12 @@ class WindowsHardwareMonitor {
       // Method 4: Directly read via LibreHardwareMonitorLib.dll
       const dllTemp = await this.getCpuTempFromLHMDll();
       if (dllTemp !== null) {
+        console.log('[HWMonitor] CPU temp from LHM DLL:', dllTemp);
         this.lastCpuTemp = { value: dllTemp, timestamp: Date.now() };
         return dllTemp;
       }
 
+      console.log('[HWMonitor] All temperature methods failed, returning null');
       return null;
     } catch (err) {
       console.error('Error getting CPU temperature:', err.message);
@@ -232,14 +237,19 @@ class WindowsHardwareMonitor {
    */
   async getCpuVoltageAndPower() {
     try {
+      console.log('[HWMonitor] Getting CPU voltage/power...');
+
       // Try WMI first (faster)
       const result = await this.getVoltageAndPowerFromLHM();
       if (result.cpuVoltage !== null || result.cpuPower !== null) {
+        console.log('[HWMonitor] WMI voltage/power result:', result);
         return result;
       }
 
       // Fallback to DLL method
-      return await this.getVoltageAndPowerFromLHMDll();
+      const dllResult = await this.getVoltageAndPowerFromLHMDll();
+      console.log('[HWMonitor] DLL voltage/power result:', dllResult);
+      return dllResult;
     } catch (err) {
       console.error('Error getting CPU voltage/power:', err.message);
       return { cpuVoltage: null, cpuPower: null };
@@ -255,6 +265,7 @@ class WindowsHardwareMonitor {
 
       exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
         if (err || stderr) {
+          console.warn('[HWMonitor] Voltage/power WMI call failed:', stderr?.trim() || err?.message);
           resolve({ cpuVoltage: null, cpuPower: null });
           return;
         }
@@ -262,12 +273,14 @@ class WindowsHardwareMonitor {
         try {
           const output = stdout.trim();
           if (!output) {
+            console.log('[HWMonitor] Voltage/power WMI returned no data');
             resolve({ cpuVoltage: null, cpuPower: null });
             return;
           }
 
           // Parse JSON (could be single object or array)
           let sensors = JSON.parse(output);
+          console.log('[HWMonitor] Voltage/power WMI raw JSON sensors:', sensors.length);
           if (!Array.isArray(sensors)) {
             sensors = [sensors];
           }
@@ -291,8 +304,10 @@ class WindowsHardwareMonitor {
             }
           }
 
+          console.log('[HWMonitor] Voltage/power WMI parsed result:', { cpuVoltage, cpuPower });
           resolve({ cpuVoltage, cpuPower });
         } catch (parseErr) {
+          console.warn('[HWMonitor] Failed to parse voltage/power WMI JSON:', parseErr.message);
           resolve({ cpuVoltage: null, cpuPower: null });
         }
       });
@@ -305,6 +320,7 @@ class WindowsHardwareMonitor {
   getVoltageAndPowerFromLHMDll() {
     return new Promise((resolve) => {
       if (!this.lhmDllPath || !fs.existsSync(this.lhmDllPath)) {
+        console.warn('[HWMonitor] Voltage/power DLL not found at:', this.lhmDllPath);
         resolve({ cpuVoltage: null, cpuPower: null });
         return;
       }
@@ -351,17 +367,28 @@ class WindowsHardwareMonitor {
 
       exec(cmd, { timeout: 5000 }, (err, stdout, stderr) => {
         if (err || stderr) {
+          console.warn('[HWMonitor] Voltage/power DLL script failed:', stderr?.trim() || err?.message);
           resolve({ cpuVoltage: null, cpuPower: null });
           return;
         }
 
         try {
-          const result = JSON.parse(stdout.trim());
-          resolve({
-            cpuVoltage: result.voltage || null,
-            cpuPower: result.power || null
-          });
+          const text = stdout.trim();
+          if (!text) {
+            console.log('[HWMonitor] Voltage/power DLL returned empty output');
+            resolve({ cpuVoltage: null, cpuPower: null });
+            return;
+          }
+
+          const result = JSON.parse(text);
+          const parsed = {
+            cpuVoltage: result.voltage ?? null,
+            cpuPower: result.power ?? null
+          };
+          console.log('[HWMonitor] Voltage/power DLL parsed result:', parsed);
+          resolve(parsed);
         } catch (parseErr) {
+          console.warn('[HWMonitor] Failed to parse voltage/power DLL JSON:', parseErr.message);
           resolve({ cpuVoltage: null, cpuPower: null });
         }
       });
@@ -479,20 +506,31 @@ class WindowsHardwareMonitor {
    * Get all hardware data (temperature, overclocking status, voltage, power)
    */
   async getAllData() {
-    const [cpuTemp, isCpuOC, isRamOC, voltageAndPower] = await Promise.all([
-      this.getCpuTemperature(),
-      this.detectCpuOverclock(),
-      this.detectRamOverclock(),
-      this.getCpuVoltageAndPower()
-    ]);
+    try {
+      const [cpuTemp, isCpuOC, isRamOC, voltageAndPower] = await Promise.all([
+        this.getCpuTemperature(),
+        this.isCpuOverclocked(),
+        this.isRamOverclocked(),
+        this.getCpuVoltageAndPower()
+      ]);
 
-    return {
-      cpuTemperature: cpuTemp,
-      isCpuOverclocked: isCpuOC,
-      isRamOverclocked: isRamOC,
-      cpuVoltage: voltageAndPower.cpuVoltage,
-      cpuPower: voltageAndPower.cpuPower
-    };
+      return {
+        cpuTemperature: cpuTemp,
+        isCpuOverclocked: isCpuOC,
+        isRamOverclocked: isRamOC,
+        cpuVoltage: voltageAndPower.cpuVoltage,
+        cpuPower: voltageAndPower.cpuPower
+      };
+    } catch (err) {
+      console.error('Error in getAllData:', err.message);
+      return {
+        cpuTemperature: null,
+        isCpuOverclocked: null,
+        isRamOverclocked: null,
+        cpuVoltage: null,
+        cpuPower: null
+      };
+    }
   }
 }
 

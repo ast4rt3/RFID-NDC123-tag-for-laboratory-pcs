@@ -1611,6 +1611,19 @@
                                 <canvas id="temperatureChart"></canvas>
                             </div>
                         </div>
+                        <div class="data-table" style="margin-top: 20px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Temperature (°C)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="temperatureTableBody">
+                                    <!-- Temperature data will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div id="power-tab" class="tab-content" style="display: none;">
@@ -1619,6 +1632,31 @@
                             <div class="chart-wrapper">
                                 <canvas id="powerVoltageChart"></canvas>
                             </div>
+                        </div>
+                        <div class="data-table" style="margin-top: 20px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Voltage (V)</th>
+                                        <th>Power (W)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="powerVoltageTableBody">
+                                    <!-- Power/Voltage data will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination Controls for Power/Voltage -->
+                        <div class="pagination" id="powerPaginationControls" style="display: none; margin-top: 10px;">
+                            <button class="pagination-btn" id="powerPrevBtn" onclick="changePowerPage(-1)">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <div class="pagination-page-numbers" id="powerPageNumbers"></div>
+                            <div class="pagination-info" id="powerPaginationInfo"></div>
+                            <button class="pagination-btn" id="powerNextBtn" onclick="changePowerPage(1)">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -1679,6 +1717,8 @@
                     let currentPage = 1;
                     let allSearchData = [];
                     let currentSearchPage = 1;
+                    let allPowerVoltageData = [];
+                    let currentPowerPage = 1;
                     const itemsPerPage = 10; // Show 10 items per page
 
                     // Auto-refresh functionality
@@ -1883,11 +1923,8 @@
                         const chartCanvas = document.getElementById('temperatureChart');
                         if (!chartCanvas) return;
 
-                        // Prepare data
-                        const labels = newData.map(entry => {
-                            const date = new Date(entry.created_at);
-                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        });
+                        // Prepare data (keep time formatting consistent with tables)
+                        const labels = newData.map(entry => formatTime(entry.created_at));
                         const data = newData.map(entry => entry.cpu_temperature);
 
                         // Update chart if exists, create if not
@@ -1967,11 +2004,11 @@
                         const chartCanvas = document.getElementById('powerVoltageChart');
                         if (!chartCanvas) return;
 
-                        // Prepare data
-                        const labels = newData.map(entry => {
-                            const date = new Date(entry.created_at);
-                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        });
+                        // Update backing data set
+                        allPowerVoltageData = newData;
+
+                        // Prepare data (keep time formatting consistent with temperature)
+                        const labels = newData.map(entry => formatTime(entry.created_at));
                         const voltageData = newData.map(entry => entry.cpu_voltage);
                         const powerData = newData.map(entry => entry.cpu_power);
 
@@ -1984,6 +2021,33 @@
                         } else {
                             // Chart doesn't exist yet, create it
                             createPowerVoltageChart(newData);
+                        }
+
+                        // Update table + pagination only if power tab is visible
+                        const tbody = document.getElementById('powerVoltageTableBody');
+                        const controls = document.getElementById('powerPaginationControls');
+                        if (!tbody || !controls) return;
+
+                        if (!allPowerVoltageData || allPowerVoltageData.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="3" class="empty-state">
+                                        <i class="fas fa-bolt"></i>
+                                        <h3>No Power/Voltage Data</h3>
+                                        <p>No power or voltage logs recorded for this date</p>
+                                    </td>
+                                </tr>`;
+                            controls.style.display = 'none';
+                            return;
+                        }
+
+                        const totalPages = Math.ceil(allPowerVoltageData.length / itemsPerPage);
+                        if (currentPowerPage > totalPages) {
+                            currentPowerPage = totalPages || 1;
+                        }
+
+                        if (tbody.closest('#power-tab').style.display !== 'none') {
+                            displayCurrentPowerPage();
                         }
                     }
 
@@ -2613,6 +2677,35 @@
                     function processTemperatureData(tempData) {
                         // Create/update chart
                         createTemperatureChart(tempData);
+
+                        // Populate table
+                        const tbody = document.getElementById('temperatureTableBody');
+                        if (!tbody) return;
+
+                        if (!tempData || tempData.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="2" class="empty-state">
+                                        <i class="fas fa-thermometer-half"></i>
+                                        <h3>No Temperature Data</h3>
+                                        <p>No CPU temperature logs recorded for this date</p>
+                                    </td>
+                                </tr>`;
+                            return;
+                        }
+
+                        tbody.innerHTML = tempData.map(entry => {
+                            const ts = formatTime(entry.created_at || entry.timestamp);
+                            const t = (entry.cpu_temperature !== null && entry.cpu_temperature !== undefined)
+                                ? entry.cpu_temperature.toFixed(1)
+                                : 'N/A';
+                            return `
+                                <tr>
+                                    <td>${ts}</td>
+                                    <td>${t}</td>
+                                </tr>
+                            `;
+                        }).join('');
                     }
 
                     function createTemperatureChart(tempData) {
@@ -2635,11 +2728,8 @@
                             return;
                         }
 
-                        // Prepare data
-                        const labels = tempData.map(entry => {
-                            const date = new Date(entry.created_at);
-                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        });
+                        // Prepare data (use same time formatting as tables)
+                        const labels = tempData.map(entry => formatTime(entry.created_at));
                         const data = tempData.map(entry => entry.cpu_temperature);
 
                         temperatureChart = new Chart(ctx, {
@@ -2697,6 +2787,148 @@
                     function processPowerVoltageData(powerVoltageData) {
                         // Create/update chart
                         createPowerVoltageChart(powerVoltageData);
+
+                        // Store data for pagination
+                        const tbody = document.getElementById('powerVoltageTableBody');
+                        const controls = document.getElementById('powerPaginationControls');
+                        if (!tbody || !controls) return;
+
+                        allPowerVoltageData = powerVoltageData || [];
+                        currentPowerPage = 1;
+
+                        if (!allPowerVoltageData.length) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="3" class="empty-state">
+                                        <i class="fas fa-bolt"></i>
+                                        <h3>No Power/Voltage Data</h3>
+                                        <p>No power or voltage logs recorded for this date</p>
+                                    </td>
+                                </tr>`;
+                            controls.style.display = 'none';
+                            return;
+                        }
+
+                        // Show pagination if more than itemsPerPage
+                        if (allPowerVoltageData.length > itemsPerPage) {
+                            controls.style.display = 'flex';
+                        } else {
+                            controls.style.display = 'none';
+                        }
+
+                        // Render first page
+                        displayCurrentPowerPage();
+                    }
+
+                    function displayCurrentPowerPage() {
+                        const tbody = document.getElementById('powerVoltageTableBody');
+                        if (!tbody) return;
+
+                        const startIndex = (currentPowerPage - 1) * itemsPerPage;
+                        const endIndex = startIndex + itemsPerPage;
+                        const pageData = allPowerVoltageData.slice(startIndex, endIndex);
+
+                        tbody.innerHTML = pageData.map(entry => {
+                            const ts = formatTime(entry.created_at || entry.timestamp);
+                            const v = (entry.cpu_voltage !== null && entry.cpu_voltage !== undefined)
+                                ? entry.cpu_voltage.toFixed(3)
+                                : 'N/A';
+                            const p = (entry.cpu_power !== null && entry.cpu_power !== undefined)
+                                ? entry.cpu_power.toFixed(1)
+                                : 'N/A';
+                            return `
+                                <tr>
+                                    <td>${ts}</td>
+                                    <td>${v}</td>
+                                    <td>${p}</td>
+                                </tr>
+                            `;
+                        }).join('');
+
+                        updatePowerPagination();
+                    }
+
+                    function updatePowerPagination() {
+                        const totalPages = Math.ceil(allPowerVoltageData.length / itemsPerPage);
+                        const info = document.getElementById('powerPaginationInfo');
+                        const prevBtn = document.getElementById('powerPrevBtn');
+                        const nextBtn = document.getElementById('powerNextBtn');
+                        const pageNumbers = document.getElementById('powerPageNumbers');
+
+                        if (!info || !prevBtn || !nextBtn || !pageNumbers) return;
+
+                        const startItem = (currentPowerPage - 1) * itemsPerPage + 1;
+                        const endItem = Math.min(currentPowerPage * itemsPerPage, allPowerVoltageData.length);
+                        info.textContent = `Showing ${startItem}-${endItem} of ${allPowerVoltageData.length}`;
+
+                        prevBtn.disabled = currentPowerPage === 1;
+                        nextBtn.disabled = currentPowerPage === totalPages;
+
+                        pageNumbers.innerHTML = '';
+                        const maxVisiblePages = 5;
+                        let startPage = Math.max(1, currentPowerPage - Math.floor(maxVisiblePages / 2));
+                        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                        if (endPage - startPage < maxVisiblePages - 1) {
+                            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                        }
+
+                        if (startPage > 1) {
+                            const firstBtn = document.createElement('button');
+                            firstBtn.className = 'page-number';
+                            firstBtn.textContent = '1';
+                            firstBtn.onclick = () => goToPowerPage(1);
+                            pageNumbers.appendChild(firstBtn);
+
+                            if (startPage > 2) {
+                                const ellipsis = document.createElement('span');
+                                ellipsis.textContent = '...';
+                                ellipsis.style.padding = '0 5px';
+                                pageNumbers.appendChild(ellipsis);
+                            }
+                        }
+
+                        for (let i = startPage; i <= endPage; i++) {
+                            const pageBtn = document.createElement('button');
+                            pageBtn.className = 'page-number' + (i === currentPowerPage ? ' active' : '');
+                            pageBtn.textContent = i;
+                            pageBtn.onclick = () => goToPowerPage(i);
+                            pageNumbers.appendChild(pageBtn);
+                        }
+
+                        if (endPage < totalPages) {
+                            if (endPage < totalPages - 1) {
+                                const ellipsis = document.createElement('span');
+                                ellipsis.textContent = '...';
+                                ellipsis.style.padding = '0 5px';
+                                pageNumbers.appendChild(ellipsis);
+                            }
+
+                            const lastBtn = document.createElement('button');
+                            lastBtn.className = 'page-number';
+                            lastBtn.textContent = totalPages;
+                            lastBtn.onclick = () => goToPowerPage(totalPages);
+                            pageNumbers.appendChild(lastBtn);
+                        }
+                    }
+
+                    function changePowerPage(direction) {
+                        const totalPages = Math.ceil(allPowerVoltageData.length / itemsPerPage);
+                        const newPage = currentPowerPage + direction;
+                        if (newPage >= 1 && newPage <= totalPages) {
+                            currentPowerPage = newPage;
+                            displayCurrentPowerPage();
+                            document.getElementById('powerVoltageTableBody')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+
+                    function goToPowerPage(page) {
+                        const totalPages = Math.ceil(allPowerVoltageData.length / itemsPerPage);
+                        if (page >= 1 && page <= totalPages) {
+                            currentPowerPage = page;
+                            displayCurrentPowerPage();
+                            document.getElementById('powerVoltageTableBody')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
                     }
 
                     function createPowerVoltageChart(powerVoltageData) {
@@ -2719,11 +2951,8 @@
                             return;
                         }
 
-                        // Prepare data
-                        const labels = powerVoltageData.map(entry => {
-                            const date = new Date(entry.created_at);
-                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        });
+                        // Prepare data (use same time formatting as temperature)
+                        const labels = powerVoltageData.map(entry => formatTime(entry.created_at));
                         const voltageData = powerVoltageData.map(entry => entry.cpu_voltage);
                         const powerData = powerVoltageData.map(entry => entry.cpu_power);
 

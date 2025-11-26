@@ -522,14 +522,19 @@ async function getHardwareTelemetry() {
 
 function maybeSendTemperatureLog(hardwareData, timestamp) {
   if (!hardwareData || hardwareData.cpuTemperature === null) {
+    console.log('🌡️ Skipping temperature log - no data:', hardwareData);
     return;
   }
 
   if (Date.now() - lastTemperatureSentAt < TEMPERATURE_LOG_INTERVAL_MS) {
+    console.log('🌡️ Skipping temperature log - within interval window');
     return;
   }
 
   lastTemperatureSentAt = Date.now();
+  console.log('🌡️ Sending temperature log:', {
+    cpu_temperature: hardwareData.cpuTemperature
+  });
   sendMessage({
     type: 'cpu_temperature_log',
     pc_name: pcName,
@@ -540,14 +545,20 @@ function maybeSendTemperatureLog(hardwareData, timestamp) {
 
 function maybeSendPowerVoltageLog(hardwareData, timestamp) {
   if (!hardwareData || (hardwareData.cpuVoltage === null && hardwareData.cpuPower === null)) {
+    console.log('⚡ Skipping power/voltage log - no data:', hardwareData);
     return;
   }
 
   if (Date.now() - lastPowerVoltageSentAt < POWER_VOLTAGE_LOG_INTERVAL_MS) {
+    console.log('⚡ Skipping power/voltage log - within interval window');
     return;
   }
 
   lastPowerVoltageSentAt = Date.now();
+  console.log('⚡ Sending power/voltage log:', {
+    cpu_voltage: hardwareData.cpuVoltage,
+    cpu_power: hardwareData.cpuPower
+  });
   sendMessage({
     type: 'power_voltage_log',
     pc_name: pcName,

@@ -199,6 +199,35 @@ class SupabaseDB {
     }
   }
 
+  async insertPowerVoltageLog(pcName, cpuVoltage, cpuPower, timestamp) {
+    const payload = {
+      pc_name: pcName,
+      created_at: timestamp
+    };
+
+    if (cpuVoltage !== null && cpuVoltage !== undefined) {
+      payload.cpu_voltage = cpuVoltage;
+    }
+    if (cpuPower !== null && cpuPower !== undefined) {
+      payload.cpu_power = cpuPower;
+    }
+
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('power_voltage_logs')
+          .insert(payload)
+          .select();
+
+        if (error) throw error;
+        return true;
+      });
+    } catch (error) {
+      console.error('❌ Error inserting power/voltage log:', error.message);
+      return false;
+    }
+  }
+
   // Get time logs
   async getTimeLogs(limit = 100) {
     const { data, error } = await this.client
