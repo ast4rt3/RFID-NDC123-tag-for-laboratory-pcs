@@ -6,6 +6,9 @@
 
 const { exec } = require('child_process');
 const os = require('os');
+const path = require('path');
+const fs = require('fs');
+const { getResourcesRoot } = require('./utils/resource-path');
 
 class WindowsHardwareMonitor {
   constructor() {
@@ -13,6 +16,16 @@ class WindowsHardwareMonitor {
     this.lastCpuTemp = null;
     this.lastOverclockCheck = null;
     this.cacheTimeout = 5000; // Cache results for 5 seconds
+    this.warned = {
+      wmi: false,
+      ohm: false,
+      lhmWmi: false,
+      dll: false
+    };
+
+    const resourcesRoot = getResourcesRoot();
+    this.lhmDir = path.join(resourcesRoot, 'LibreHardwareMonitor');
+    this.lhmDllPath = path.join(this.lhmDir || '', 'LibreHardwareMonitorLib.dll');
   }
 
   /**
@@ -44,11 +57,18 @@ class WindowsHardwareMonitor {
         return ohmTemp;
       }
 
-      // Method 3: Try reading from LibreHardwareMonitor (if installed)
+      // Method 3: Try reading from LibreHardwareMonitor WMI (if installed)
       const lhmTemp = await this.getCpuTempFromLHM();
       if (lhmTemp !== null) {
         this.lastCpuTemp = { value: lhmTemp, timestamp: Date.now() };
         return lhmTemp;
+      }
+
+      // Method 4: Directly read via LibreHardwareMonitorLib.dll
+      const dllTemp = await this.getCpuTempFromLHMDll();
+      if (dllTemp !== null) {
+        this.lastCpuTemp = { value: dllTemp, timestamp: Date.now() };
+        return dllTemp;
       }
 
       return null;
@@ -64,9 +84,13 @@ class WindowsHardwareMonitor {
   getCpuTempFromWMI() {
     return new Promise((resolve) => {
       const cmd = 'powershell -Command "Get-WmiObject -Namespace root/wmi -Class MSAcpi_ThermalZoneTemperature | Select-Object -First 1 -ExpandProperty CurrentTemperature"';
-      
+
       exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
         if (err || stderr) {
+          if (!this.warned.wmi) {
+            console.warn('[HWMonitor] WMI thermal zone unavailable:', stderr?.trim() || err?.message);
+            this.warned.wmi = true;
+          }
           resolve(null);
           return;
         }
@@ -89,9 +113,13 @@ class WindowsHardwareMonitor {
   getCpuTempFromOHM() {
     return new Promise((resolve) => {
       const cmd = 'powershell -Command "Get-WmiObject -Namespace root/OpenHardwareMonitor -Class Sensor | Where-Object {$_.SensorType -eq \'Temperature\' -and $_.Name -like \'*CPU*\'} | Select-Object -First 1 -ExpandProperty Value"';
-      
+
       exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
         if (err || stderr) {
+          if (!this.warned.ohm) {
+            console.warn('[HWMonitor] OpenHardwareMonitor WMI unavailable:', stderr?.trim() || err?.message);
+            this.warned.ohm = true;
+          }
           resolve(null);
           return;
         }
@@ -112,9 +140,13 @@ class WindowsHardwareMonitor {
   getCpuTempFromLHM() {
     return new Promise((resolve) => {
       const cmd = 'powershell -Command "Get-WmiObject -Namespace root/LibreHardwareMonitor -Class Sensor | Where-Object {$_.SensorType -eq \'Temperature\' -and $_.Name -like \'*CPU*\'} | Select-Object -First 1 -ExpandProperty Value"';
-      
+
       exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
         if (err || stderr) {
+          if (!this.warned.lhmWmi) {
+            console.warn('[HWMonitor] LibreHardwareMonitor WMI unavailable:', stderr?.trim() || err?.message);
+            this.warned.lhmWmi = true;
+          }
           resolve(null);
           return;
         }
@@ -122,6 +154,72 @@ class WindowsHardwareMonitor {
         const temp = parseFloat(stdout.trim());
         if (!isNaN(temp) && temp > 0 && temp < 150) {
           resolve(Math.round(temp * 10) / 10);
+        } else {
+          resolve(null);
+        }
+      });
+    });
+  }
+
+  /**
+   * Get CPU temperature by loading LibreHardwareMonitorLib.dll directly
+   */
+  getCpuTempFromLHMDll() {
+    return new Promise((resolve) => {
+      if (!this.lhmDllPath || !fs.existsSync(this.lhmDllPath)) {
+        if (!this.warned.dll) {
+          console.warn('[HWMonitor] LibreHardwareMonitorLib.dll not found at:', this.lhmDllPath);
+          this.warned.dll = true;
+        }
+        resolve(null);
+        return;
+      }
+
+      const escapedDllPath = this.lhmDllPath.replace(/\\/g, '\\\\');
+      const script = `
+        try {
+          Add-Type -Path '${escapedDllPath}';
+          $computer = New-Object LibreHardwareMonitor.Hardware.Computer;
+          $computer.IsCpuEnabled = $true;
+          $computer.Open();
+          $temperature = $null;
+          foreach ($hardware in $computer.Hardware) {
+            if ($hardware.HardwareType -eq [LibreHardwareMonitor.Hardware.HardwareType]::CPU) {
+              $hardware.Update();
+              foreach ($sensor in $hardware.Sensors) {
+                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature -and ($sensor.Name -like '*CPU*' -or $sensor.Name -like '*Package*')) {
+                  $temperature = $sensor.Value;
+                  break;
+                }
+              }
+            }
+            if ($temperature -ne $null) { break }
+          }
+          $computer.Close();
+          if ($temperature -ne $null) {
+            Write-Output ([math]::Round($temperature, 1));
+          }
+        } catch {
+          Write-Error $_.Exception.Message;
+        }
+      `;
+
+      const encoded = Buffer.from(script, 'utf16le').toString('base64');
+      const cmd = `powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${encoded}`;
+
+      exec(cmd, { timeout: 5000 }, (err, stdout, stderr) => {
+        if (err || stderr) {
+          if (!this.warned.dll) {
+            console.warn('[HWMonitor] Direct DLL read failed:', stderr?.trim() || err?.message);
+            this.warned.dll = true;
+          }
+          resolve(null);
+          return;
+        }
+
+        const temp = parseFloat(stdout.trim());
+        if (!isNaN(temp) && temp > 0 && temp < 150) {
+          resolve(temp);
         } else {
           resolve(null);
         }

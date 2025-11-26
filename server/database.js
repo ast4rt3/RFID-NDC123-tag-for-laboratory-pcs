@@ -74,7 +74,7 @@ class Database {
             os_version=excluded.os_version,
             hostname=excluded.hostname,
             updated_at=CURRENT_TIMESTAMP`;
-        this.db.run(sql, [pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname], function(err) {
+        this.db.run(sql, [pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname], function (err) {
           if (err) reject(err);
           else resolve();
         });
@@ -126,6 +126,7 @@ class Database {
         appUsageLogs: [],
         browserSearchLogs: [],
         idleLogs: [],
+        temperatureLogs: [],
         pcStatus: {}  // Initialize pcStatus storage
       };
       console.log('📦 Using in-memory storage (data will not persist)');
@@ -196,7 +197,7 @@ class Database {
         CREATE INDEX IF NOT EXISTS idx_idle_logs_pc_name ON idle_logs(pc_name);
         CREATE INDEX IF NOT EXISTS idx_idle_logs_start_time ON idle_logs(start_time);
       `;
-  // Helper to format date in 12-hour format with AM/PM
+      // Helper to format date in 12-hour format with AM/PM
 
       this.db.exec(createTables, (err) => {
         if (err) {
@@ -241,13 +242,25 @@ class Database {
     }
   }
 
-  async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent) {
+  async insertAppUsageLog(pcName, appName, startTime, endTime, duration, memoryUsage, cpuPercent, gpuPercent, cpuTemperature, isCpuOverclocked, isRamOverclocked) {
     // Convert to ISO strings to preserve timezone
     const formattedStartTime = new Date(startTime).toISOString();
     const formattedEndTime = new Date(endTime).toISOString();
 
     if (this.type === 'supabase') {
-      return await this.db.insertAppUsageLog(pcName, appName, formattedStartTime, formattedEndTime, duration, memoryUsage, cpuPercent, gpuPercent);
+      return await this.db.insertAppUsageLog(
+        pcName,
+        appName,
+        formattedStartTime,
+        formattedEndTime,
+        duration,
+        memoryUsage,
+        cpuPercent,
+        gpuPercent,
+        cpuTemperature,
+        isCpuOverclocked,
+        isRamOverclocked
+      );
     } else {
       // In-memory storage
       const log = {
@@ -260,6 +273,9 @@ class Database {
         memory_usage_bytes: memoryUsage,
         cpu_percent: cpuPercent,
         gpu_percent: gpuPercent,
+        cpu_temperature: cpuTemperature,
+        is_cpu_overclocked: isCpuOverclocked,
+        is_ram_overclocked: isRamOverclocked,
         created_at: new Date().toISOString()
       };
       this.db.appUsageLogs.push(log);
@@ -315,6 +331,43 @@ class Database {
     }
   }
 
+  async insertTemperatureLog(pcName, cpuTemperature, timestamp) {
+    const createdAt = timestamp ? new Date(timestamp).toISOString() : new Date().toISOString();
+
+    if (this.type === 'supabase') {
+      return await this.db.insertTemperatureLog(pcName, cpuTemperature, createdAt);
+    } else {
+      const log = {
+        id: this.db.temperatureLogs.length + 1,
+        pc_name: pcName,
+        cpu_temperature: cpuTemperature,
+        created_at: createdAt
+      };
+      this.db.temperatureLogs.push(log);
+      return Promise.resolve();
+    }
+  }
+
+  async getTemperatureLogs(pcName = null, limit = 100) {
+    if (this.type === 'supabase') {
+      return await this.db.getTemperatureLogs(pcName, limit);
+    } else {
+      let logs = [...this.db.temperatureLogs];
+
+      if (pcName) {
+        logs = logs.filter(log => log.pc_name === pcName);
+      }
+
+      logs = logs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      if (limit) {
+        logs = logs.slice(0, Number(limit));
+      }
+
+      return Promise.resolve(logs);
+    }
+  }
+
   async getTimeLogs() {
     if (this.type === 'supabase') {
       return await this.db.getTimeLogs();
@@ -330,20 +383,20 @@ class Database {
     } else {
       // In-memory storage
       let logs = this.db.browserSearchLogs;
-      
+
       if (pcName) {
         logs = logs.filter(log => log.pc_name === pcName);
       }
       if (searchEngine) {
         logs = logs.filter(log => log.search_engine === searchEngine);
       }
-      
+
       logs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      
+
       if (limit) {
         logs = logs.slice(0, limit);
       }
-      
+
       return Promise.resolve(logs);
     }
   }
@@ -355,7 +408,7 @@ class Database {
       // This ensures timezone is preserved correctly
       let formattedLastSeen = null;
       let formattedLastActivity = null;
-      
+
       if (lastSeen) {
         if (typeof lastSeen === 'string' && (lastSeen.includes('AM') || lastSeen.includes('PM'))) {
           // If it's already in the custom format, parse it back to Date first
@@ -365,7 +418,7 @@ class Database {
           formattedLastSeen = new Date(lastSeen).toISOString();
         }
       }
-      
+
       if (lastActivity) {
         if (typeof lastActivity === 'string' && (lastActivity.includes('AM') || lastActivity.includes('PM'))) {
           formattedLastActivity = new Date(lastActivity).toISOString();
@@ -378,7 +431,7 @@ class Database {
       const pcStatus = {
         pc_name: pcName
       };
-      
+
       // Only include fields that are not null/undefined
       if (isOnline !== null && isOnline !== undefined) {
         pcStatus.is_online = isOnline;

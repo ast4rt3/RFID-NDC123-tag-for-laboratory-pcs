@@ -127,7 +127,10 @@
     "asarUnpack": [
       "client/pc-logger.js",
       "client/config.js",
+      "client/hardware-monitor-manager.js",
       "client/windows-hardware-monitor.js",
+      "client/utils/**",
+      "client/check-idle.ps1",
       "client/*.node",
       "config.json",
       "node_modules/**",

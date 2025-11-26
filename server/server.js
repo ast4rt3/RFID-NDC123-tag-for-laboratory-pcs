@@ -138,7 +138,10 @@ wss.on('connection', ws => {
             duration,
             data.memory_usage_bytes,
             data.cpu_percent,
-            data.gpu_percent
+            data.gpu_percent,
+            data.cpu_temperature,
+            data.is_cpu_overclocked,
+            data.is_ram_overclocked
           );
           await db.updatePCStatus(clientId, true, endTime, endTime);
         } catch (error) {
@@ -166,7 +169,10 @@ wss.on('connection', ws => {
             duration,
             data.memory_usage_bytes,
             data.cpu_percent,
-            data.gpu_percent
+            data.gpu_percent,
+            data.cpu_temperature,
+            data.is_cpu_overclocked,
+            data.is_ram_overclocked
           );
           await db.updatePCStatus(clientId, true, endTime, endTime);
         } catch (error) {
@@ -238,6 +244,18 @@ wss.on('connection', ws => {
       } catch (error) {
         console.error(`❌ [${data.pc_name}] Failed to insert idle session:`, error.message);
       }
+    } else if (data.type === 'cpu_temperature_log') {
+      try {
+        const pcName = data.pc_name || clientId;
+        if (!pcName) {
+          console.warn('⚠️ Received cpu_temperature_log without pc_name, skipping');
+          return;
+        }
+        const timestamp = data.timestamp ? new Date(data.timestamp).toISOString() : new Date().toISOString();
+        await db.insertTemperatureLog(pcName, data.cpu_temperature, timestamp);
+      } catch (error) {
+        console.error(`❌ [${data.pc_name || clientId}] Failed to insert temperature log:`, error.message);
+      }
     }
 
 
@@ -288,6 +306,18 @@ app.get('/browser-logs', async (req, res) => {
     res.json(logs);
   } catch (error) {
     console.error('Error fetching browser logs:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.get('/temperature-logs', async (req, res) => {
+  const { pc_name, limit = 100 } = req.query;
+
+  try {
+    const logs = await db.getTemperatureLogs(pc_name, limit);
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching temperature logs:', error);
     res.status(500).json({ error: 'Database error' });
   }
 });

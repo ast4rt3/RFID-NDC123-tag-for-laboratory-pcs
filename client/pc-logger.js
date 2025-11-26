@@ -7,6 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const si = require('systeminformation');
 const sqlite3 = require('sqlite3');
+const WindowsHardwareMonitor = require('./windows-hardware-monitor');
+const HardwareMonitorManager = require('./hardware-monitor-manager');
 
 const config = require('./config');
 const logStream = fs.createWriteStream('rfid-client-debug.log', { flags: 'a' });
@@ -22,6 +24,52 @@ console.error = function (...args) {
 };
 
 const pcName = os.hostname();
+const TEMPERATURE_LOG_INTERVAL_MS = 5000;
+let lastTemperatureSentAt = 0;
+
+let windowsHardwareMonitor = null;
+let hardwareMonitorManager = null;
+let hardwareMonitorReadyPromise = null;
+
+function ensureHardwareMonitorReady() {
+  if (process.platform !== 'win32') {
+    return Promise.resolve(false);
+  }
+
+  if (hardwareMonitorReadyPromise) {
+    return hardwareMonitorReadyPromise;
+  }
+
+  hardwareMonitorReadyPromise = (async () => {
+    try {
+      hardwareMonitorManager = new HardwareMonitorManager();
+      const started = await hardwareMonitorManager.start();
+      if (started) {
+        console.log('✅ LibreHardwareMonitor background service ready');
+      } else {
+        console.warn('⚠️ Unable to start LibreHardwareMonitor automatically (temperature may be null)');
+      }
+      return started;
+    } catch (error) {
+      console.error('❌ Failed to start LibreHardwareMonitor:', error.message);
+      return false;
+    }
+  })();
+
+  return hardwareMonitorReadyPromise;
+}
+
+if (process.platform === 'win32') {
+  try {
+    ensureHardwareMonitorReady();
+    windowsHardwareMonitor = new WindowsHardwareMonitor();
+    console.log('✅ Windows hardware monitor initialized');
+  } catch (error) {
+    console.error('❌ Failed to initialize Windows hardware monitor:', error.message);
+  }
+} else {
+  console.log('ℹ️ Skipping Windows hardware monitor initialization (non-Windows OS)');
+}
 console.log('PC Name:', pcName);
 
 // Buffer file path for storing data when disconnected
@@ -441,6 +489,53 @@ function getSystemGpuUsage(callback) {
   });
 }
 
+function getSystemGpuUsageAsync() {
+  return new Promise((resolve) => {
+    getSystemGpuUsage((gpuPercent) => resolve(gpuPercent));
+  });
+}
+
+async function getHardwareTelemetry() {
+  await ensureHardwareMonitorReady().catch(() => false);
+
+  if (!windowsHardwareMonitor) {
+    return {
+      cpuTemperature: null,
+      isCpuOverclocked: null,
+      isRamOverclocked: null
+    };
+  }
+
+  try {
+    return await windowsHardwareMonitor.getAllData();
+  } catch (error) {
+    console.error('❌ Error getting hardware telemetry:', error.message);
+    return {
+      cpuTemperature: null,
+      isCpuOverclocked: null,
+      isRamOverclocked: null
+    };
+  }
+}
+
+function maybeSendTemperatureLog(hardwareData, timestamp) {
+  if (!hardwareData || hardwareData.cpuTemperature === null) {
+    return;
+  }
+
+  if (Date.now() - lastTemperatureSentAt < TEMPERATURE_LOG_INTERVAL_MS) {
+    return;
+  }
+
+  lastTemperatureSentAt = Date.now();
+  sendMessage({
+    type: 'cpu_temperature_log',
+    pc_name: pcName,
+    cpu_temperature: hardwareData.cpuTemperature,
+    timestamp: timestamp.toISOString()
+  });
+}
+
 // Buffer management functions
 function readBuffer() {
   try {
@@ -744,74 +839,88 @@ function setupAppUsageTracking() {
       }
     }
 
-    // Get GPU usage and send the log inside the callback
-    getSystemGpuUsage((gpuPercent) => {
-      // NOTE: We DO NOT update lastActivityTime here anymore because active-win
-      // returns data even if the user is idle. We rely on checkSystemIdleTime() instead.
+    const [gpuPercent, hardwareData] = await Promise.all([
+      getSystemGpuUsageAsync(),
+      getHardwareTelemetry()
+    ]);
 
-      if (!appActive) {
-        // First non-ignored app seen
-        sendMessage({
-          type: 'app_usage_start',
-          pc_name: pcName,
-          app_name: appName,
-          start_time: now.toISOString(),
-          end_time: now.toISOString(),
-          duration_seconds: 0,
-          memory_usage_bytes: memoryUsage,
-          cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
-        });
-        console.log('Sent app_usage_start for', appName);
-        lastApp = appName;
-        lastStart = now;
-        appActive = true;
-      } else if (appName !== lastApp) {
-        // App changed: finalize previous, start new
-        sendMessage({
-          type: 'app_usage_end',
-          pc_name: pcName,
-          app_name: lastApp,
-          start_time: lastStart.toISOString(),
-          end_time: now.toISOString(),
-          duration_seconds: Math.floor((now - lastStart) / 1000),
-          memory_usage_bytes: memoryUsage,
-          cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
-        });
-        console.log('Sent app_usage_end for', lastApp);
+    maybeSendTemperatureLog(hardwareData, now);
 
-        sendMessage({
-          type: 'app_usage_start',
-          pc_name: pcName,
-          app_name: appName,
-          start_time: now.toISOString(),
-          end_time: now.toISOString(),
-          duration_seconds: 0,
-          memory_usage_bytes: memoryUsage,
-          cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
-        });
-        console.log('Sent app_usage_start for', appName);
+    const telemetryPayload = {
+      cpu_temperature: hardwareData?.cpuTemperature ?? null,
+      is_cpu_overclocked: hardwareData?.isCpuOverclocked ?? null,
+      is_ram_overclocked: hardwareData?.isRamOverclocked ?? null
+    };
 
-        lastApp = appName;
-        lastStart = now;
-      } else {
-        // App is still active, update
-        sendMessage({
-          type: 'app_usage_update',
-          pc_name: pcName,
-          app_name: appName,
-          start_time: lastStart.toISOString(),
-          end_time: now.toISOString(),
-          duration_seconds: Math.floor((now - lastStart) / 1000),
-          memory_usage_bytes: memoryUsage,
-          cpu_percent: cpuPercent,
-          gpu_percent: gpuPercent
-        });
-        console.log('Sent app_usage_update for', appName);
-      }
-    });
+    // NOTE: We DO NOT update lastActivityTime here anymore because active-win
+    // returns data even if the user is idle. We rely on checkSystemIdleTime() instead.
+
+    if (!appActive) {
+      // First non-ignored app seen
+      sendMessage({
+        type: 'app_usage_start',
+        pc_name: pcName,
+        app_name: appName,
+        start_time: now.toISOString(),
+        end_time: now.toISOString(),
+        duration_seconds: 0,
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: gpuPercent,
+        ...telemetryPayload
+      });
+      console.log('Sent app_usage_start for', appName);
+      lastApp = appName;
+      lastStart = now;
+      appActive = true;
+    } else if (appName !== lastApp) {
+      // App changed: finalize previous, start new
+      sendMessage({
+        type: 'app_usage_end',
+        pc_name: pcName,
+        app_name: lastApp,
+        start_time: lastStart.toISOString(),
+        end_time: now.toISOString(),
+        duration_seconds: Math.floor((now - lastStart) / 1000),
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: gpuPercent,
+        ...telemetryPayload
+      });
+      console.log('Sent app_usage_end for', lastApp);
+
+      sendMessage({
+        type: 'app_usage_start',
+        pc_name: pcName,
+        app_name: appName,
+        start_time: now.toISOString(),
+        end_time: now.toISOString(),
+        duration_seconds: 0,
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: gpuPercent,
+        ...telemetryPayload
+      });
+      console.log('Sent app_usage_start for', appName);
+
+      lastApp = appName;
+      lastStart = now;
+    } else {
+      // App is still active, update
+      sendMessage({
+        type: 'app_usage_update',
+        pc_name: pcName,
+        app_name: appName,
+        start_time: lastStart.toISOString(),
+        end_time: now.toISOString(),
+        duration_seconds: Math.floor((now - lastStart) / 1000),
+        memory_usage_bytes: memoryUsage,
+        cpu_percent: cpuPercent,
+        gpu_percent: gpuPercent,
+        ...telemetryPayload
+      });
+      console.log('Sent app_usage_update for', appName);
+    }
   }, 3000); // 3 seconds
 }
 

@@ -7,23 +7,19 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const { getResourcesRoot } = require('./utils/resource-path');
 
 class HardwareMonitorManager {
   constructor() {
     this.lhmProcess = null;
     this.isRunning = false;
-    
+
     // Determine the path to LibreHardwareMonitor
     // In production (packaged app), it will be in resources
     // In development, it will be in the project root
-    const isDev = !process.resourcesPath;
-    
-    if (isDev) {
-      this.lhmPath = path.join(__dirname, '..', 'resources', 'LibreHardwareMonitor', 'LibreHardwareMonitor.exe');
-    } else {
-      this.lhmPath = path.join(process.resourcesPath, 'LibreHardwareMonitor', 'LibreHardwareMonitor.exe');
-    }
-    
+    const resourcesRoot = getResourcesRoot();
+    this.lhmPath = path.join(resourcesRoot, 'LibreHardwareMonitor', 'LibreHardwareMonitor.exe');
+
     console.log('[HWMonitor] LibreHardwareMonitor path:', this.lhmPath);
   }
 
@@ -70,9 +66,9 @@ class HardwareMonitorManager {
 
       // Start LibreHardwareMonitor minimized
       this.lhmProcess = spawn('cmd.exe', ['/c', `"${this.lhmPath}" -minimized`], {
-  detached: true,
-  stdio: 'ignore',
-  windowsHide: true
+        detached: true,
+        stdio: 'ignore',
+        windowsHide: true
       });
 
 
@@ -94,7 +90,7 @@ class HardwareMonitorManager {
   }
 
 
-  
+
   /**
    * Check if LibreHardwareMonitor is already running
    */

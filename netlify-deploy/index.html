@@ -1415,6 +1415,10 @@
                             style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
                             <i class="fas fa-tasks"></i> Performance
                         </button>
+                        <button class="tab-btn" onclick="switchTab('temperature')" id="tab-btn-temperature"
+                            style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
+                            <i class="fas fa-thermometer-half"></i> Temperature
+                        </button>
                     </div>
 
                     <div id="browser-tab" class="tab-content" style="display: none;">
@@ -1595,6 +1599,15 @@
                     </div>
 
 
+                    <div id="temperature-tab" class="tab-content" style="display: none;">
+                        <div class="chart-container">
+                            <div class="chart-title">CPU Temperature (°C)</div>
+                            <div class="chart-wrapper">
+                                <canvas id="temperatureChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="loadingMessage" class="loading">
                         Enter PC name and date to view activity data
                     </div>
@@ -1637,6 +1650,7 @@
                     let searchChart = null;
                     let cpuChart = null;
                     let memoryChart = null;
+                    let temperatureChart = null;
                     let taskManagerRefreshInterval = null;
                     let autoRefreshInterval = null;
                     let pcStatusRefreshInterval = null;
@@ -2055,6 +2069,7 @@
                         document.getElementById('statsGrid').style.display = 'none';
                         document.getElementById('pcStatusContainer').style.display = 'none';
                         document.getElementById('apps-tab').style.display = 'none';
+                        document.getElementById('temperature-tab').style.display = 'none';
                         hideTaskManager();
 
                         try {
@@ -2139,6 +2154,19 @@
                                 console.warn('Search data error:', searchError);
                             }
 
+                            // Fetch temperature logs
+                            const { data: tempData, error: tempError } = await supabase
+                                .from('temperature_logs')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .gte('created_at', startDate)
+                                .lte('created_at', endDate)
+                                .order('created_at', { ascending: true });
+
+                            if (tempError) {
+                                console.warn('Temperature data error:', tempError);
+                            }
+
                             // Merge and sort data
                             let combinedData = [...(appData || [])];
                             if (idleData) {
@@ -2165,6 +2193,7 @@
                             // Process and display data
                             processData(combinedData);
                             processSearchData(searchData || []);
+                            processTemperatureData(tempData || []);
 
                             // Update last update time
                             updateLastUpdateTime();
@@ -2297,6 +2326,90 @@
                         } catch {
                             return [];
                         }
+                    }
+
+                    function processTemperatureData(tempData) {
+                        // Create/update chart
+                        createTemperatureChart(tempData);
+                    }
+
+                    function createTemperatureChart(tempData) {
+                        const chartCanvas = document.getElementById('temperatureChart');
+                        if (!chartCanvas) {
+                            console.warn('Temperature chart canvas not found');
+                            return;
+                        }
+
+                        const ctx = chartCanvas.getContext('2d');
+
+                        // Destroy existing chart if it exists
+                        if (temperatureChart) {
+                            temperatureChart.destroy();
+                            temperatureChart = null;
+                        }
+
+                        if (!tempData || tempData.length === 0) {
+                            // Show empty state or just return
+                            return;
+                        }
+
+                        // Prepare data
+                        const labels = tempData.map(entry => {
+                            const date = new Date(entry.created_at);
+                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        });
+                        const data = tempData.map(entry => entry.cpu_temperature);
+
+                        temperatureChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'CPU Temperature (°C)',
+                                    data: data,
+                                    borderColor: '#ef4444',
+                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                    borderWidth: 2,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 0,
+                                    pointHoverRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index',
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: false,
+                                        suggestedMin: 30,
+                                        suggestedMax: 90,
+                                        title: {
+                                            display: true,
+                                            text: 'Temperature (°C)'
+                                        }
+                                    },
+                                    x: {
+                                        ticks: {
+                                            maxTicksLimit: 12
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `Temperature: ${context.parsed.y.toFixed(1)}°C`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
                     }
 
                     function populateAppTable(appData) {

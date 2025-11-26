@@ -178,6 +178,27 @@ class SupabaseDB {
     }
   }
 
+  async insertTemperatureLog(pcName, cpuTemperature, timestamp) {
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('temperature_logs')
+          .insert({
+            pc_name: pcName,
+            cpu_temperature: cpuTemperature,
+            created_at: timestamp
+          })
+          .select();
+
+        if (error) throw error;
+        return true;
+      });
+    } catch (error) {
+      console.error('❌ Error inserting temperature log:', error.message);
+      return false;
+    }
+  }
+
   // Get time logs
   async getTimeLogs(limit = 100) {
     const { data, error } = await this.client
@@ -218,6 +239,28 @@ class SupabaseDB {
     }
 
     return data;
+  }
+
+  async getTemperatureLogs(pcName = null, limit = 100) {
+    try {
+      let query = this.client
+        .from('temperature_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (pcName) {
+        query = query.eq('pc_name', pcName);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('❌ Error fetching temperature logs:', error.message);
+      return [];
+    }
   }
 
   // Get app usage data for specific PC and date
