@@ -2407,7 +2407,7 @@
                         updateURL(pcName, selectedDate);
 
                         // Switch views
-                        document.getElementById('homePage').classList.remove('active');
+                        document.querySelectorAll('.home-container').forEach(el => el.classList.remove('active'));
                         const detailPage = document.getElementById('detailPage');
                         detailPage.classList.add('active');
                         detailPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
