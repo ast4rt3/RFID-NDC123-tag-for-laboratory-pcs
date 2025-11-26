@@ -1624,6 +1624,18 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Pagination Controls for Temperature -->
+                        <div class="pagination" id="temperaturePaginationControls"
+                            style="display: none; margin-top: 10px;">
+                            <button class="pagination-btn" id="temperaturePrevBtn" onclick="changeTempPage(-1)">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <div class="pagination-page-numbers" id="temperaturePageNumbers"></div>
+                            <div class="pagination-info" id="temperaturePaginationInfo"></div>
+                            <button class="pagination-btn" id="temperatureNextBtn" onclick="changeTempPage(1)">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div id="power-tab" class="tab-content" style="display: none;">
@@ -1719,6 +1731,8 @@
                     let currentSearchPage = 1;
                     let allPowerVoltageData = [];
                     let currentPowerPage = 1;
+                    let allTempData = [];
+                    let currentTempPage = 1;
                     const itemsPerPage = 10; // Show 10 items per page
 
                     // Auto-refresh functionality
@@ -1935,6 +1949,23 @@
                         } else {
                             // Chart doesn't exist yet, create it
                             createTemperatureChart(newData);
+                        }
+
+                        // Update table + pagination only if temperature tab is visible
+                        allTempData = newData;
+                        const tbody = document.getElementById('temperatureTableBody');
+                        const controls = document.getElementById('temperaturePaginationControls');
+
+                        if (tbody && controls) {
+                            // Keep user on same page if possible
+                            const totalPages = Math.ceil(allTempData.length / itemsPerPage);
+                            if (currentTempPage > totalPages) {
+                                currentTempPage = totalPages > 0 ? totalPages : 1;
+                            }
+
+                            if (tbody.closest('#temperature-tab').style.display !== 'none') {
+                                displayCurrentTempPage();
+                            }
                         }
                     }
 
@@ -2678,11 +2709,15 @@
                         // Create/update chart
                         createTemperatureChart(tempData);
 
-                        // Populate table
+                        // Store data for pagination
                         const tbody = document.getElementById('temperatureTableBody');
-                        if (!tbody) return;
+                        const controls = document.getElementById('temperaturePaginationControls');
+                        if (!tbody || !controls) return;
 
-                        if (!tempData || tempData.length === 0) {
+                        allTempData = tempData || [];
+                        currentTempPage = 1;
+
+                        if (!allTempData.length) {
                             tbody.innerHTML = `
                                 <tr>
                                     <td colspan="2" class="empty-state">
@@ -2691,10 +2726,30 @@
                                         <p>No CPU temperature logs recorded for this date</p>
                                     </td>
                                 </tr>`;
+                            controls.style.display = 'none';
                             return;
                         }
 
-                        tbody.innerHTML = tempData.map(entry => {
+                        // Show pagination if more than itemsPerPage
+                        if (allTempData.length > itemsPerPage) {
+                            controls.style.display = 'flex';
+                        } else {
+                            controls.style.display = 'none';
+                        }
+
+                        // Render first page
+                        displayCurrentTempPage();
+                    }
+
+                    function displayCurrentTempPage() {
+                        const tbody = document.getElementById('temperatureTableBody');
+                        if (!tbody) return;
+
+                        const startIndex = (currentTempPage - 1) * itemsPerPage;
+                        const endIndex = startIndex + itemsPerPage;
+                        const pageData = allTempData.slice(startIndex, endIndex);
+
+                        tbody.innerHTML = pageData.map(entry => {
                             const ts = formatTime(entry.created_at || entry.timestamp);
                             const t = (entry.cpu_temperature !== null && entry.cpu_temperature !== undefined)
                                 ? entry.cpu_temperature.toFixed(1)
@@ -2706,6 +2761,91 @@
                                 </tr>
                             `;
                         }).join('');
+
+                        updateTempPagination();
+                    }
+
+                    function updateTempPagination() {
+                        const totalPages = Math.ceil(allTempData.length / itemsPerPage);
+                        const info = document.getElementById('temperaturePaginationInfo');
+                        const prevBtn = document.getElementById('temperaturePrevBtn');
+                        const nextBtn = document.getElementById('temperatureNextBtn');
+                        const pageNumbers = document.getElementById('temperaturePageNumbers');
+
+                        if (!info || !prevBtn || !nextBtn || !pageNumbers) return;
+
+                        const startItem = (currentTempPage - 1) * itemsPerPage + 1;
+                        const endItem = Math.min(currentTempPage * itemsPerPage, allTempData.length);
+                        info.textContent = `Showing ${startItem}-${endItem} of ${allTempData.length}`;
+
+                        prevBtn.disabled = currentTempPage === 1;
+                        nextBtn.disabled = currentTempPage === totalPages;
+
+                        pageNumbers.innerHTML = '';
+                        const maxVisiblePages = 5;
+                        let startPage = Math.max(1, currentTempPage - Math.floor(maxVisiblePages / 2));
+                        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                        if (endPage - startPage < maxVisiblePages - 1) {
+                            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                        }
+
+                        if (startPage > 1) {
+                            const firstBtn = document.createElement('button');
+                            firstBtn.className = 'page-number';
+                            firstBtn.textContent = '1';
+                            firstBtn.onclick = () => goToTempPage(1);
+                            pageNumbers.appendChild(firstBtn);
+
+                            if (startPage > 2) {
+                                const ellipsis = document.createElement('span');
+                                ellipsis.textContent = '...';
+                                ellipsis.style.padding = '0 5px';
+                                pageNumbers.appendChild(ellipsis);
+                            }
+                        }
+
+                        for (let i = startPage; i <= endPage; i++) {
+                            const pageBtn = document.createElement('button');
+                            pageBtn.className = 'page-number' + (i === currentTempPage ? ' active' : '');
+                            pageBtn.textContent = i;
+                            pageBtn.onclick = () => goToTempPage(i);
+                            pageNumbers.appendChild(pageBtn);
+                        }
+
+                        if (endPage < totalPages) {
+                            if (endPage < totalPages - 1) {
+                                const ellipsis = document.createElement('span');
+                                ellipsis.textContent = '...';
+                                ellipsis.style.padding = '0 5px';
+                                pageNumbers.appendChild(ellipsis);
+                            }
+
+                            const lastBtn = document.createElement('button');
+                            lastBtn.className = 'page-number';
+                            lastBtn.textContent = totalPages;
+                            lastBtn.onclick = () => goToTempPage(totalPages);
+                            pageNumbers.appendChild(lastBtn);
+                        }
+                    }
+
+                    function changeTempPage(direction) {
+                        const totalPages = Math.ceil(allTempData.length / itemsPerPage);
+                        const newPage = currentTempPage + direction;
+                        if (newPage >= 1 && newPage <= totalPages) {
+                            currentTempPage = newPage;
+                            displayCurrentTempPage();
+                            document.getElementById('temperatureTableBody')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+
+                    function goToTempPage(page) {
+                        const totalPages = Math.ceil(allTempData.length / itemsPerPage);
+                        if (page >= 1 && page <= totalPages) {
+                            currentTempPage = page;
+                            displayCurrentTempPage();
+                            document.getElementById('temperatureTableBody')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
                     }
 
                     function createTemperatureChart(tempData) {
