@@ -25,7 +25,9 @@ console.error = function (...args) {
 
 const pcName = os.hostname();
 const TEMPERATURE_LOG_INTERVAL_MS = 5000;
+const POWER_VOLTAGE_LOG_INTERVAL_MS = 5000;
 let lastTemperatureSentAt = 0;
+let lastPowerVoltageSentAt = 0;
 
 let windowsHardwareMonitor = null;
 let hardwareMonitorManager = null;
@@ -536,6 +538,25 @@ function maybeSendTemperatureLog(hardwareData, timestamp) {
   });
 }
 
+function maybeSendPowerVoltageLog(hardwareData, timestamp) {
+  if (!hardwareData || (hardwareData.cpuVoltage === null && hardwareData.cpuPower === null)) {
+    return;
+  }
+
+  if (Date.now() - lastPowerVoltageSentAt < POWER_VOLTAGE_LOG_INTERVAL_MS) {
+    return;
+  }
+
+  lastPowerVoltageSentAt = Date.now();
+  sendMessage({
+    type: 'power_voltage_log',
+    pc_name: pcName,
+    cpu_voltage: hardwareData.cpuVoltage,
+    cpu_power: hardwareData.cpuPower,
+    timestamp: timestamp.toISOString()
+  });
+}
+
 // Buffer management functions
 function readBuffer() {
   try {
@@ -845,6 +866,7 @@ function setupAppUsageTracking() {
     ]);
 
     maybeSendTemperatureLog(hardwareData, now);
+    maybeSendPowerVoltageLog(hardwareData, now);
 
     const telemetryPayload = {
       cpu_temperature: hardwareData?.cpuTemperature ?? null,

@@ -1419,6 +1419,10 @@
                             style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
                             <i class="fas fa-thermometer-half"></i> Temperature
                         </button>
+                        <button class="tab-btn" onclick="switchTab('power')" id="tab-btn-power"
+                            style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
+                            <i class="fas fa-bolt"></i> Power & Voltage
+                        </button>
                     </div>
 
                     <div id="browser-tab" class="tab-content" style="display: none;">
@@ -1609,6 +1613,15 @@
                         </div>
                     </div>
 
+                    <div id="power-tab" class="tab-content" style="display: none;">
+                        <div class="chart-container">
+                            <div class="chart-title">CPU Voltage & Power</div>
+                            <div class="chart-wrapper">
+                                <canvas id="powerVoltageChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="loadingMessage" class="loading">
                         Enter PC name and date to view activity data
                     </div>
@@ -1652,6 +1665,7 @@
                     let cpuChart = null;
                     let memoryChart = null;
                     let temperatureChart = null;
+                    let powerVoltageChart = null;
                     let taskManagerRefreshInterval = null;
                     let autoRefreshInterval = null;
                     let pcStatusRefreshInterval = null;
@@ -1774,6 +1788,15 @@
                                 .lte('created_at', endDate)
                                 .order('created_at', { ascending: true });
 
+                            // Fetch power/voltage logs
+                            const { data: powerVoltageData } = await supabase
+                                .from('power_voltage_logs')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .gte('created_at', startDate)
+                                .lte('created_at', endDate)
+                                .order('created_at', { ascending: true });
+
                             // Merge app and idle data
                             let combinedData = [...(appData || [])];
                             if (idleData) {
@@ -1799,6 +1822,7 @@
                             updateAppDataSilently(combinedData);
                             updateSearchDataSilently(searchData || []);
                             updateTemperatureDataSilently(tempData || []);
+                            updatePowerVoltageDataSilently(powerVoltageData || []);
 
                             // Update last update time
                             updateLastUpdateTime();
@@ -1934,6 +1958,33 @@
                         if (totalTimeEl) totalTimeEl.textContent = formatDuration(totalDuration);
                         if (uniqueAppsEl) uniqueAppsEl.textContent = uniqueApps.size;
                         if (idleTimeEl) idleTimeEl.textContent = idleSessions;
+                    }
+
+                    // Update power/voltage data and chart
+                    function updatePowerVoltageDataSilently(newData) {
+                        if (!newData || newData.length === 0) return;
+
+                        const chartCanvas = document.getElementById('powerVoltageChart');
+                        if (!chartCanvas) return;
+
+                        // Prepare data
+                        const labels = newData.map(entry => {
+                            const date = new Date(entry.created_at);
+                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        });
+                        const voltageData = newData.map(entry => entry.cpu_voltage);
+                        const powerData = newData.map(entry => entry.cpu_power);
+
+                        // Update chart if exists, create if not
+                        if (powerVoltageChart) {
+                            powerVoltageChart.data.labels = labels;
+                            powerVoltageChart.data.datasets[0].data = voltageData;
+                            powerVoltageChart.data.datasets[1].data = powerData;
+                            powerVoltageChart.update('none'); // Use 'none' mode for instant update
+                        } else {
+                            // Chart doesn't exist yet, create it
+                            createPowerVoltageChart(newData);
+                        }
                     }
 
 
@@ -2286,6 +2337,7 @@
                         document.getElementById('pcStatusContainer').style.display = 'none';
                         document.getElementById('apps-tab').style.display = 'none';
                         document.getElementById('temperature-tab').style.display = 'none';
+                        document.getElementById('power-tab').style.display = 'none';
                         hideTaskManager();
 
                         try {
@@ -2383,6 +2435,19 @@
                                 console.warn('Temperature data error:', tempError);
                             }
 
+                            // Fetch power/voltage logs
+                            const { data: powerVoltageData, error: powerVoltageError } = await supabase
+                                .from('power_voltage_logs')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .gte('created_at', startDate)
+                                .lte('created_at', endDate)
+                                .order('created_at', { ascending: true });
+
+                            if (powerVoltageError) {
+                                console.warn('Power/Voltage data error:', powerVoltageError);
+                            }
+
                             // Merge and sort data
                             let combinedData = [...(appData || [])];
                             if (idleData) {
@@ -2410,6 +2475,7 @@
                             processData(combinedData);
                             processSearchData(searchData || []);
                             processTemperatureData(tempData || []);
+                            processPowerVoltageData(powerVoltageData || []);
 
                             // Update last update time
                             updateLastUpdateTime();
@@ -2620,6 +2686,136 @@
                                         callbacks: {
                                             label: function (context) {
                                                 return `Temperature: ${context.parsed.y.toFixed(1)}°C`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    function processPowerVoltageData(powerVoltageData) {
+                        // Create/update chart
+                        createPowerVoltageChart(powerVoltageData);
+                    }
+
+                    function createPowerVoltageChart(powerVoltageData) {
+                        const chartCanvas = document.getElementById('powerVoltageChart');
+                        if (!chartCanvas) {
+                            console.warn('Power/Voltage chart canvas not found');
+                            return;
+                        }
+
+                        const ctx = chartCanvas.getContext('2d');
+
+                        // Destroy existing chart if it exists
+                        if (powerVoltageChart) {
+                            powerVoltageChart.destroy();
+                            powerVoltageChart = null;
+                        }
+
+                        if (!powerVoltageData || powerVoltageData.length === 0) {
+                            // Show empty state or just return
+                            return;
+                        }
+
+                        // Prepare data
+                        const labels = powerVoltageData.map(entry => {
+                            const date = new Date(entry.created_at);
+                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        });
+                        const voltageData = powerVoltageData.map(entry => entry.cpu_voltage);
+                        const powerData = powerVoltageData.map(entry => entry.cpu_power);
+
+                        powerVoltageChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [
+                                    {
+                                        label: 'CPU Voltage (V)',
+                                        data: voltageData,
+                                        borderColor: '#10b981',
+                                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                        borderWidth: 2,
+                                        fill: true,
+                                        tension: 0.4,
+                                        pointRadius: 0,
+                                        pointHoverRadius: 4,
+                                        yAxisID: 'y'
+                                    },
+                                    {
+                                        label: 'CPU Power (W)',
+                                        data: powerData,
+                                        borderColor: '#f59e0b',
+                                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                        borderWidth: 2,
+                                        fill: true,
+                                        tension: 0.4,
+                                        pointRadius: 0,
+                                        pointHoverRadius: 4,
+                                        yAxisID: 'y1'
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index',
+                                },
+                                scales: {
+                                    y: {
+                                        type: 'linear',
+                                        display: true,
+                                        position: 'left',
+                                        beginAtZero: false,
+                                        suggestedMin: 0.8,
+                                        suggestedMax: 1.6,
+                                        title: {
+                                            display: true,
+                                            text: 'Voltage (V)'
+                                        },
+                                        ticks: {
+                                            color: '#10b981'
+                                        }
+                                    },
+                                    y1: {
+                                        type: 'linear',
+                                        display: true,
+                                        position: 'right',
+                                        beginAtZero: false,
+                                        suggestedMin: 0,
+                                        suggestedMax: 150,
+                                        title: {
+                                            display: true,
+                                            text: 'Power (W)'
+                                        },
+                                        ticks: {
+                                            color: '#f59e0b'
+                                        },
+                                        grid: {
+                                            drawOnChartArea: false
+                                        }
+                                    },
+                                    x: {
+                                        ticks: {
+                                            maxTicksLimit: 12
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                const label = context.dataset.label || '';
+                                                const value = context.parsed.y;
+                                                if (label.includes('Voltage')) {
+                                                    return `${label}: ${value.toFixed(3)}V`;
+                                                } else {
+                                                    return `${label}: ${value.toFixed(1)}W`;
+                                                }
                                             }
                                         }
                                     }

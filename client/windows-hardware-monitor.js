@@ -228,6 +228,147 @@ class WindowsHardwareMonitor {
   }
 
   /**
+   * Get CPU voltage and power from LibreHardwareMonitor
+   */
+  async getCpuVoltageAndPower() {
+    try {
+      // Try WMI first (faster)
+      const result = await this.getVoltageAndPowerFromLHM();
+      if (result.cpuVoltage !== null || result.cpuPower !== null) {
+        return result;
+      }
+
+      // Fallback to DLL method
+      return await this.getVoltageAndPowerFromLHMDll();
+    } catch (err) {
+      console.error('Error getting CPU voltage/power:', err.message);
+      return { cpuVoltage: null, cpuPower: null };
+    }
+  }
+
+  /**
+   * Get CPU voltage and power from LibreHardwareMonitor WMI
+   */
+  getVoltageAndPowerFromLHM() {
+    return new Promise((resolve) => {
+      const cmd = `powershell -Command "Get-WmiObject -Namespace root/LibreHardwareMonitor -Class Sensor | Where-Object {($_.SensorType -eq 'Voltage' -and ($_.Name -like '*CPU*' -or $_.Name -like '*Core*' -or $_.Name -like '*VID*')) -or ($_.SensorType -eq 'Power' -and ($_.Name -like '*Package*' -or $_.Name -like '*CPU*'))} | Select-Object Name, Value, SensorType | ConvertTo-Json"`;
+
+      exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
+        if (err || stderr) {
+          resolve({ cpuVoltage: null, cpuPower: null });
+          return;
+        }
+
+        try {
+          const output = stdout.trim();
+          if (!output) {
+            resolve({ cpuVoltage: null, cpuPower: null });
+            return;
+          }
+
+          // Parse JSON (could be single object or array)
+          let sensors = JSON.parse(output);
+          if (!Array.isArray(sensors)) {
+            sensors = [sensors];
+          }
+
+          let cpuVoltage = null;
+          let cpuPower = null;
+
+          // Find voltage and power values
+          for (const sensor of sensors) {
+            if (sensor.SensorType === 'Voltage' && cpuVoltage === null) {
+              const val = parseFloat(sensor.Value);
+              if (!isNaN(val) && val > 0 && val < 10) { // Reasonable voltage range
+                cpuVoltage = Math.round(val * 1000) / 1000; // Round to 3 decimals
+              }
+            }
+            if (sensor.SensorType === 'Power' && cpuPower === null) {
+              const val = parseFloat(sensor.Value);
+              if (!isNaN(val) && val > 0 && val < 1000) { // Reasonable power range
+                cpuPower = Math.round(val * 10) / 10; // Round to 1 decimal
+              }
+            }
+          }
+
+          resolve({ cpuVoltage, cpuPower });
+        } catch (parseErr) {
+          resolve({ cpuVoltage: null, cpuPower: null });
+        }
+      });
+    });
+  }
+
+  /**
+   * Get CPU voltage and power from LibreHardwareMonitorLib.dll directly
+   */
+  getVoltageAndPowerFromLHMDll() {
+    return new Promise((resolve) => {
+      if (!this.lhmDllPath || !fs.existsSync(this.lhmDllPath)) {
+        resolve({ cpuVoltage: null, cpuPower: null });
+        return;
+      }
+
+      const escapedDllPath = this.lhmDllPath.replace(/\\/g, '\\\\');
+      const script = `
+        try {
+          Add-Type -Path '${escapedDllPath}';
+          $computer = New-Object LibreHardwareMonitor.Hardware.Computer;
+          $computer.IsCpuEnabled = $true;
+          $computer.Open();
+          $voltage = $null;
+          $power = $null;
+          foreach ($hardware in $computer.Hardware) {
+            if ($hardware.HardwareType -eq [LibreHardwareMonitor.Hardware.HardwareType]::CPU) {
+              $hardware.Update();
+              foreach ($sensor in $hardware.Sensors) {
+                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Voltage -and $voltage -eq $null) {
+                  if ($sensor.Name -like '*CPU*' -or $sensor.Name -like '*Core*' -or $sensor.Name -like '*VID*') {
+                    $voltage = $sensor.Value;
+                  }
+                }
+                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Power -and $power -eq $null) {
+                  if ($sensor.Name -like '*Package*' -or $sensor.Name -like '*CPU*') {
+                    $power = $sensor.Value;
+                  }
+                }
+              }
+            }
+            if ($voltage -ne $null -and $power -ne $null) { break }
+          }
+          $computer.Close();
+          $result = @{};
+          if ($voltage -ne $null) { $result.voltage = [math]::Round($voltage, 3) }
+          if ($power -ne $null) { $result.power = [math]::Round($power, 1) }
+          Write-Output (ConvertTo-Json $result);
+        } catch {
+          Write-Error $_.Exception.Message;
+        }
+      `;
+
+      const encoded = Buffer.from(script, 'utf16le').toString('base64');
+      const cmd = `powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${encoded}`;
+
+      exec(cmd, { timeout: 5000 }, (err, stdout, stderr) => {
+        if (err || stderr) {
+          resolve({ cpuVoltage: null, cpuPower: null });
+          return;
+        }
+
+        try {
+          const result = JSON.parse(stdout.trim());
+          resolve({
+            cpuVoltage: result.voltage || null,
+            cpuPower: result.power || null
+          });
+        } catch (parseErr) {
+          resolve({ cpuVoltage: null, cpuPower: null });
+        }
+      });
+    });
+  }
+
+  /**
    * Detect if CPU is overclocked
    * Compares current CPU speed with base speed
    */
@@ -335,21 +476,24 @@ class WindowsHardwareMonitor {
   }
 
   /**
-   * Get all hardware monitoring data at once
+   * Get all hardware data (temperature, overclocking status, voltage, power)
    */
   async getAllData() {
-    const [cpuTemp, overclockData] = await Promise.all([
+    const [cpuTemp, isCpuOC, isRamOC, voltageAndPower] = await Promise.all([
       this.getCpuTemperature(),
-      this.checkOverclocking()
+      this.detectCpuOverclock(),
+      this.detectRamOverclock(),
+      this.getCpuVoltageAndPower()
     ]);
 
     return {
       cpuTemperature: cpuTemp,
-      isCpuOverclocked: overclockData.cpuOverclocked,
-      isRamOverclocked: overclockData.ramOverclocked
+      isCpuOverclocked: isCpuOC,
+      isRamOverclocked: isRamOC,
+      cpuVoltage: voltageAndPower.cpuVoltage,
+      cpuPower: voltageAndPower.cpuPower
     };
   }
 }
 
 module.exports = WindowsHardwareMonitor;
-
