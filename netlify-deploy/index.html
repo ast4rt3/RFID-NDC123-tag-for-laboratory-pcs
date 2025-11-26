@@ -1424,8 +1424,9 @@
                     <div id="browser-tab" class="tab-content" style="display: none;">
                         <div class="card" id="topSearchList"
                             style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                            <div class="chart-title" style="text-align: left; margin-bottom: 15px;">
-                                <i class="fas fa-arrow-trend-up"></i> Top Sites Visited
+                            <div class="chart-title"
+                                style="text-align: left; margin-bottom: 15px; color: var(--text-heading);">
+                                <i class="fas fa-arrow-trend-up"></i> Recent Sites Visited
                             </div>
                             <div id="topSearchListBody">
                                 <div style="text-align: center; color: #9ca3af;">No data yet</div>
@@ -1656,8 +1657,8 @@
                     let pcStatusRefreshInterval = null;
                     let lastUpdateTime = null;
                     const PC_STATUS_REFRESH_INTERVAL = 5000; // 5 seconds for PC status
-                    const FULL_REFRESH_INTERVAL = 20000; // 20 seconds for full data reload
-                    const TASK_MANAGER_REFRESH_INTERVAL = 3000; // 3 seconds for task manager
+                    const FULL_REFRESH_INTERVAL = 5000; // 5 seconds for full data reload
+                    const TASK_MANAGER_REFRESH_INTERVAL = 1000; // 1 second for task manager
 
                     // Pagination variables
                     let allAppData = [];
@@ -1685,41 +1686,256 @@
                         updateLastUpdateTime();
 
                         // Start PC status refresh interval (every 5 seconds)
-                        // pcStatusRefreshInterval = setInterval(() => {
-                        //     if (document.hidden) return;
+                        pcStatusRefreshInterval = setInterval(() => {
+                            if (document.hidden) return;
 
-                        //     const currentPcName = document.getElementById('pcName').value.trim();
-                        //     if (currentPcName) {
-                        //         console.log('Auto-refresh: Updating PC status...');
-                        //         refreshPcStatusOnly(currentPcName);
-                        //     } else {
-                        //         stopAutoRefresh();
-                        //     }
-                        // }, PC_STATUS_REFRESH_INTERVAL);
+                            const currentPcName = document.getElementById('pcName').value.trim();
+                            if (currentPcName) {
+                                console.log('Auto-refresh: Updating PC status...');
+                                refreshPcStatusOnly(currentPcName);
+                            } else {
+                                stopAutoRefresh();
+                            }
+                        }, PC_STATUS_REFRESH_INTERVAL);
 
-                        // Start full data refresh interval (every 20 seconds)
-                        // autoRefreshInterval = setInterval(() => {
-                        //     if (document.hidden) return;
+                        // Start full data refresh interval (every 5 seconds)
+                        autoRefreshInterval = setInterval(() => {
+                            if (document.hidden) return;
 
-                        //     const currentPcName = document.getElementById('pcName').value.trim();
-                        //     if (currentPcName) {
-                        //         // Check if task manager is open
-                        //         const taskManagerSection = document.getElementById('taskManagerSection');
-                        //         const isTaskManagerOpen = taskManagerSection && taskManagerSection.style.display !== 'none';
+                            const currentPcName = document.getElementById('pcName').value.trim();
+                            if (currentPcName) {
+                                // Check if task manager is open
+                                const taskManagerSection = document.getElementById('taskManagerSection');
+                                const isTaskManagerOpen = taskManagerSection && taskManagerSection.style.display !== 'none';
 
-                        //         if (!isTaskManagerOpen) {
-                        //             console.log('Auto-refresh: Full data reload...');
-                        //             loadData();
-                        //         } else {
-                        //             console.log('Auto-refresh: Skipping full reload (task manager is open)');
-                        //         }
-                        //     } else {
-                        //         stopAutoRefresh();
-                        //     }
-                        // }, FULL_REFRESH_INTERVAL);
+                                if (!isTaskManagerOpen) {
+                                    console.log('Auto-refresh: Silent data reload...');
+                                    refreshDataOnly();
+                                } else {
+                                    console.log('Auto-refresh: Skipping data reload (task manager is open)');
+                                }
+                            } else {
+                                stopAutoRefresh();
+                            }
+                        }, FULL_REFRESH_INTERVAL);
 
-                        console.log('Auto-refresh started for PC:', pcName, '- PC status: 5s, Full reload: 20s');
+                        console.log('Auto-refresh started for PC:', pcName, '- PC status: 5s, Full reload: 5s');
                     }
+
+                    // Silent data refresh - updates charts and tables without disrupting user view
+                    async function refreshDataOnly() {
+                        const pcNameInput = document.getElementById('pcName').value;
+                        const pcName = sanitizePcNameInput(pcNameInput);
+                        const pcNameFilter = buildCaseInsensitiveFilter(pcName);
+                        const selectedDate = document.getElementById('selectedDate').value;
+
+                        if (!pcName || !selectedDate) return;
+
+                        try {
+                            // Fetch data silently
+                            const localStart = new Date(`${selectedDate}T00:00:00`);
+                            const localEnd = new Date(`${selectedDate}T23:59:59.999`);
+                            const startDate = localStart.toISOString();
+                            const endDate = localEnd.toISOString();
+
+                            // Fetch app usage data
+                            const { data: appData } = await supabase
+                                .from('app_usage_logs')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .gte('start_time', startDate)
+                                .lte('start_time', endDate)
+                                .order('start_time', { ascending: false });
+
+                            // Fetch idle logs
+                            const { data: idleData } = await supabase
+                                .from('idle_logs')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .gte('start_time', startDate)
+                                .lte('start_time', endDate)
+                                .order('start_time', { ascending: false });
+
+                            // Fetch browser search logs
+                            const { data: searchData } = await supabase
+                                .from('browser_search_logs')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .gte('timestamp', startDate)
+                                .lte('timestamp', endDate)
+                                .order('timestamp', { ascending: false });
+
+                            // Fetch temperature logs
+                            const { data: tempData } = await supabase
+                                .from('temperature_logs')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .gte('created_at', startDate)
+                                .lte('created_at', endDate)
+                                .order('created_at', { ascending: true });
+
+                            // Merge app and idle data
+                            let combinedData = [...(appData || [])];
+                            if (idleData) {
+                                const formattedIdleData = idleData.map(log => {
+                                    let duration = log.duration_seconds;
+                                    if (!duration && log.start_time && log.end_time) {
+                                        const start = new Date(log.start_time);
+                                        const end = new Date(log.end_time);
+                                        duration = Math.round((end - start) / 1000);
+                                    }
+                                    return {
+                                        ...log,
+                                        app_name: 'System Idle',
+                                        is_idle_session: true,
+                                        duration_seconds: duration || 0
+                                    };
+                                });
+                                combinedData = [...combinedData, ...formattedIdleData];
+                            }
+                            combinedData.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+                            // Update data arrays and preserve pagination state
+                            updateAppDataSilently(combinedData);
+                            updateSearchDataSilently(searchData || []);
+                            updateTemperatureDataSilently(tempData || []);
+
+                            // Update last update time
+                            updateLastUpdateTime();
+                        } catch (error) {
+                            console.error('Error refreshing data:', error);
+                        }
+                    }
+
+                    // Update app data without resetting pagination
+                    function updateAppDataSilently(newData) {
+                        const oldPage = currentPage;
+                        allAppData = newData;
+
+                        // Keep user on same page if possible
+                        const totalPages = Math.ceil(allAppData.length / itemsPerPage);
+                        if (oldPage > totalPages) {
+                            currentPage = totalPages > 0 ? totalPages : 1;
+                        }
+
+                        // Update display
+                        const tbody = document.getElementById('appTableBody');
+                        if (tbody && tbody.closest('#apps-tab').style.display !== 'none') {
+                            displayCurrentPage();
+                        }
+
+                        // Update chart if it exists
+                        updateAppChartSilently(newData);
+
+                        // Update stats
+                        updateStatsSilently(newData);
+                    }
+
+                    // Update search data without resetting pagination
+                    function updateSearchDataSilently(newData) {
+                        const oldPage = currentSearchPage;
+                        allSearchData = newData;
+
+                        // Keep user on same page if possible
+                        const totalPages = Math.ceil(allSearchData.length / itemsPerPage);
+                        if (oldPage > totalPages) {
+                            currentSearchPage = totalPages > 0 ? totalPages : 1;
+                        }
+
+                        // Update display
+                        const tbody = document.getElementById('searchTableBody');
+                        if (tbody && tbody.closest('#browser-tab').style.display !== 'none') {
+                            displayCurrentSearchPage();
+                        }
+
+                        // Update top sites list
+                        updateTopSearchList(newData);
+                    }
+
+                    // Update temperature data and chart
+                    function updateTemperatureDataSilently(newData) {
+                        if (!newData || newData.length === 0) return;
+
+                        const chartCanvas = document.getElementById('temperatureChart');
+                        if (!chartCanvas) return;
+
+                        // Prepare data
+                        const labels = newData.map(entry => {
+                            const date = new Date(entry.created_at);
+                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        });
+                        const data = newData.map(entry => entry.cpu_temperature);
+
+                        // Update chart if exists, create if not
+                        if (temperatureChart) {
+                            temperatureChart.data.labels = labels;
+                            temperatureChart.data.datasets[0].data = data;
+                            temperatureChart.update('none'); // Use 'none' mode for instant update
+                        } else {
+                            // Chart doesn't exist yet, create it
+                            createTemperatureChart(newData);
+                        }
+                    }
+
+                    // Update app chart without recreation
+                    function updateAppChartSilently(appData) {
+                        if (!appChart) return;
+
+                        const appUsage = {};
+                        appData.forEach(entry => {
+                            if (entry && entry.app_name) {
+                                if (!appUsage[entry.app_name]) {
+                                    appUsage[entry.app_name] = 0;
+                                }
+                                appUsage[entry.app_name] += entry.duration_seconds || 0;
+                            }
+                        });
+
+                        const labels = Object.keys(appUsage);
+                        const data = Object.values(appUsage).map(seconds => Math.round(seconds / 60));
+                        const backgroundColors = labels.map(label =>
+                            label === 'System Idle' ? '#f59e0b' : '#4f46e5'
+                        );
+
+                        // Update chart data
+                        appChart.data.labels = labels;
+                        appChart.data.datasets[0].data = data;
+                        appChart.data.datasets[0].backgroundColor = backgroundColors;
+                        appChart.update('none');
+                    }
+
+                    // Update stats without full recreation
+                    function updateStatsSilently(appData) {
+                        const statsGrid = document.getElementById('statsGrid');
+                        if (!statsGrid || statsGrid.style.display === 'none') return;
+
+                        // Calculate stats
+                        let totalSessions = appData.length;
+                        let totalDuration = 0;
+                        let idleSessions = 0;
+                        const uniqueApps = new Set();
+
+                        appData.forEach(entry => {
+                            totalDuration += entry.duration_seconds || 0;
+                            if (entry.is_idle_session) {
+                                idleSessions++;
+                            } else if (entry.app_name) {
+                                uniqueApps.add(entry.app_name);
+                            }
+                        });
+
+                        // Update DOM
+                        const totalSessionsEl = document.getElementById('totalSessions');
+                        const totalTimeEl = document.getElementById('totalTime');
+                        const uniqueAppsEl = document.getElementById('uniqueApps');
+                        const idleTimeEl = document.getElementById('idleTime');
+
+                        if (totalSessionsEl) totalSessionsEl.textContent = totalSessions;
+                        if (totalTimeEl) totalTimeEl.textContent = formatDuration(totalDuration);
+                        if (uniqueAppsEl) uniqueAppsEl.textContent = uniqueApps.size;
+                        if (idleTimeEl) idleTimeEl.textContent = idleSessions;
+                    }
+
 
                     function stopAutoRefresh() {
                         if (autoRefreshInterval) {
@@ -2387,7 +2603,7 @@
                                     y: {
                                         beginAtZero: false,
                                         suggestedMin: 30,
-                                        suggestedMax: 90,
+                                        suggestedMax: 120,
                                         title: {
                                             display: true,
                                             text: 'Temperature (°C)'
@@ -2781,6 +2997,12 @@
                             return;
                         }
 
+                        // We want recent sites, so we just take the raw searchData (already sorted by time desc)
+                        // and deduplicate by host if needed, or just show the stream.
+                        // The user asked for "recent sites visited", implying a chronological list.
+                        // However, to keep it clean like the previous "Top Sites", we might want to still group by host
+                        // but order by the *most recent* visit to that host.
+
                         const hostUsage = {};
                         searchData.forEach(entry => {
                             const url = entry.url || '';
@@ -2796,20 +3018,26 @@
                                 host = entry.search_engine || entry.browser || 'Unknown Source';
                             }
                             const key = host || 'Unknown Source';
+
                             if (!hostUsage[key]) {
-                                hostUsage[key] = { count: 0, lastEntry: entry };
+                                hostUsage[key] = { lastEntry: entry };
                             }
-                            hostUsage[key].count += 1;
+                            // Keep the most recent entry for this host
                             if (entry.timestamp && (!hostUsage[key].lastEntry.timestamp || new Date(entry.timestamp) > new Date(hostUsage[key].lastEntry.timestamp))) {
                                 hostUsage[key].lastEntry = entry;
                             }
                         });
 
-                        const topHosts = Object.entries(hostUsage)
-                            .sort((a, b) => b[1].count - a[1].count)
+                        // Sort by timestamp descending (most recent first)
+                        const recentHosts = Object.entries(hostUsage)
+                            .sort((a, b) => {
+                                const timeA = a[1].lastEntry.timestamp ? new Date(a[1].lastEntry.timestamp) : new Date(0);
+                                const timeB = b[1].lastEntry.timestamp ? new Date(b[1].lastEntry.timestamp) : new Date(0);
+                                return timeB - timeA;
+                            })
                             .slice(0, 5);
 
-                        listContainer.innerHTML = topHosts.map(([host, data], index) => {
+                        listContainer.innerHTML = recentHosts.map(([host, data], index) => {
                             const url = data.lastEntry.url || '';
                             const rawTitle = data.lastEntry.search_query || host;
                             const title = rawTitle.length > 80 ? `${rawTitle.slice(0, 77)}...` : rawTitle;
@@ -2823,7 +3051,7 @@
                                 <div style="font-weight:600;color:#1f2937;">${escapeHtml(host)}</div>
                                 <div style="font-size:0.9rem;color:#6b7280;margin:4px 0;">${escapeHtml(title)}</div>
                                 <div style="font-size:0.8rem;color:#9ca3af;margin-bottom:6px;">
-                                    <i class="fas fa-clock"></i> ${timestamp} • ${data.count} visit${data.count > 1 ? 's' : ''}
+                                    <i class="fas fa-clock"></i> ${timestamp}
                                 </div>
                                 <div style="font-size:0.85rem;">${link}</div>
                             </div>
