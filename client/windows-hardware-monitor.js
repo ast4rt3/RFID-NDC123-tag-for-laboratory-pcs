@@ -11,11 +11,14 @@ const fs = require('fs');
 const { getResourcesRoot } = require('./utils/resource-path');
 
 class WindowsHardwareMonitor {
-  constructor() {
+  constructor(hardwareMonitorManager) {
     this.isWindows = os.platform() === 'win32';
     this.lastCpuTemp = null;
     this.lastOverclockCheck = null;
     this.cacheTimeout = 5000; // Cache results for 5 seconds
+    this.hardwareMonitorManager = hardwareMonitorManager;
+    this.wmiFailureCount = 0;
+    this.MAX_WMI_FAILURES = 3;
     this.warned = {
       wmi: false,
       ohm: false,
@@ -261,57 +264,88 @@ class WindowsHardwareMonitor {
    */
   getVoltageAndPowerFromLHM() {
     return new Promise((resolve) => {
-      const cmd = `powershell -Command "Get-WmiObject -Namespace root/LibreHardwareMonitor -Class Sensor | Where-Object {($_.SensorType -eq 'Voltage' -and ($_.Name -like '*CPU*' -or $_.Name -like '*Core*' -or $_.Name -like '*VID*')) -or ($_.SensorType -eq 'Power' -and ($_.Name -like '*Package*' -or $_.Name -like '*CPU*'))} | Select-Object Name, Value, SensorType | ConvertTo-Json"`;
+      // Try LibreHardwareMonitor namespace first
+      const lhmCmd = `powershell -Command "try { Get-WmiObject -Namespace root/LibreHardwareMonitor -Class Sensor -ErrorAction Stop | Where-Object {($_.SensorType -eq 'Voltage' -and ($_.Name -like '*CPU*' -or $_.Name -like '*Core*' -or $_.Name -like '*VID*')) -or ($_.SensorType -eq 'Power' -and ($_.Name -like '*Package*' -or $_.Name -like '*CPU*'))} | Select-Object Name, Value, SensorType | ConvertTo-Json } catch { Write-Output 'WMI_ERROR' }"`;
 
-      exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
-        if (err || stderr) {
-          console.warn('[HWMonitor] Voltage/power WMI call failed:', stderr?.trim() || err?.message);
-          resolve({ cpuVoltage: null, cpuPower: null });
+      exec(lhmCmd, { timeout: 5000 }, async (err, stdout, stderr) => {
+        if (err || stderr || stdout.includes('WMI_ERROR')) {
+          // Try OpenHardwareMonitor namespace as fallback
+          const ohmCmd = `powershell -Command "try { Get-WmiObject -Namespace root/OpenHardwareMonitor -Class Sensor -ErrorAction Stop | Where-Object {($_.SensorType -eq 'Voltage' -and ($_.Name -like '*CPU*' -or $_.Name -like '*Core*' -or $_.Name -like '*VID*')) -or ($_.SensorType -eq 'Power' -and ($_.Name -like '*Package*' -or $_.Name -like '*CPU*'))} | Select-Object Name, Value, SensorType | ConvertTo-Json } catch { Write-Output 'WMI_ERROR' }"`;
+
+          exec(ohmCmd, { timeout: 5000 }, (ohmErr, ohmStdout, ohmStderr) => {
+            if (ohmErr || ohmStderr || ohmStdout.includes('WMI_ERROR')) {
+              // Both failed
+              this.wmiFailureCount++;
+
+              if (this.wmiFailureCount >= this.MAX_WMI_FAILURES) {
+                if (!this.warned.lhmWmi) {
+                  console.warn(`[HWMonitor] WMI failed ${this.wmiFailureCount} times.`);
+                  console.warn('[HWMonitor] ⚠️ Please ensure:');
+                  console.warn('[HWMonitor] 1. LibreHardwareMonitor is running');
+                  console.warn('[HWMonitor] 2. "Options > Enable WMI" is CHECKED in LibreHardwareMonitor');
+                  this.warned.lhmWmi = true;
+                }
+                this.wmiFailureCount = 0;
+              }
+              resolve({ cpuVoltage: null, cpuPower: null });
+              return;
+            }
+
+            // OHM worked!
+            this.parseWmiOutput(ohmStdout, resolve);
+          });
           return;
         }
 
-        try {
-          const output = stdout.trim();
-          if (!output) {
-            console.log('[HWMonitor] Voltage/power WMI returned no data');
-            resolve({ cpuVoltage: null, cpuPower: null });
-            return;
-          }
-
-          // Parse JSON (could be single object or array)
-          let sensors = JSON.parse(output);
-          console.log('[HWMonitor] Voltage/power WMI raw JSON sensors:', sensors.length);
-          if (!Array.isArray(sensors)) {
-            sensors = [sensors];
-          }
-
-          let cpuVoltage = null;
-          let cpuPower = null;
-
-          // Find voltage and power values
-          for (const sensor of sensors) {
-            if (sensor.SensorType === 'Voltage' && cpuVoltage === null) {
-              const val = parseFloat(sensor.Value);
-              if (!isNaN(val) && val > 0 && val < 10) { // Reasonable voltage range
-                cpuVoltage = Math.round(val * 1000) / 1000; // Round to 3 decimals
-              }
-            }
-            if (sensor.SensorType === 'Power' && cpuPower === null) {
-              const val = parseFloat(sensor.Value);
-              if (!isNaN(val) && val > 0 && val < 1000) { // Reasonable power range
-                cpuPower = Math.round(val * 10) / 10; // Round to 1 decimal
-              }
-            }
-          }
-
-          console.log('[HWMonitor] Voltage/power WMI parsed result:', { cpuVoltage, cpuPower });
-          resolve({ cpuVoltage, cpuPower });
-        } catch (parseErr) {
-          console.warn('[HWMonitor] Failed to parse voltage/power WMI JSON:', parseErr.message);
-          resolve({ cpuVoltage: null, cpuPower: null });
-        }
+        // LHM worked!
+        this.parseWmiOutput(stdout, resolve);
       });
     });
+  }
+
+  parseWmiOutput(stdout, resolve) {
+    try {
+      const output = stdout.trim();
+      if (!output) {
+        resolve({ cpuVoltage: null, cpuPower: null });
+        return;
+      }
+
+      // Parse JSON (could be single object or array)
+      let sensors = JSON.parse(output);
+      if (!Array.isArray(sensors)) {
+        sensors = [sensors];
+      }
+
+      let cpuVoltage = null;
+      let cpuPower = null;
+
+      // Find voltage and power values
+      for (const sensor of sensors) {
+        if (sensor.SensorType === 'Voltage' && cpuVoltage === null) {
+          const val = parseFloat(sensor.Value);
+          if (!isNaN(val) && val > 0 && val < 10) { // Reasonable voltage range
+            cpuVoltage = Math.round(val * 1000) / 1000; // Round to 3 decimals
+          }
+        }
+        if (sensor.SensorType === 'Power' && cpuPower === null) {
+          const val = parseFloat(sensor.Value);
+          if (!isNaN(val) && val > 0 && val < 1000) { // Reasonable power range
+            cpuPower = Math.round(val * 10) / 10; // Round to 1 decimal
+          }
+        }
+      }
+
+      // If we got data, reset the warning flag
+      if (cpuVoltage !== null || cpuPower !== null) {
+        this.warned.lhmWmi = false;
+        this.wmiFailureCount = 0;
+      }
+
+      resolve({ cpuVoltage, cpuPower });
+    } catch (parseErr) {
+      resolve({ cpuVoltage: null, cpuPower: null });
+    }
   }
 
   /**

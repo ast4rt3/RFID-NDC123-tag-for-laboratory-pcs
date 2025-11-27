@@ -5,6 +5,11 @@ function getResourcesRoot() {
   const defaultPath = path.join(__dirname, '..', '..');
 
   if (!process || !process.resourcesPath) {
+    // In development mode, check if resources/LibreHardwareMonitor exists
+    const resourcesPath = path.join(defaultPath, 'resources');
+    if (fs.existsSync(path.join(resourcesPath, 'LibreHardwareMonitor'))) {
+      return resourcesPath;
+    }
     return defaultPath;
   }
 

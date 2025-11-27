@@ -40,7 +40,9 @@ class HardwareMonitorManager {
   }
 
   /**
-   * Start LibreHardwareMonitor in the background
+   * Start monitoring (Passive mode)
+   * Checks if LibreHardwareMonitor is running, but does NOT start it automatically
+   * as the user wants to manage it manually.
    */
   async start() {
     if (!this.isAvailable()) {
@@ -48,48 +50,21 @@ class HardwareMonitorManager {
       return false;
     }
 
-    if (this.isRunning) {
-      console.log('[HWMonitor] Already running');
-      return true;
-    }
+    console.log('[HWMonitor] Checking for LibreHardwareMonitor...');
 
-    try {
-      console.log('[HWMonitor] Starting LibreHardwareMonitor...');
-
-      // Check if already running (from previous instance)
-      const isAlreadyRunning = await this.checkIfRunning();
-      if (isAlreadyRunning) {
-        console.log('[HWMonitor] LibreHardwareMonitor already running (from previous instance)');
-        this.isRunning = true;
-        return true;
-      }
-
-      // Start LibreHardwareMonitor minimized
-      this.lhmProcess = spawn('cmd.exe', ['/c', `"${this.lhmPath}" -minimized`], {
-        detached: true,
-        stdio: 'ignore',
-        windowsHide: true
-      });
-
-
-      // Don't wait for the process to exit
-      this.lhmProcess.unref();
-
+    // Check if running
+    const isRunning = await this.checkIfRunning();
+    if (isRunning) {
+      console.log('[HWMonitor] ✅ LibreHardwareMonitor is running');
       this.isRunning = true;
-      console.log('[HWMonitor] LibreHardwareMonitor started successfully');
-
-      // Wait a bit for it to initialize
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
       return true;
-
-    } catch (err) {
-      console.error('[HWMonitor] Failed to start LibreHardwareMonitor:', err.message);
+    } else {
+      console.warn('[HWMonitor] ⚠️ LibreHardwareMonitor is NOT running');
+      console.warn('[HWMonitor] Please launch LibreHardwareMonitor.exe manually as Administrator');
+      this.isRunning = false;
       return false;
     }
   }
-
-
 
   /**
    * Check if LibreHardwareMonitor is already running
@@ -113,23 +88,20 @@ class HardwareMonitorManager {
   }
 
   /**
-   * Stop LibreHardwareMonitor
-   * Note: We generally don't stop it, as it should keep running for monitoring
+   * Stop monitoring
+   * In passive mode, this just updates internal state
    */
   async stop() {
-    if (!this.isRunning) {
-      return;
-    }
+    this.isRunning = false;
+  }
 
-    try {
-      if (this.lhmProcess && !this.lhmProcess.killed) {
-        this.lhmProcess.kill();
-        console.log('[HWMonitor] LibreHardwareMonitor stopped');
-      }
-      this.isRunning = false;
-    } catch (err) {
-      console.error('[HWMonitor] Error stopping LibreHardwareMonitor:', err.message);
-    }
+  /**
+   * Restart requested (No-op in manual mode)
+   */
+  async restartLHM() {
+    console.log('[HWMonitor] Restart requested, but running in manual mode.');
+    console.log('[HWMonitor] Please restart LibreHardwareMonitor manually if needed.');
+    return this.start();
   }
 
   /**

@@ -1211,8 +1211,11 @@ function handleExit() {
 function setupSystemLoadTracking() {
   if (systemLoadInterval) return;
 
+  console.log('🔄 Setting up system load tracking...');
+
   const trackLoad = async () => {
     try {
+      console.log('📊 Collecting system load data...');
       const [load, mem] = await Promise.all([
         si.currentLoad(),
         si.mem()
@@ -1220,6 +1223,8 @@ function setupSystemLoadTracking() {
 
       const cpuUsage = load.currentLoad;
       const ramUsage = (mem.active / mem.total) * 100;
+
+      console.log(`📊 System load: CPU=${cpuUsage.toFixed(1)}%, RAM=${ramUsage.toFixed(1)}%`);
 
       sendMessage({
         type: 'system_load',
@@ -1236,6 +1241,7 @@ function setupSystemLoadTracking() {
   trackLoad();
 
   systemLoadInterval = setInterval(trackLoad, SYSTEM_LOAD_INTERVAL_MS);
+  console.log(`✅ System load tracking started (interval: ${SYSTEM_LOAD_INTERVAL_MS}ms)`);
 }
 
 // Handle shutdown and exit signals
