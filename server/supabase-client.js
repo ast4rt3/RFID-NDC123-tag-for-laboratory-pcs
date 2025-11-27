@@ -33,7 +33,7 @@ class SupabaseDB {
 
         if (isNetworkError && !isLastAttempt) {
           const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
-          console.warn(`⚠️ Network error, retrying in ${delay}ms (attempt ${attempt}/${maxRetries})...`);
+          // console.warn(`⚠️ Network error, retrying in ${delay}ms (attempt ${attempt}/${maxRetries})...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         } else {
           throw err; // Re-throw if not a network error or last attempt
@@ -356,13 +356,15 @@ class SupabaseDB {
   }
 
   // Upsert system information
-  async upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname) {
+  async upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, gpuModel, diskModels, osPlatform, osVersion, hostname) {
     const systemData = {
       pc_name: pcName,
       cpu_model: cpuModel,
       cpu_cores: cpuCores,
       cpu_speed_ghz: cpuSpeedGhz,
       total_memory_gb: totalMemoryGb,
+      gpu_model: gpuModel,
+      disk_models: diskModels,
       os_platform: osPlatform,
       os_version: osVersion,
       hostname: hostname
@@ -382,6 +384,38 @@ class SupabaseDB {
       });
     } catch (error) {
       console.error('❌ Error upserting system info:', error.message);
+      throw error;
+    }
+  }
+
+  // Upsert disk storage info
+  async upsertDiskStorage(pcName, storageData) {
+    if (!storageData || storageData.length === 0) return;
+
+    const records = storageData.map(disk => ({
+      pc_name: pcName,
+      mount_point: disk.mount_point,
+      total_gb: disk.total_gb,
+      used_gb: disk.used_gb,
+      available_gb: disk.available_gb,
+      use_percent: disk.use_percent,
+      label: disk.label
+    }));
+
+    try {
+      return await this.retryOperation(async () => {
+        const { data, error } = await this.client
+          .from('disk_storage')
+          .upsert(records, {
+            onConflict: 'pc_name, mount_point'
+          })
+          .select();
+
+        if (error) throw error;
+        return data;
+      });
+    } catch (error) {
+      console.error('❌ Error upserting disk storage:', error.message);
       throw error;
     }
   }

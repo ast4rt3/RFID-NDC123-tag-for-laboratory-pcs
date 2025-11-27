@@ -57,24 +57,26 @@ class Database {
     this.init();
   }
 
-  async upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname) {
+  async upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, gpuModel, diskModels, osPlatform, osVersion, hostname) {
     if (this.type === 'supabase') {
-      return await this.db.upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname);
+      return await this.db.upsertSystemInfo(pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, gpuModel, diskModels, osPlatform, osVersion, hostname);
     } else if (this.db && this.db.exec) {
       // SQLite
       return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO system_info (pc_name, cpu_model, cpu_cores, cpu_speed_ghz, total_memory_gb, os_platform, os_version, hostname, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        const sql = `INSERT INTO system_info (pc_name, cpu_model, cpu_cores, cpu_speed_ghz, total_memory_gb, gpu_model, disk_models, os_platform, os_version, hostname, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
           ON CONFLICT(pc_name) DO UPDATE SET 
             cpu_model=excluded.cpu_model,
             cpu_cores=excluded.cpu_cores,
             cpu_speed_ghz=excluded.cpu_speed_ghz,
             total_memory_gb=excluded.total_memory_gb,
+            gpu_model=excluded.gpu_model,
+            disk_models=excluded.disk_models,
             os_platform=excluded.os_platform,
             os_version=excluded.os_version,
             hostname=excluded.hostname,
             updated_at=CURRENT_TIMESTAMP`;
-        this.db.run(sql, [pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, osPlatform, osVersion, hostname], function (err) {
+        this.db.run(sql, [pcName, cpuModel, cpuCores, cpuSpeedGhz, totalMemoryGb, gpuModel, diskModels, osPlatform, osVersion, hostname], function (err) {
           if (err) reject(err);
           else resolve();
         });
@@ -88,11 +90,69 @@ class Database {
         cpu_cores: cpuCores,
         cpu_speed_ghz: cpuSpeedGhz,
         total_memory_gb: totalMemoryGb,
+        gpu_model: gpuModel,
+        disk_models: diskModels,
         os_platform: osPlatform,
         os_version: osVersion,
         hostname: hostname,
         updated_at: new Date().toISOString()
       };
+      return Promise.resolve();
+    }
+  }
+
+  async upsertDiskStorage(pcName, storageData) {
+    if (this.type === 'supabase') {
+      return await this.db.upsertDiskStorage(pcName, storageData);
+    } else if (this.db && this.db.exec) {
+      // SQLite - upsert each row
+      return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO disk_storage (pc_name, mount_point, total_gb, used_gb, available_gb, use_percent, label, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          ON CONFLICT(pc_name, mount_point) DO UPDATE SET 
+            total_gb=excluded.total_gb,
+            used_gb=excluded.used_gb,
+            available_gb=excluded.available_gb,
+            use_percent=excluded.use_percent,
+            label=excluded.label,
+            updated_at=CURRENT_TIMESTAMP`;
+
+        const stmt = this.db.prepare(sql);
+
+        this.db.serialize(() => {
+          this.db.run("BEGIN TRANSACTION");
+
+          storageData.forEach(disk => {
+            stmt.run([
+              pcName,
+              disk.mount_point,
+              disk.total_gb,
+              disk.used_gb,
+              disk.available_gb,
+              disk.use_percent,
+              disk.label
+            ]);
+          });
+
+          this.db.run("COMMIT", (err) => {
+            stmt.finalize();
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+      });
+    } else {
+      // In-memory storage
+      if (!this.db.diskStorage) this.db.diskStorage = {};
+      if (!this.db.diskStorage[pcName]) this.db.diskStorage[pcName] = [];
+
+      // Replace existing storage info for this PC
+      this.db.diskStorage[pcName] = storageData.map(disk => ({
+        ...disk,
+        pc_name: pcName,
+        updated_at: new Date().toISOString()
+      }));
+
       return Promise.resolve();
     }
   }

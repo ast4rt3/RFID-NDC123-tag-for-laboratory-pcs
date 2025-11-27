@@ -200,10 +200,19 @@ wss.on('connection', ws => {
           data.cpu_cores,
           data.cpu_speed_ghz,
           data.total_memory_gb,
+          data.gpu_model,
+          data.disk_models,
           data.os_platform,
           data.os_version,
           data.hostname
         );
+
+        // Handle storage info if present
+        if (data.storage_info && Array.isArray(data.storage_info)) {
+          await db.upsertDiskStorage(data.pc_name, data.storage_info);
+        }
+
+        // console.log(`✅ [${data.pc_name}] System info updated`);
       } catch (error) {
         console.error(`❌ [${data.pc_name}] Failed to upsert system info:`, error.message);
       }

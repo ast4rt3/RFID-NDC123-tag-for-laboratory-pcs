@@ -700,10 +700,14 @@ async function sendSystemInfo() {
     console.log('Collecting system information...');
 
     // Collect system information (even if not connected, so we have it ready)
-    const [cpu, mem, osInfo] = await Promise.all([
+    const [cpu, mem, osInfo, graphics, diskLayout, fsSize, blockDevices] = await Promise.all([
       si.cpu(),
       si.mem(),
-      si.osInfo()
+      si.osInfo(),
+      si.graphics().catch(e => ({ controllers: [] })), // Handle graphics error gracefully
+      si.diskLayout().catch(e => []),
+      si.fsSize().catch(e => []),
+      si.blockDevices().catch(e => [])
     ]);
 
     // Extract CPU model and speed
@@ -711,13 +715,79 @@ async function sendSystemInfo() {
     const cpuCores = cpu.cores || 0;
     const cpuSpeedGhz = cpu.speed ? (cpu.speed / 1000) : 0; // Convert MHz to GHz
 
-    // Extract memory (convert bytes to GB)
-    const totalMemoryGb = mem.total ? (mem.total / (1024 * 1024 * 1024)) : 0;
+    // Extract GPU model (take the first controller if available)
+    let gpuModel = 'Unknown';
+    if (graphics && graphics.controllers && graphics.controllers.length > 0) {
+      const gpu = graphics.controllers[0];
+      gpuModel = gpu.model || gpu.vendor || 'Unknown GPU';
+      // If we have multiple GPUs, maybe list them? For now, just the first one is fine or join them
+      if (graphics.controllers.length > 1) {
+        gpuModel = graphics.controllers.map(g => g.model || g.vendor).join(', ');
+      }
+    }
 
-    // Extract OS information
-    const osPlatform = osInfo.platform || os.platform();
-    const osVersion = osInfo.distro || osInfo.release || 'Unknown';
+    // Extract memory (convert bytes to GB)
+    const totalMemoryGb = Math.round((mem.total / (1024 * 1024 * 1024)) * 10) / 10;
+
+    // Extract OS info
+    const osPlatform = `${osInfo.platform} ${osInfo.distro}`;
+    const osVersion = osInfo.release;
     const hostname = os.hostname();
+
+    // Extract disk models
+    const diskModels = diskLayout && diskLayout.length > 0
+      ? diskLayout.map(d => d.name || d.device).join(', ')
+      : 'Unknown Disk';
+
+    // Extract storage info
+    const storageInfo = fsSize && fsSize.length > 0
+      ? fsSize.map((fs, index) => {
+        // Try to find the physical disk model for this mount point
+        let model = 'Unknown Disk'; // Default to generic text instead of FS type
+
+        // Helper to normalize mount points for comparison (e.g. "C:" vs "c:")
+        const normalize = (s) => s ? s.toString().toLowerCase().trim().replace(/\\/g, '') : '';
+        const fsMount = normalize(fs.mount);
+
+        if (blockDevices && blockDevices.length > 0) {
+          // 1. Find the partition block device
+          const partition = blockDevices.find(bd => normalize(bd.mount) === fsMount || normalize(bd.name) === fsMount);
+
+          if (partition) {
+            // 2. Find the physical disk block device (same physical identifier, type 'disk')
+            const disk = blockDevices.find(bd => bd.physical === partition.physical && bd.type === 'disk');
+            if (disk && disk.model) {
+              model = disk.model;
+            } else if (partition.model) {
+              model = partition.model;
+            }
+          }
+        }
+
+        // Fallback 1: Use volume label (for USB drives and removable media with labels)
+        if (model === 'Unknown Disk' && fs.label && fs.label.trim() !== '') {
+          model = fs.label;
+        }
+
+        // Fallback 2: Use diskLayout data (for internal drives)
+        // This is the same source that populates the Physical Disks section
+        // Map volumes to disks sequentially by array index (they're in the same order)
+        if (model === 'Unknown Disk' && diskLayout && diskLayout.length > 0) {
+          if (index < diskLayout.length && diskLayout[index] && diskLayout[index].name) {
+            model = diskLayout[index].name;
+          }
+        }
+
+        return {
+          mount_point: fs.mount,
+          total_gb: Math.round((fs.size / (1024 * 1024 * 1024)) * 10) / 10,
+          used_gb: Math.round((fs.used / (1024 * 1024 * 1024)) * 10) / 10,
+          available_gb: Math.round((fs.available / (1024 * 1024 * 1024)) * 10) / 10,
+          use_percent: fs.use,
+          label: model // Store Model Name in the 'label' field
+        };
+      })
+      : [];
 
     // Send system info to server (will be buffered if not connected)
     sendMessage({
@@ -727,6 +797,9 @@ async function sendSystemInfo() {
       cpu_cores: cpuCores,
       cpu_speed_ghz: cpuSpeedGhz,
       total_memory_gb: totalMemoryGb,
+      gpu_model: gpuModel,
+      disk_models: diskModels,
+      storage_info: storageInfo,
       os_platform: osPlatform,
       os_version: osVersion,
       hostname: hostname
@@ -737,6 +810,9 @@ async function sendSystemInfo() {
       cpu_cores: cpuCores,
       cpu_speed_ghz: cpuSpeedGhz,
       total_memory_gb: totalMemoryGb,
+      gpu_model: gpuModel,
+      disk_models: diskModels,
+      storage_count: storageInfo.length,
       os_platform: osPlatform,
       os_version: osVersion,
       hostname: hostname

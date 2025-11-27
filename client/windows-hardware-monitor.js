@@ -32,8 +32,8 @@ class WindowsHardwareMonitor {
   }
 
   /**
-   * Get CPU temperature using multiple methods
-   * Tries WMI, then falls back to Open Hardware Monitor if available
+   * Get CPU temperature using LibreHardwareMonitor WMI
+   * User requested to strictly use this method to avoid ambient/thermal zone readings
    */
   async getCpuTemperature() {
     if (!this.isWindows) {
@@ -46,23 +46,7 @@ class WindowsHardwareMonitor {
     }
 
     try {
-      // Method 1: Try WMI MSAcpi_ThermalZoneTemperature (works on some systems)
-      const wmiTemp = await this.getCpuTempFromWMI();
-      if (wmiTemp !== null) {
-        console.log('[HWMonitor] CPU temp from WMI:', wmiTemp);
-        this.lastCpuTemp = { value: wmiTemp, timestamp: Date.now() };
-        return wmiTemp;
-      }
-
-      // Method 2: Try Open Hardware Monitor WMI namespace (if installed)
-      const ohmTemp = await this.getCpuTempFromOHM();
-      if (ohmTemp !== null) {
-        console.log('[HWMonitor] CPU temp from OHM WMI:', ohmTemp);
-        this.lastCpuTemp = { value: ohmTemp, timestamp: Date.now() };
-        return ohmTemp;
-      }
-
-      // Method 3: Try reading from LibreHardwareMonitor WMI (if installed)
+      // Method: Try LibreHardwareMonitor WMI (Method 3 from diagnostic)
       const lhmTemp = await this.getCpuTempFromLHM();
       if (lhmTemp !== null) {
         console.log('[HWMonitor] CPU temp from LHM WMI:', lhmTemp);
@@ -70,15 +54,7 @@ class WindowsHardwareMonitor {
         return lhmTemp;
       }
 
-      // Method 4: Directly read via LibreHardwareMonitorLib.dll
-      const dllTemp = await this.getCpuTempFromLHMDll();
-      if (dllTemp !== null) {
-        console.log('[HWMonitor] CPU temp from LHM DLL:', dllTemp);
-        this.lastCpuTemp = { value: dllTemp, timestamp: Date.now() };
-        return dllTemp;
-      }
-
-      console.log('[HWMonitor] All temperature methods failed, returning null');
+      console.log('[HWMonitor] LHM WMI temperature method failed, returning null');
       return null;
     } catch (err) {
       console.error('Error getting CPU temperature:', err.message);
@@ -95,10 +71,7 @@ class WindowsHardwareMonitor {
 
       exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
         if (err || stderr) {
-          if (!this.warned.wmi) {
-            console.warn('[HWMonitor] WMI thermal zone unavailable:', stderr?.trim() || err?.message);
-            this.warned.wmi = true;
-          }
+          // Suppress warnings for this method as it's no longer primary
           resolve(null);
           return;
         }
@@ -123,21 +96,7 @@ class WindowsHardwareMonitor {
       const cmd = 'powershell -Command "Get-WmiObject -Namespace root/OpenHardwareMonitor -Class Sensor | Where-Object {$_.SensorType -eq \'Temperature\' -and $_.Name -like \'*CPU*\'} | Select-Object -First 1 -ExpandProperty Value"';
 
       exec(cmd, { timeout: 3000 }, (err, stdout, stderr) => {
-        if (err || stderr) {
-          if (!this.warned.ohm) {
-            console.warn('[HWMonitor] OpenHardwareMonitor WMI unavailable:', stderr?.trim() || err?.message);
-            this.warned.ohm = true;
-          }
-          resolve(null);
-          return;
-        }
-
-        const temp = parseFloat(stdout.trim());
-        if (!isNaN(temp) && temp > 0 && temp < 150) {
-          resolve(Math.round(temp * 10) / 10);
-        } else {
-          resolve(null);
-        }
+        resolve(null);
       });
     });
   }
@@ -173,66 +132,8 @@ class WindowsHardwareMonitor {
    * Get CPU temperature by loading LibreHardwareMonitorLib.dll directly
    */
   getCpuTempFromLHMDll() {
-    return new Promise((resolve) => {
-      if (!this.lhmDllPath || !fs.existsSync(this.lhmDllPath)) {
-        if (!this.warned.dll) {
-          console.warn('[HWMonitor] LibreHardwareMonitorLib.dll not found at:', this.lhmDllPath);
-          this.warned.dll = true;
-        }
-        resolve(null);
-        return;
-      }
-
-      const escapedDllPath = this.lhmDllPath.replace(/\\/g, '\\\\');
-      const script = `
-        try {
-          Add-Type -Path '${escapedDllPath}';
-          $computer = New-Object LibreHardwareMonitor.Hardware.Computer;
-          $computer.IsCpuEnabled = $true;
-          $computer.Open();
-          $temperature = $null;
-          foreach ($hardware in $computer.Hardware) {
-            if ($hardware.HardwareType -eq [LibreHardwareMonitor.Hardware.HardwareType]::CPU) {
-              $hardware.Update();
-              foreach ($sensor in $hardware.Sensors) {
-                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature -and ($sensor.Name -like '*CPU*' -or $sensor.Name -like '*Package*')) {
-                  $temperature = $sensor.Value;
-                  break;
-                }
-              }
-            }
-            if ($temperature -ne $null) { break }
-          }
-          $computer.Close();
-          if ($temperature -ne $null) {
-            Write-Output ([math]::Round($temperature, 1));
-          }
-        } catch {
-          Write-Error $_.Exception.Message;
-        }
-      `;
-
-      const encoded = Buffer.from(script, 'utf16le').toString('base64');
-      const cmd = `powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${encoded}`;
-
-      exec(cmd, { timeout: 5000 }, (err, stdout, stderr) => {
-        if (err || stderr) {
-          if (!this.warned.dll) {
-            console.warn('[HWMonitor] Direct DLL read failed:', stderr?.trim() || err?.message);
-            this.warned.dll = true;
-          }
-          resolve(null);
-          return;
-        }
-
-        const temp = parseFloat(stdout.trim());
-        if (!isNaN(temp) && temp > 0 && temp < 150) {
-          resolve(temp);
-        } else {
-          resolve(null);
-        }
-      });
-    });
+    // Disabled to prevent errors
+    return Promise.resolve(null);
   }
 
   /**
@@ -240,19 +141,11 @@ class WindowsHardwareMonitor {
    */
   async getCpuVoltageAndPower() {
     try {
-      console.log('[HWMonitor] Getting CPU voltage/power...');
-
-      // Try WMI first (faster)
+      // Try WMI first (faster and safer)
       const result = await this.getVoltageAndPowerFromLHM();
-      if (result.cpuVoltage !== null || result.cpuPower !== null) {
-        console.log('[HWMonitor] WMI voltage/power result:', result);
-        return result;
-      }
+      return result;
 
-      // Fallback to DLL method
-      const dllResult = await this.getVoltageAndPowerFromLHMDll();
-      console.log('[HWMonitor] DLL voltage/power result:', dllResult);
-      return dllResult;
+      // DLL fallback removed to prevent "Command failed" errors
     } catch (err) {
       console.error('Error getting CPU voltage/power:', err.message);
       return { cpuVoltage: null, cpuPower: null };

@@ -1472,6 +1472,10 @@
                             style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
                             <i class="fas fa-bolt"></i> Power & Voltage
                         </button>
+                        <button class="tab-btn" onclick="switchTab('storage')" id="tab-btn-storage"
+                            style="padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
+                            <i class="fas fa-hdd"></i> Storage
+                        </button>
                     </div>
 
                     <div id="browser-tab" class="tab-content" style="display: none;">
@@ -1721,6 +1725,44 @@
                         </div>
                     </div>
 
+                    <div id="storage-tab" class="tab-content" style="display: none;">
+                        <div class="card"
+                            style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px;">
+                            <h3 style="font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 15px;">
+                                <i class="fas fa-hdd" style="color: #4f46e5; margin-right: 8px;"></i> Physical Disks
+                            </h3>
+                            <div id="diskModelsList" style="font-size: 0.95rem; color: #4b5563; line-height: 1.6;">
+                                Loading...
+                            </div>
+                        </div>
+
+                        <div class="card"
+                            style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <h3 style="font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 15px;">
+                                <i class="fas fa-database" style="color: #4f46e5; margin-right: 8px;"></i> Logical
+                                Volumes
+                            </h3>
+                            <div class="data-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Drive Name</th>
+                                            <th>Label</th>
+                                            <th>Total</th>
+                                            <th>Used</th>
+                                            <th>Available</th>
+                                            <th>Usage</th>
+                                            <th>Last Updated</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="storageTableBody">
+                                        <!-- Storage data will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="loadingMessage" class="loading">
                         Enter PC name and date to view activity data
                     </div>
@@ -1891,7 +1933,7 @@
                                 .ilike('pc_name', pcNameFilter)
                                 .gte('created_at', startDate)
                                 .lte('created_at', endDate)
-                                .order('created_at', { ascending: true });
+                                .order('created_at', { ascending: false });
 
                             // Fetch power/voltage logs
                             const { data: powerVoltageData } = await supabase
@@ -1900,7 +1942,7 @@
                                 .ilike('pc_name', pcNameFilter)
                                 .gte('created_at', startDate)
                                 .lte('created_at', endDate)
-                                .order('created_at', { ascending: true });
+                                .order('created_at', { ascending: false });
 
                             // Merge app and idle data
                             let combinedData = [...(appData || [])];
@@ -1989,8 +2031,10 @@
                         if (!chartCanvas) return;
 
                         // Prepare data (keep time formatting consistent with tables)
-                        const labels = newData.map(entry => formatTime(entry.created_at));
-                        const data = newData.map(entry => entry.cpu_temperature);
+                        // Reverse for chart (oldest to newest)
+                        const chartData = [...newData].reverse();
+                        const labels = chartData.map(entry => formatTime(entry.created_at));
+                        const data = chartData.map(entry => entry.cpu_temperature);
 
                         // Update chart if exists, create if not
                         if (temperatureChart) {
@@ -2090,9 +2134,11 @@
                         allPowerVoltageData = newData;
 
                         // Prepare data (keep time formatting consistent with temperature)
-                        const labels = newData.map(entry => formatTime(entry.created_at));
-                        const voltageData = newData.map(entry => entry.cpu_voltage);
-                        const powerData = newData.map(entry => entry.cpu_power);
+                        // Reverse for chart (oldest to newest)
+                        const chartData = [...newData].reverse();
+                        const labels = chartData.map(entry => formatTime(entry.created_at));
+                        const voltageData = chartData.map(entry => entry.cpu_voltage);
+                        const powerData = chartData.map(entry => entry.cpu_power);
 
                         // Update chart if exists, create if not
                         if (powerVoltageChart) {
@@ -2750,7 +2796,7 @@
                                 .ilike('pc_name', pcNameFilter)
                                 .gte('created_at', startDate)
                                 .lte('created_at', endDate)
-                                .order('created_at', { ascending: true });
+                                .order('created_at', { ascending: false });
 
                             if (tempError) {
                                 console.warn('Temperature data error:', tempError);
@@ -2763,7 +2809,7 @@
                                 .ilike('pc_name', pcNameFilter)
                                 .gte('created_at', startDate)
                                 .lte('created_at', endDate)
-                                .order('created_at', { ascending: true });
+                                .order('created_at', { ascending: false });
 
                             if (powerVoltageError) {
                                 console.warn('Power/Voltage data error:', powerVoltageError);
@@ -2932,8 +2978,8 @@
                     }
 
                     function processTemperatureData(tempData) {
-                        // Create/update chart
-                        createTemperatureChart(tempData);
+                        // Create/update chart (reverse for chronological order)
+                        createTemperatureChart([...tempData].reverse());
 
                         // Store data for pagination
                         const tbody = document.getElementById('temperatureTableBody');
@@ -3151,8 +3197,8 @@
                     }
 
                     function processPowerVoltageData(powerVoltageData) {
-                        // Create/update chart
-                        createPowerVoltageChart(powerVoltageData);
+                        // Create/update chart (reverse for chronological order)
+                        createPowerVoltageChart([...powerVoltageData].reverse());
 
                         // Store data for pagination
                         const tbody = document.getElementById('powerVoltageTableBody');
@@ -3879,6 +3925,12 @@
                                 return;
                             }
                             showTaskManager(pcName);
+                        } else if (tabName === 'storage') {
+                            hideTaskManager();
+                            const pcName = document.getElementById('pcName').value.trim();
+                            if (pcName) {
+                                loadStorageData(pcName);
+                            }
                         } else {
                             hideTaskManager();
                         }
@@ -3966,6 +4018,18 @@
                         <div class="system-info-item">
                             <div class="label"><i class="fas fa-microchip"></i> CPU</div>
                             <div class="value">${escapeHtml(systemInfo.cpu_model)}</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.gpu_model ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-display"></i> GPU</div>
+                            <div class="value">${escapeHtml(systemInfo.gpu_model)}</div>
+                        </div>
+                    ` : ''}
+                    ${systemInfo.disk_models ? `
+                        <div class="system-info-item">
+                            <div class="label"><i class="fas fa-hdd"></i> Disks</div>
+                            <div class="value">${escapeHtml(systemInfo.disk_models)}</div>
                         </div>
                     ` : ''}
                     ${systemInfo.cpu_cores ? `
@@ -4256,6 +4320,92 @@
                             .replace(/>/g, "&gt;")
                             .replace(/"/g, "&quot;")
                             .replace(/'/g, "&#039;");
+                    }
+
+                    // Storage Functions
+                    async function loadStorageData(pcName) {
+                        const sanitizedPcName = sanitizePcNameInput(pcName);
+                        if (!sanitizedPcName) return;
+                        const pcNameFilter = buildCaseInsensitiveFilter(sanitizedPcName);
+
+                        try {
+                            // Fetch system info for disk models
+                            const systemInfo = await fetchPcRowCaseInsensitive('system_info', pcNameFilter);
+                            if (systemInfo && systemInfo.disk_models) {
+                                const diskModelsList = document.getElementById('diskModelsList');
+                                if (diskModelsList) {
+                                    const models = systemInfo.disk_models.split(',').map(m => m.trim()).filter(m => m);
+                                    if (models.length > 0) {
+                                        diskModelsList.innerHTML = models.map(model =>
+                                            `<div style="margin-bottom: 4px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 0.8rem; margin-right: 6px;"></i>${escapeHtml(model)}</div>`
+                                        ).join('');
+                                    } else {
+                                        diskModelsList.textContent = 'No disk models detected';
+                                    }
+                                }
+                            }
+
+                            // Fetch storage volumes
+                            const { data: storageData, error } = await supabase
+                                .from('disk_storage')
+                                .select('*')
+                                .ilike('pc_name', pcNameFilter)
+                                .order('mount_point', { ascending: true });
+
+                            if (error) throw error;
+
+                            renderStorageTable(storageData || []);
+
+                        } catch (error) {
+                            console.error('Error loading storage data:', error);
+                            const tbody = document.getElementById('storageTableBody');
+                            if (tbody) {
+                                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading storage data</td></tr>`;
+                            }
+                        }
+                    }
+
+                    function renderStorageTable(storageData) {
+                        const tbody = document.getElementById('storageTableBody');
+                        if (!tbody) return;
+
+                        if (storageData.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="empty-state">
+                                        <i class="fas fa-hdd"></i>
+                                        <h3>No Storage Data</h3>
+                                        <p>No storage volumes detected</p>
+                                    </td>
+                                </tr>`;
+                            return;
+                        }
+
+                        tbody.innerHTML = storageData.map(vol => {
+                            const usePercent = vol.use_percent || 0;
+                            let barColor = '#10b981'; // Green
+                            if (usePercent > 90) barColor = '#ef4444'; // Red
+                            else if (usePercent > 75) barColor = '#f59e0b'; // Yellow
+
+                            return `
+                                <tr>
+                                    <td style="font-weight: 600;">${escapeHtml(vol.label || 'Unknown')}</td>
+                                    <td>${escapeHtml(vol.mount_point || '-')}</td>
+                                    <td>${vol.total_gb ? vol.total_gb.toFixed(1) + ' GB' : '-'}</td>
+                                    <td>${vol.used_gb ? vol.used_gb.toFixed(1) + ' GB' : '-'}</td>
+                                    <td>${vol.available_gb ? vol.available_gb.toFixed(1) + ' GB' : '-'}</td>
+                                    <td style="width: 200px;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="flex: 1; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
+                                                <div style="width: ${usePercent}%; height: 100%; background: ${barColor};"></div>
+                                            </div>
+                                            <span style="font-size: 0.85rem; font-weight: 600; min-width: 40px;">${Math.round(usePercent)}%</span>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 0.85rem; color: #6b7280;">${formatDateTime(vol.updated_at)}</td>
+                                </tr>
+                            `;
+                        }).join('');
                     }
 
                     // Task Manager Functions - Fetch from Supabase

@@ -1,0 +1,109 @@
+--- si.fsSize() ---
+[
+  {
+    "fs": "C:",
+    "type": "NTFS",
+    "size": 254951813120,
+    "used": 233472253952,
+    "available": 21479559168,
+    "use": 91.58,
+    "mount": "C:",
+    "rw": true
+  },
+  {
+    "fs": "L:",
+    "type": "NTFS",
+    "size": 512107737088,
+    "used": 285868421120,
+    "available": 226239315968,
+    "use": 55.82,
+    "mount": "L:",
+    "rw": true
+  }
+]
+
+--- si.blockDevices() ---
+[
+  {
+    "name": "C:",
+    "identifier": "C:",
+    "type": "disk",
+    "fsType": "ntfs",
+    "mount": "C:",
+    "size": "254951813120",
+    "physical": "Local",
+    "uuid": "9219FAE5",
+    "label": "Local Disk",
+    "model": "",
+    "serial": "9219FAE5",
+    "removable": false,
+    "protocol": "",
+    "group": "",
+    "device": "\\\\.\\PHYSICALDRIVE0"
+  },
+  {
+    "name": "L:",
+    "identifier": "L:",
+    "type": "disk",
+    "fsType": "ntfs",
+    "mount": "L:",
+    "size": "512107737088",
+    "physical": "Local",
+    "uuid": "924AECF1",
+    "label": "Law 500GB",
+    "model": "",
+    "serial": "924AECF1",
+    "removable": false,
+    "protocol": "",
+    "group": "",
+    "device": "\\\\.\\PHYSICALDRIVE1"
+  }
+]
+
+--- si.diskLayout() ---
+[
+  {
+    "device": "\\\\.\\PHYSICALDRIVE1",
+    "type": "SSD",
+    "name": "KINGSTON SNVS500G",
+    "vendor": "Kingston Technology",
+    "size": 512105932800,
+    "bytesPerSector": 512,
+    "totalCylinders": 62260,
+    "totalHeads": 255,
+    "totalSectors": 1000206900,
+    "totalTracks": 15876300,
+    "tracksPerCylinder": 255,
+    "sectorsPerTrack": 63,
+    "firmwareRevision": "T1103F0L",
+    "serialNum": "0000_0000_0000_0000_0000_0100_0000_0000.",
+    "interfaceType": "NVMe",
+    "smartStatus": "Ok",
+    "temperature": null
+  },
+  {
+    "device": "\\\\.\\PHYSICALDRIVE0",
+    "type": "SSD",
+    "name": "Wodposit SSD 256GB",
+    "vendor": "",
+    "size": 256052966400,
+    "bytesPerSector": 512,
+    "totalCylinders": 31130,
+    "totalHeads": 255,
+    "totalSectors": 500103450,
+    "totalTracks": 7938150,
+    "tracksPerCylinder": 255,
+    "sectorsPerTrack": 63,
+    "firmwareRevision": "V4.7",
+    "serialNum": "00017D0",
+    "interfaceType": "SATA",
+    "smartStatus": "Ok",
+    "temperature": null
+  }
+]
+
+--- Mapping Attempt ---
+  Found physical disk for C:: {"name":"C:","identifier":"C:","type":"disk","fsType":"ntfs","mount":"C:","size":"254951813120","physical":"Local","uuid":"9219FAE5","label":"Local Disk","model":"","serial":"9219FAE5","removable":false,"protocol":"","group":"","device":"\\\\.\\PHYSICALDRIVE0"}
+Mount: C: -> Model: Unknown Model
+  Found physical disk for L:: {"name":"C:","identifier":"C:","type":"disk","fsType":"ntfs","mount":"C:","size":"254951813120","physical":"Local","uuid":"9219FAE5","label":"Local Disk","model":"","serial":"9219FAE5","removable":false,"protocol":"","group":"","device":"\\\\.\\PHYSICALDRIVE0"}
+Mount: L: -> Model: Unknown Model

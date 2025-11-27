@@ -20,6 +20,15 @@ BEGIN
         RAISE NOTICE 'Added cpu_model column';
     END IF;
 
+    -- Add gpu_model if it doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_schema = 'public' 
+                   AND table_name = 'system_info' 
+                   AND column_name = 'gpu_model') THEN
+        ALTER TABLE system_info ADD COLUMN gpu_model VARCHAR(200);
+        RAISE NOTICE 'Added gpu_model column';
+    END IF;
+
     -- Add cpu_cores if it doesn't exist
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
                    WHERE table_schema = 'public' 
