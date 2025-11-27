@@ -113,10 +113,14 @@ wss.on('connection', ws => {
       // Use the start_time from client, or create new one if not provided
       const startTime = data.start_time ? new Date(data.start_time).toISOString() : new Date().toISOString();
       appActiveSessions[clientId][data.app_name] = { start_time: startTime };
-      try {
-        await db.updatePCStatus(clientId, true, startTime, startTime);
-      } catch (error) {
-        console.error(`❌ [${clientId}] Failed to update PC status on app_usage_start:`, error.message);
+
+      // Only update status if session is active
+      if (activeSessions[clientId]) {
+        try {
+          await db.updatePCStatus(clientId, true, startTime, startTime);
+        } catch (error) {
+          console.error(`❌ [${clientId}] Failed to update PC status on app_usage_start:`, error.message);
+        }
       }
     } else if (
       data.type === 'app_usage_end'
@@ -143,7 +147,11 @@ wss.on('connection', ws => {
             data.is_cpu_overclocked,
             data.is_ram_overclocked
           );
-          await db.updatePCStatus(clientId, true, endTime, endTime);
+
+          // Only update status if session is active
+          if (activeSessions[clientId]) {
+            await db.updatePCStatus(clientId, true, endTime, endTime);
+          }
         } catch (error) {
           console.error(`❌ [${clientId}] Failed to save app_usage_end:`, error.message);
         }
@@ -174,7 +182,11 @@ wss.on('connection', ws => {
             data.is_cpu_overclocked,
             data.is_ram_overclocked
           );
-          await db.updatePCStatus(clientId, true, endTime, endTime);
+
+          // Only update status if session is active
+          if (activeSessions[clientId]) {
+            await db.updatePCStatus(clientId, true, endTime, endTime);
+          }
         } catch (error) {
           console.error(`❌ [${clientId}] Failed to save app_usage_update:`, error.message);
         }
@@ -197,17 +209,22 @@ wss.on('connection', ws => {
       }
     } else if (data.type === 'idle_status') {
       // Handle idle status
-      try {
-        await db.updatePCStatus(data.pc_name, null, null, null, data.is_idle);
-      } catch (error) {
-        console.error(`❌ [${data.pc_name}] Failed to update idle status:`, error.message);
+      if (activeSessions[data.pc_name]) {
+        try {
+          await db.updatePCStatus(data.pc_name, null, null, null, data.is_idle);
+        } catch (error) {
+          console.error(`❌ [${data.pc_name}] Failed to update idle status:`, error.message);
+        }
       }
     } else if (data.type === 'heartbeat') {
       // Handle heartbeat - just update last_seen to keep connection alive
-      try {
-        await db.updatePCStatus(data.pc_name, true, new Date().toISOString(), null);
-      } catch (error) {
-        // Silently ignore heartbeat errors to avoid spam
+      // Only process if session is active to prevent zombie online status
+      if (activeSessions[data.pc_name]) {
+        try {
+          await db.updatePCStatus(data.pc_name, true, new Date().toISOString(), null);
+        } catch (error) {
+          // Silently ignore heartbeat errors to avoid spam
+        }
       }
     } else if (data.type === 'browser_activity') {
       // Handle browser activity
@@ -267,6 +284,18 @@ wss.on('connection', ws => {
         await db.insertPowerVoltageLog(pcName, data.cpu_voltage, data.cpu_power, timestamp);
       } catch (error) {
         console.error(`❌ [${data.pc_name || clientId}] Failed to insert power/voltage log:`, error.message);
+      }
+    } else if (data.type === 'system_load') {
+      try {
+        const pcName = data.pc_name || clientId;
+        if (!pcName) return;
+
+        // Only update if session is active
+        if (activeSessions[pcName]) {
+          await db.updatePCStatus(pcName, null, null, null, null, data.cpu_usage_percent, data.ram_usage_percent);
+        }
+      } catch (error) {
+        console.error(`❌ [${data.pc_name || clientId}] Failed to update system load:`, error.message);
       }
     }
 

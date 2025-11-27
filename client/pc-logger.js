@@ -26,6 +26,7 @@ console.error = function (...args) {
 const pcName = os.hostname();
 const TEMPERATURE_LOG_INTERVAL_MS = 5000;
 const POWER_VOLTAGE_LOG_INTERVAL_MS = 5000;
+const SYSTEM_LOAD_INTERVAL_MS = 5000;
 let lastTemperatureSentAt = 0;
 let lastPowerVoltageSentAt = 0;
 
@@ -120,6 +121,7 @@ let idleCheckInterval = null;
 let heartbeatInterval = null;
 let heartbeatTimeout = null;
 let systemInfoTimeout = null;
+let systemLoadInterval = null;
 let browserHistoryInterval = null;
 
 const IGNORED_APPS = [
@@ -765,6 +767,10 @@ function cleanupIntervals() {
     clearTimeout(systemInfoTimeout);
     systemInfoTimeout = null;
   }
+  if (systemLoadInterval) {
+    clearInterval(systemLoadInterval);
+    systemLoadInterval = null;
+  }
   if (browserHistoryInterval) {
     clearInterval(browserHistoryInterval);
     browserHistoryInterval = null;
@@ -1110,12 +1116,11 @@ function connect() {
       // Send buffered messages first (if any)
       await sendBufferedMessages();
 
-      // Send system information after a short delay
-      systemInfoTimeout = setTimeout(() => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          sendSystemInfo();
-        }
-      }, 1000);
+      // Start system info collection (once)
+      systemInfoTimeout = setTimeout(sendSystemInfo, 2000);
+
+      // Start system load tracking
+      setupSystemLoadTracking();
     });
 
     ws.on('error', (err) => {
@@ -1201,6 +1206,36 @@ function handleExit() {
   } else {
     process.exit(0);
   }
+}
+
+function setupSystemLoadTracking() {
+  if (systemLoadInterval) return;
+
+  const trackLoad = async () => {
+    try {
+      const [load, mem] = await Promise.all([
+        si.currentLoad(),
+        si.mem()
+      ]);
+
+      const cpuUsage = load.currentLoad;
+      const ramUsage = (mem.active / mem.total) * 100;
+
+      sendMessage({
+        type: 'system_load',
+        pc_name: pcName,
+        cpu_usage_percent: parseFloat(cpuUsage.toFixed(1)),
+        ram_usage_percent: parseFloat(ramUsage.toFixed(1))
+      });
+    } catch (error) {
+      console.error('❌ Error tracking system load:', error.message);
+    }
+  };
+
+  // Initial run
+  trackLoad();
+
+  systemLoadInterval = setInterval(trackLoad, SYSTEM_LOAD_INTERVAL_MS);
 }
 
 // Handle shutdown and exit signals

@@ -489,6 +489,55 @@
             color: var(--text-secondary);
         }
 
+        .pc-card-info-item span:last-child {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .cpu-bar-container {
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .cpu-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .cpu-bar-track {
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .cpu-bar-fill {
+            height: 100%;
+            background-color: var(--success);
+            border-radius: 3px;
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+
+        .ram-bar-fill {
+            height: 100%;
+            background-color: #8b5cf6;
+            /* Purple */
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .load-bar-fill {
+            height: 100%;
+            background-color: #3b82f6;
+            /* Blue */
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
         .graph-label {
             font-weight: 600;
             color: var(--text-primary);
@@ -1719,10 +1768,12 @@
                     let taskManagerRefreshInterval = null;
                     let autoRefreshInterval = null;
                     let pcStatusRefreshInterval = null;
-                    let lastUpdateTime = null;
                     const PC_STATUS_REFRESH_INTERVAL = 5000; // 5 seconds for PC status
                     const FULL_REFRESH_INTERVAL = 5000; // 5 seconds for full data reload
                     const TASK_MANAGER_REFRESH_INTERVAL = 1000; // 1 second for task manager
+                    const HOME_REFRESH_INTERVAL = 3000; // 3 seconds for home page
+
+                    let homeRefreshInterval = null;
 
                     // Pagination variables
                     let allAppData = [];
@@ -2309,15 +2360,15 @@
                                 }
 
                                 return `
-                        <div class="pc-card" data-pc-name="${escapeHtml(pc.pc_name)}">
+                        <div class="pc-card" id="card-${escapeHtml(pc.pc_name)}" data-pc-name="${escapeHtml(pc.pc_name)}">
                             <div class="pc-card-header">
-                                <div class="pc-card-status ${statusClass}"></div>
+                                <div class="pc-card-status ${statusClass}" id="status-dot-${escapeHtml(pc.pc_name)}"></div>
                                 <div class="pc-card-name">${escapeHtml(pc.pc_name)}</div>
                             </div>
                             <div class="pc-card-info">
                                     <div class="pc-card-info-item">
                                     <span>Status:</span>
-                                    <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                                    <span id="status-text-${escapeHtml(pc.pc_name)}" style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
                                 </div>
                                 ${pc.systemInfo && pc.systemInfo.cpu_model ? `
                                     <div class="pc-card-info-item">
@@ -2334,13 +2385,43 @@
                                 ${pc.last_seen ? `
                                     <div class="pc-card-info-item">
                                         <span>Last Seen:</span>
-                                        <span>${formatDateTime(pc.last_seen)}</span>
+                                        <span id="last-seen-${escapeHtml(pc.pc_name)}">${formatDateTime(pc.last_seen)}</span>
                                     </div>
                                 ` : ''}
+                                <div class="cpu-bar-container">
+                                    <div class="cpu-bar-label">
+                                        <span>CPU Load</span>
+                                        <span class="cpu-load-value" id="load-${escapeHtml(pc.pc_name)}">--%</span>
+                                    </div>
+                                    <div class="cpu-bar-track">
+                                        <div class="load-bar-fill" id="load-bar-${escapeHtml(pc.pc_name)}" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="cpu-bar-container">
+                                    <div class="cpu-bar-label">
+                                        <span>RAM Usage</span>
+                                        <span class="ram-usage-value" id="ram-${escapeHtml(pc.pc_name)}">--%</span>
+                                    </div>
+                                    <div class="cpu-bar-track">
+                                        <div class="ram-bar-fill" id="ram-bar-${escapeHtml(pc.pc_name)}" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="cpu-bar-container">
+                                    <div class="cpu-bar-label">
+                                        <span>CPU Temp</span>
+                                        <span class="cpu-temp-value" id="temp-${escapeHtml(pc.pc_name)}">--°C</span>
+                                    </div>
+                                    <div class="cpu-bar-track">
+                                        <div class="cpu-bar-fill" id="bar-${escapeHtml(pc.pc_name)}" style="width: 0%"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     `;
                             }).join('');
+
+                            // Start auto-refresh for home page
+                            startHomeAutoRefresh();
 
                         } catch (error) {
                             console.error('Error loading PCs:', error);
@@ -2377,13 +2458,155 @@
                     document.addEventListener('visibilitychange', () => {
                         if (document.hidden) {
                             stopAutoRefresh();
+                            stopHomeAutoRefresh();
                         } else {
                             const pcName = document.getElementById('pcName').value.trim();
-                            if (pcName) {
+                            if (pcName && document.getElementById('detailPage').classList.contains('active')) {
                                 startAutoRefresh();
+                            } else if (document.getElementById('homePage').classList.contains('active')) {
+                                startHomeAutoRefresh();
                             }
                         }
                     });
+
+                    function startHomeAutoRefresh() {
+                        stopHomeAutoRefresh();
+                        refreshHomePage(); // Initial call
+                        homeRefreshInterval = setInterval(refreshHomePage, HOME_REFRESH_INTERVAL);
+                        console.log('Home page auto-refresh started');
+                    }
+
+                    function stopHomeAutoRefresh() {
+                        if (homeRefreshInterval) {
+                            clearInterval(homeRefreshInterval);
+                            homeRefreshInterval = null;
+                            console.log('Home page auto-refresh stopped');
+                        }
+                    }
+
+                    async function refreshHomePage() {
+                        if (document.hidden || !document.getElementById('homePage').classList.contains('active')) {
+                            stopHomeAutoRefresh();
+                            return;
+                        }
+
+                        try {
+                            // 1. Fetch latest PC statuses
+                            const { data: pcStatuses, error: statusError } = await supabase
+                                .from('pc_status')
+                                .select('*');
+
+                            if (statusError) throw statusError;
+
+                            // 2. Update UI for each PC
+                            for (const pc of pcStatuses) {
+                                const pcName = pc.pc_name;
+                                const isOnline = pc.is_online;
+                                const isIdle = pc.is_idle === true;
+
+                                // Update Status Dot and Text
+                                const statusDot = document.getElementById(`status-dot-${pcName}`);
+                                const statusTextEl = document.getElementById(`status-text-${pcName}`);
+                                const lastSeenEl = document.getElementById(`last-seen-${pcName}`);
+
+                                if (statusDot && statusTextEl) {
+                                    // Reset classes
+                                    statusDot.className = 'pc-card-status';
+
+                                    let statusText, statusColor;
+                                    if (!isOnline) {
+                                        statusDot.classList.add('offline');
+                                        statusText = 'Offline';
+                                        statusColor = '#ef4444';
+                                    } else if (isIdle) {
+                                        statusDot.classList.add('idle');
+                                        statusText = 'Idle';
+                                        statusColor = '#f59e0b';
+                                    } else {
+                                        statusText = 'Online';
+                                        statusColor = '#22c55e';
+                                    }
+
+                                    statusTextEl.textContent = statusText;
+                                    statusTextEl.style.color = statusColor;
+                                }
+
+                                if (lastSeenEl && pc.last_seen) {
+                                    lastSeenEl.textContent = formatDateTime(pc.last_seen);
+                                }
+
+                                const tempEl = document.getElementById(`temp-${pcName}`);
+                                const barEl = document.getElementById(`bar-${pcName}`);
+                                const loadEl = document.getElementById(`load-${pcName}`);
+                                const loadBarEl = document.getElementById(`load-bar-${pcName}`);
+                                const ramEl = document.getElementById(`ram-${pcName}`);
+                                const ramBarEl = document.getElementById(`ram-bar-${pcName}`);
+
+                                // Update Load and RAM bars from pc_status
+                                if (loadEl && loadBarEl) {
+                                    if (!isOnline || pc.cpu_usage_percent === null || pc.cpu_usage_percent === undefined) {
+                                        loadEl.textContent = '--%';
+                                        loadBarEl.style.width = '0%';
+                                    } else {
+                                        loadEl.textContent = `${pc.cpu_usage_percent.toFixed(1)}%`;
+                                        loadBarEl.style.width = `${Math.min(pc.cpu_usage_percent, 100)}%`;
+                                    }
+                                }
+
+                                if (ramEl && ramBarEl) {
+                                    if (!isOnline || pc.ram_usage_percent === null || pc.ram_usage_percent === undefined) {
+                                        ramEl.textContent = '--%';
+                                        ramBarEl.style.width = '0%';
+                                    } else {
+                                        ramEl.textContent = `${pc.ram_usage_percent.toFixed(1)}%`;
+                                        ramBarEl.style.width = `${Math.min(pc.ram_usage_percent, 100)}%`;
+                                    }
+                                }
+
+                                if (tempEl && barEl) {
+                                    if (!isOnline) {
+                                        // PC is offline, show empty state
+                                        tempEl.textContent = '--°C';
+                                        barEl.style.width = '0%';
+                                        barEl.style.backgroundColor = 'var(--bg-tertiary)';
+                                    } else {
+                                        // 3. Fetch latest temperature for this PC
+                                        const { data: tempData, error: tempError } = await supabase
+                                            .from('temperature_logs')
+                                            .select('cpu_temperature')
+                                            .eq('pc_name', pcName)
+                                            .order('created_at', { ascending: false })
+                                            .limit(1);
+
+                                        if (!tempError && tempData && tempData.length > 0) {
+                                            const temp = tempData[0].cpu_temperature;
+                                            tempEl.textContent = `${temp.toFixed(1)}°C`;
+
+                                            // Calculate width (0-100°C)
+                                            const width = Math.min(Math.max(temp, 0), 100);
+                                            barEl.style.width = `${width}%`;
+
+                                            // Color coding
+                                            if (temp < 60) {
+                                                barEl.style.backgroundColor = 'var(--success)'; // Green
+                                            } else if (temp < 80) {
+                                                barEl.style.backgroundColor = '#f59e0b'; // Orange
+                                            } else {
+                                                barEl.style.backgroundColor = '#ef4444'; // Red
+                                            }
+                                        } else {
+                                            // Online but no data
+                                            tempEl.textContent = '--°C';
+                                            barEl.style.width = '0%';
+                                            barEl.style.backgroundColor = 'var(--bg-tertiary)';
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (error) {
+                            console.warn('Error refreshing home page:', error);
+                        }
+                    }
 
                     async function loadData() {
                         const pcNameInput = document.getElementById('pcName').value;
@@ -2411,6 +2634,9 @@
                         const detailPage = document.getElementById('detailPage');
                         detailPage.classList.add('active');
                         detailPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                        // Stop home refresh, start detail refresh
+                        stopHomeAutoRefresh();
 
                         // Update navbar
                         document.getElementById('nav-home').classList.remove('active');

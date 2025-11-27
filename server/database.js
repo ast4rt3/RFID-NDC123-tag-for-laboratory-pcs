@@ -422,7 +422,7 @@ class Database {
   }
 
   // Update or insert PC status
-  async updatePCStatus(pcName, isOnline, lastSeen, lastActivity, isIdle) {
+  async updatePCStatus(pcName, isOnline, lastSeen, lastActivity, isIdle, cpuUsage, ramUsage) {
     try {
       // Store dates as ISO strings (includes timezone info) instead of formatted strings
       // This ensures timezone is preserved correctly
@@ -464,6 +464,12 @@ class Database {
       }
       if (isIdle !== null && isIdle !== undefined) {
         pcStatus.is_idle = isIdle;
+      }
+      if (cpuUsage !== null && cpuUsage !== undefined) {
+        pcStatus.cpu_usage_percent = cpuUsage;
+      }
+      if (ramUsage !== null && ramUsage !== undefined) {
+        pcStatus.ram_usage_percent = ramUsage;
       }
 
       if (this.type === 'supabase') {
