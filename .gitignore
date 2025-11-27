@@ -26,3 +26,17 @@ rfid-client-debug.log
 server.log
 juglonecertification.pfx
 juglonecertification.cer
+
+# Test files
+client/test-*.js
+client/list-sensors.js
+client/test.ps1
+
+# Log and debug files
+*.log
+client/*.log
+client/*-debug.txt
+client/disk-*.txt
+client/disk-*.log
+test-download.zip
+verify_output.txt
