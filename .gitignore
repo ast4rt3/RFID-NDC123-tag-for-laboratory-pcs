@@ -26,3 +26,4 @@ rfid-client-debug.log
 server.log
 juglonecertification.pfx
 juglonecertification.cer
+resources/LibreHardwareMonitor/LibreHardwareMonitor.config
