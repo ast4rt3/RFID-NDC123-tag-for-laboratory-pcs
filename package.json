@@ -1,6 +1,6 @@
 {
   "name": "juglone",
-  "version": "2.5.0",
+  "version": "3.0.0",
   "description": "RFID NDC123 Tag for Laboratory PC - Client Application",
   "main": "client/main.js",
   "scripts": {
@@ -78,8 +78,8 @@
   "build": {
     "appId": "com.rfid.ndc123.client",
     "productName": "Darwin",
-      "cscLink": "juglonecertification.pfx",
-      "cscKeyPassword": "yourpassword",
+    "cscLink": "juglonecertification.pfx",
+    "cscKeyPassword": "yourpassword",
     "directories": {
       "output": "dist"
     },
@@ -98,7 +98,6 @@
       }
     ],
     "win": {
-     
       "requestedExecutionLevel": "asInvoker",
       "publisherName": "Juglones",
       "icon": "client/assets/icon.ico",

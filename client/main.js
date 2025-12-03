@@ -219,10 +219,11 @@ function startLoggerProcess() {
     : path.join(__dirname, '..', 'node_modules');
 
   // Start the logger process with proper environment and IPC channel
-  loggerProcess = spawn('node', [loggerPath], {
+  loggerProcess = spawn(process.execPath, [loggerPath], {
     stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
     env: {
       ...process.env,
+      ELECTRON_RUN_AS_NODE: '1',
       NODE_PATH: nodeModulesPath
     }
   });

@@ -4,7 +4,7 @@ const path = require('path');
 class Config {
   constructor() {
     this.defaultConfig = {
-      serverIP: '127.0.0.1',
+      serverIP: '192.168.1.16',
       serverPort: 8080
     };
 

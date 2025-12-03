@@ -1,0 +1,169 @@
+{
+  "timestamp": "2025-11-30T09:19:54.653Z",
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "passRate": "100.0%"
+  },
+  "results": [
+    {
+      "test": "System Information Accuracy",
+      "status": "PASS",
+      "data": {
+        "hostname": "i3S",
+        "cpuModel": "Intel Core™ i3-8109U",
+        "cpuCores": 4,
+        "cpuSpeed": "0.00 GHz",
+        "totalMemoryGB": "23.89",
+        "osPlatform": "Windows",
+        "osVersion": "Microsoft Windows 11 Home Single Language"
+      }
+    },
+    {
+      "test": "Duration Calculation Accuracy",
+      "status": "PASS",
+      "results": [
+        {
+          "target": "30s",
+          "actual": "30s",
+          "difference": "0s",
+          "tolerance": "±3s",
+          "status": "✅ PASS"
+        },
+        {
+          "target": "60s",
+          "actual": "60s",
+          "difference": "0s",
+          "tolerance": "±3s",
+          "status": "✅ PASS"
+        },
+        {
+          "target": "120s",
+          "actual": "120s",
+          "difference": "0s",
+          "tolerance": "±3s",
+          "status": "✅ PASS"
+        },
+        {
+          "target": "300s",
+          "actual": "300s",
+          "difference": "0s",
+          "tolerance": "±3s",
+          "status": "✅ PASS"
+        }
+      ]
+    },
+    {
+      "test": "CPU Usage Measurement",
+      "status": "PASS",
+      "average": 24.534,
+      "min": 8.27,
+      "max": 46.7,
+      "measurements": [
+        {
+          "iteration": 1,
+          "cpuPercent": "24.32%",
+          "timestamp": "2025-11-30T09:19:33.101Z"
+        },
+        {
+          "iteration": 2,
+          "cpuPercent": "8.27%",
+          "timestamp": "2025-11-30T09:19:35.106Z"
+        },
+        {
+          "iteration": 3,
+          "cpuPercent": "11.32%",
+          "timestamp": "2025-11-30T09:19:37.109Z"
+        },
+        {
+          "iteration": 4,
+          "cpuPercent": "20.45%",
+          "timestamp": "2025-11-30T09:19:39.126Z"
+        },
+        {
+          "iteration": 5,
+          "cpuPercent": "36.15%",
+          "timestamp": "2025-11-30T09:19:41.137Z"
+        },
+        {
+          "iteration": 6,
+          "cpuPercent": "17.12%",
+          "timestamp": "2025-11-30T09:19:43.150Z"
+        },
+        {
+          "iteration": 7,
+          "cpuPercent": "46.70%",
+          "timestamp": "2025-11-30T09:19:45.151Z"
+        },
+        {
+          "iteration": 8,
+          "cpuPercent": "23.03%",
+          "timestamp": "2025-11-30T09:19:47.158Z"
+        },
+        {
+          "iteration": 9,
+          "cpuPercent": "34.76%",
+          "timestamp": "2025-11-30T09:19:49.164Z"
+        },
+        {
+          "iteration": 10,
+          "cpuPercent": "23.22%",
+          "timestamp": "2025-11-30T09:19:51.176Z"
+        }
+      ]
+    },
+    {
+      "test": "Memory Usage Measurement",
+      "status": "PASS",
+      "data": {
+        "total": "23.89 GB",
+        "used": "11.42 GB",
+        "free": "12.48 GB",
+        "usedPercent": "47.78%"
+      }
+    },
+    {
+      "test": "Timestamp Accuracy",
+      "status": "PASS",
+      "data": {
+        "UTC ISO": "2025-11-30T09:19:51.818Z",
+        "Local Time": "11/30/2025, 5:19:51 PM",
+        "UTC Offset": "UTC+8",
+        "Unix Timestamp": 1764494391818,
+        "Timezone": "Asia/Shanghai"
+      }
+    },
+    {
+      "test": "Application Detection",
+      "status": "PASS",
+      "processes": [
+        {
+          "name": "System Idle Process",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "System",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "Secure System",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "Registry",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "smss.exe",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        }
+      ]
+    }
+  ]
+}

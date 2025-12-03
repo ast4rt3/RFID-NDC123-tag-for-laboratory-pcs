@@ -3,38 +3,30 @@ const fs = require('fs');
 
 function getResourcesRoot() {
   const defaultPath = path.join(__dirname, '..', '..');
+  const possiblePaths = [];
 
-  if (!process || !process.resourcesPath) {
-    // In development mode, check if resources/LibreHardwareMonitor exists
-    const resourcesPath = path.join(defaultPath, 'resources');
-    if (fs.existsSync(path.join(resourcesPath, 'LibreHardwareMonitor'))) {
-      return resourcesPath;
-    }
-    return defaultPath;
+  // 1. Check process.resourcesPath (Production / Electron default)
+  if (process.resourcesPath) {
+    possiblePaths.push(process.resourcesPath);
   }
 
-  let root = process.resourcesPath;
+  // 2. Check local resources folder (Development)
+  possiblePaths.push(path.join(defaultPath, 'resources'));
 
-  if (!fs.existsSync(path.join(root, 'LibreHardwareMonitor'))) {
-    if (root.endsWith('app.asar.unpacked')) {
-      const candidate = path.resolve(root, '..', 'resources');
-      if (fs.existsSync(path.join(candidate, 'LibreHardwareMonitor'))) {
-        root = candidate;
-      }
-    } else if (root.endsWith('app.asar')) {
-      const candidate = path.resolve(root, '..');
-      if (fs.existsSync(path.join(candidate, 'LibreHardwareMonitor'))) {
-        root = candidate;
-      }
-    } else {
-      const candidate = path.join(root, 'resources');
-      if (fs.existsSync(path.join(candidate, 'LibreHardwareMonitor'))) {
-        root = candidate;
-      }
+  // 3. Check relative to main module (Fallback)
+  if (process.mainModule && process.mainModule.filename) {
+    possiblePaths.push(path.join(path.dirname(process.mainModule.filename), '..', 'resources'));
+  }
+
+  for (const root of possiblePaths) {
+    const lhmPath = path.join(root, 'LibreHardwareMonitor', 'LibreHardwareMonitor.exe');
+    if (fs.existsSync(lhmPath)) {
+      return root;
     }
   }
 
-  return root;
+  // Default to process.resourcesPath if available, otherwise defaultPath
+  return process.resourcesPath || defaultPath;
 }
 
 module.exports = { getResourcesRoot };

@@ -1,0 +1,155 @@
+{
+  "timestamp": "2025-11-30T09:06:03.128Z",
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "passRate": "100.0%"
+  },
+  "results": [
+    {
+      "test": "System Information Accuracy",
+      "status": "PASS",
+      "data": {
+        "hostname": "i3S",
+        "cpuModel": "Intel Core™ i3-8109U",
+        "cpuCores": 4,
+        "cpuSpeed": "0.00 GHz",
+        "totalMemoryGB": "23.89",
+        "osPlatform": "Windows",
+        "osVersion": "Microsoft Windows 11 Home Single Language"
+      }
+    },
+    {
+      "test": "Duration Calculation Accuracy",
+      "status": "PASS",
+      "results": [
+        {
+          "target": "5s",
+          "actual": "5s",
+          "difference": "0s",
+          "tolerance": "±3s",
+          "status": "✅ PASS"
+        },
+        {
+          "target": "10s",
+          "actual": "10s",
+          "difference": "0s",
+          "tolerance": "±3s",
+          "status": "✅ PASS"
+        }
+      ]
+    },
+    {
+      "test": "CPU Usage Measurement",
+      "status": "PASS",
+      "average": 45.212,
+      "min": 24.32,
+      "max": 77.11,
+      "measurements": [
+        {
+          "iteration": 1,
+          "cpuPercent": "24.32%",
+          "timestamp": "2025-11-30T09:05:40.776Z"
+        },
+        {
+          "iteration": 2,
+          "cpuPercent": "36.73%",
+          "timestamp": "2025-11-30T09:05:42.792Z"
+        },
+        {
+          "iteration": 3,
+          "cpuPercent": "54.44%",
+          "timestamp": "2025-11-30T09:05:44.801Z"
+        },
+        {
+          "iteration": 4,
+          "cpuPercent": "53.18%",
+          "timestamp": "2025-11-30T09:05:46.813Z"
+        },
+        {
+          "iteration": 5,
+          "cpuPercent": "31.59%",
+          "timestamp": "2025-11-30T09:05:48.838Z"
+        },
+        {
+          "iteration": 6,
+          "cpuPercent": "75.86%",
+          "timestamp": "2025-11-30T09:05:50.849Z"
+        },
+        {
+          "iteration": 7,
+          "cpuPercent": "33.78%",
+          "timestamp": "2025-11-30T09:05:52.858Z"
+        },
+        {
+          "iteration": 8,
+          "cpuPercent": "37.79%",
+          "timestamp": "2025-11-30T09:05:54.897Z"
+        },
+        {
+          "iteration": 9,
+          "cpuPercent": "77.11%",
+          "timestamp": "2025-11-30T09:05:56.905Z"
+        },
+        {
+          "iteration": 10,
+          "cpuPercent": "27.32%",
+          "timestamp": "2025-11-30T09:05:58.919Z"
+        }
+      ]
+    },
+    {
+      "test": "Memory Usage Measurement",
+      "status": "PASS",
+      "data": {
+        "total": "23.89 GB",
+        "used": "11.76 GB",
+        "free": "12.13 GB",
+        "usedPercent": "49.23%"
+      }
+    },
+    {
+      "test": "Timestamp Accuracy",
+      "status": "PASS",
+      "data": {
+        "UTC ISO": "2025-11-30T09:05:59.539Z",
+        "Local Time": "11/30/2025, 5:05:59 PM",
+        "UTC Offset": "UTC+8",
+        "Unix Timestamp": 1764493559539,
+        "Timezone": "Asia/Shanghai"
+      }
+    },
+    {
+      "test": "Application Detection",
+      "status": "PASS",
+      "processes": [
+        {
+          "name": "System Idle Process",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "System",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "Secure System",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "Registry",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        },
+        {
+          "name": "smss.exe",
+          "cpu": "0.00%",
+          "memory": "0.00 MB"
+        }
+      ]
+    }
+  ]
+}

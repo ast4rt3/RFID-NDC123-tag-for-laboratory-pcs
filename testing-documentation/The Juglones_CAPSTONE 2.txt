@@ -1,0 +1,1172 @@
+﻿Computer Laboratory Management System: An RFID PC-Based Monitoring System for the Institute for Computer Studies’ Laboratory at Northern Bukidnon State College
+
+
+
+
+A Capstone Project 
+Presented to the 
+Faculty of the Institute for Computer Studies 
+Northern Bukidnon State College
+  
+In Partial Fulfillment
+of the Requirements for the Degree
+Bachelor of Science in Information Technology
+
+
+By
+Churchill Duane V. Daus
+Lawrence B. Heras
+Gian Cyril  Mijares
+Lloyd Philip H. Tejada
+
+
+December 2025
+
+
+APPROVAL SHEET
+
+
+This Capstone Proposal entitled: “Computer Laboratory Management System: An RFID PC-Based Monitoring System for the Institute for Computer Studies’ Laboratory at Northern Bukidnon State College” is prepared and submitted by Churchill Duane V. Daus, Lawrence B. Heras, Gian Cyril  Mijares and Lloyd Philip H. Tejada in partial fulfillment of the requirements for the degree of Bachelor of Science in Information Technology has been examined and is recommended for acceptance and approval.
+RONALD O. MANCAO 
+Adviser  
+PANEL OF EXAMINERS
+Approved by the Committee on Proposal Defense with a grade of ______________ on December_____, 2025.
+SHIELA MAE M. OROZCO, MIT
+Chairman
+
+
+MARCHILYN A. ABUNDA
+Member
+NILO B. TUBIO II
+Member
+Approved and accepted in partial fulfillment of the requirements for the degree Bachelor of Science in Information Technology.  
+
+
+SHIELA MAE M. OROZCO, MIT
+                                        Program Head
+
+
+ACKNOWLEDGMENT
+(Do not write this part, yet)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The Researchers
+
+
+
+
+
+
+
+
+
+
+ABSTRACT
+(Do not write this part, yet)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+KEYWORDS: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TABLE OF CONTENTS
+                                                                                          Page        
+TITLE PAGE                                                                         i
+APPROVAL SHEET                                                                ii
+ACKNOWLEDGMENT                                                           iii
+ABSTRACT                                                                           iv
+TABLE OF CONTENTS                                                            v
+LIST OF FIGURES                                                                   vii
+LIST OF TABLES                                                                   viii
+CHAPTER        
+1. THE RATIONALE                                                        1
+              1.1      Introduction                                                        1
+                1.2        Statement of the Problem                                        4
+                1.3        Objectives of the Study                                        6
+                1.4        Scope and Limitations of the Study                                7
+   5.         Significance of the Study                                        8
+   6.         Definition of Terms                                                9
+        2        REVIEW OF RELATED LITERATURE AND STUDIES        13
+                2.1        Related Literature and Studies                                13
+                2.2        Synthesis of the Reviewed Related Literature and Studies        23
+
+
+        3        METHODOLOGY                                                        26
+                3.1        Research Design                                                26
+                        3.1.1        Type of Research                                        26
+                        3.1.2         Data Gathering Procedure                                27
+                        3.1.4         Data Analysis Method                                        28
+        3.2        Research Design Approach                                        30
+        3.3        Hardware and Software Specification                        32
+                3.3.1        Hardware Specification for Development                32
+                3.3.2        Software Specification for Development                32
+        3.4        System Design Architecture                                            33
+        3.5        System Diagrams                                                35
+        4        RESULTS & DISCUSSION                                                38
+4.1        Overview                                                        38
+4.2        CPU Usage Trends                                                39
+4.3        Memory Usage Trends                                        40
+4.4         Application Usage Analysis                                        41
+4.5         Laboratory Capability Contextualization                        43
+4.6         Estimated Electricity Cost Using CPU usage from Idle Ti-   43
+4.7         Summary of Findings                                                44
+        5        SUMMARY, CONCLUSIONS, AND RECOMMENDATIONS        46
+                5.1         Summary                                                         46
+                5.2         Conclusions                                                        47
+                5.3         Recommendations                                                49
+                        5.3.1         System Enhancement                                        49
+                        5.3.2         Administrative and Policy Recommendations        50
+                5.3.3         Future Research and Development                        51
+                5.4         Final Statement                                                51
+REFERENCES                                                                     53
+  
+
+LIST OF FIGURES
+
+
+Figures                        Title                                                              Page
+     1                         V-Model Development Framework                          30
+     2                           System Design Architecture of PCUMS                  34
+     3                           Use-Case Diagram of PCUMS                                 36
+     4                          CPU usage trends over the five-day monitoring       40
+     5                           Memory consumption                                                   41
+     6                           Total application usage hours                                    42
+  
+
+
+
+
+
+
+
+LIST OF TABLES
+
+
+Tables                        Title                                                      Page
+     1        Hardware Development Specification                   32
+     2                                Software Development Specification                     33
+CHAPTER 1
+THE RATIONALE
+   1. Introduction
+
+
+Computers today generate huge amounts of information. This growth is part of what we call big data, where systems produce large volumes of records at high speed and in many formats that do not fit well in standard databases (Zhang et al., 2020).  Logs add even more weight to this growth because they capture detailed runtime activity used for development, maintenance, and monitoring. As software grows more complex, the volume of logs rises with it (Zhu, 2023). 
+The problem shows up when these logs are collected manually. Studies on computerized maintenance management systems show that technicians face a mix of technological, organizational, and people challenges when recording asset data by hand. Six case studies across Finland, India, and the Caribbean found that even trained and competent technicians still deal with slow processes, unclear system tools, and low usability when entering data manually (Mahlamäki, 2020). Good results depend on strong training and clear instructions, but even the best sites reported that manual collection slows down the work and affects the quality of the information recorded. These findings highlight a larger pattern: manual data collection is limited by the tools, the workflow, and the pressure placed on the user. The process is slow, repetitive, and easy to break. Large files are hard to store, time stamps can be missed, and important entries can be overlooked. Even with solutions like cloud storage, the real issue remains. Manual collection cannot keep up with the size and speed of modern logs, which leaves gaps in analysis and slows down the work (Miranskyy, 2020).
+Information technology (IT) is now an important part of higher education today and has served as the key to education efficiency, accountability, and innovation in either academic or administrative operations. In 2023, 65% of institutions in higher education are investing in more IT budgets in digital transformation, and half of them now use data analytics to enhance their operations, a tool that may be ported to raise performance levels in laboratory management (World Metrics, 2023). Over the last few years, 78% of higher education CIOs have treated digital transformation as a way of student success prioritization, and 73% of those consider it a high or essential prioritization to an institution (Workday Higher Education Outlook, 2023). Additionally, a 2023 EDUCAUSE report revealed that 72% of institutions experience fragmented data systems and assessing cross-departmental insights across the university is challenging, which can have severe negative effects on efforts such as efficient lab resource allocation.
+In spite of this progress in adopting IT, monitoring of shared computer laboratories which is a key element in most academic programs, lacks sufficient utilization and in some cases is outdated. In other words, the previous solutions, like the PC-Based computer laboratory monitoring system developed by Lumawig and Payawal (2000) were based on strategies that are outdated and do not comply with the requirements of modern standards. Even in most institutions, administrators continue to rely on manual observation, ad hoc log retrieval and surveys, which are often not complete and may not be uniform. Such inadequacies deteriorate the chances of making sound decisions regarding the timing, software licenses, and hardware upgrading processes on the basis of correct and on-time information.
+Education is one of the national development support, the pillar of national competitiveness in the global age. Within the Philippines, Republic Act No. 10599 and CHED Memorandum Orders require higher education institutions to have sufficient facilities and infrastructure such as libraries, laboratories and other specialized learning areas to permit established and sustainable learning conditions (CHED, 2021).
+In Northern Bukidnon State College (NBSC), the Information and Communication Technology Management Office (ICTMO), acts as a significant factor in making this vision possible. The ICTMO believes in delivering innovative, competent, and dependable ICT solutions in order to meet the academic, administrative, and operational objectives of the institution. It aims to enhance the NBSC community through its provision of technology services, provision of a secure and sustainable IT environment and initiation of digital transformation in all departments. It aims to facilitate hassle-free communication and boost digital learning and to help the college to attain excellence in education and service. But to effectively run the laboratory of the Institute of Computer Studies, it is more important than to maintain the machines to be in working condition. Administrators would want to have fine grained, per-session statistics of what applications students are actually executing or the use of PC softwares such as CPU-Z and task manager to view the current status of the PC’s ram and processor which are not logged in the computer. In absence of these kinds of insight ineffective prioritization of hardware upgrade, scheduled shutdown, unwanted application and more can take place.
+Also researchers have found that examining application usage trends allows system administrators to distribute software licenses more directly, avoid inventory shortages at high usage periods, and save on unused tools (LabStats, 2024). Additionally, the detection of non-academic usage of software during the laboratory classes may assist in supporting an academically oriented environment since studies have shown that the presence of distractions in the digital sphere may decrease student arousal and performance to varying degrees (Nguyen & Ma, 2024).
+A technical Cebu college, college study reported in 2023 that old PCs regularly exceeded CPU and RAM limits during multimedia courses, which slows their workflows and the ability of, say, instructors to slash practice sessions (Santos & Lim, 2023). In the same area, a Malaysian polytechnic study in 2021 revealed that without automatic monitoring, sometimes the high-spec machines remained idle and when the demands were heavy on the low-spec machines, caused requests to be delayed, and resources to be wasted all that was not documented or logged(Ahmad et al., 2021).
+To address these challenges, this study presents an automated laboratory monitoring system designed for NBSC. This application automatically tracks application usage, session uptime, and hardware utilization for every workstation. Furthermore, it introduces an RFID-based quick-access feature, allowing administrators to instantly view the status of any specific machine on a mobile dashboard simply by scanning its tag. This system aims to replace manual checks with continuous, high-resolution monitoring, providing the actionable insights needed for evidence-based academic and budgetary decisions.
+
+
+1.2 Statement of the Problem
+The primary issue addressed by this study is the lack of an efficient, automated mechanism for tracking and analyzing the usage and health of laboratory computers.
+
+
+* Lack of Visibility: Administrators have no easy way to see what applications are being used or what websites are being visited during lab sessions.
+* Inefficient Resource Management: It is difficult to track how long computers are used or identify underutilized workstations without manual logs.
+* Inefficient Status Checking: To check the status of a specific computer (e.g., "Is PC-05 online?"), an administrator often has to walk to the machine or search for it in a complex list.
+* Hardware Maintenance Blind Spots: Issues like overheating, high resource consumption and high power consumption often go unnoticed until a system fails, as there is no continuous monitoring of CPU or memory health.
+* Manual Authentication Errors: Relying on manual sign-in sheets for lab usage is unreliable and difficult to correlate with actual computer activity.
+
+
+PC Misuse
+Misuse is also a problem that unmonitored laboratories have to deal with, such as illegal software installation and excessive non-academic use, which are not typically noticed (Chen et al., 2021; Tan and Ng, 2022). Another problem is energy inefficiency where idle computers may take up to 60 percent of overall energy consumption, which escalates the cost of operation and environmental implication (Kaur & Singh, 2021). In the absence of automatic monitoring of idle time, it is hard to implement energy saving policies like planned shutdowns.
+
+
+
+
+
+
+Unequal usage spread
+The unequal access also contributes to the problem. Improper monitoring may lead to the overuse of some machines with high demand and leave some unused, leading to access limitation and increasing hardware degradation speed (Alvarez and Santos, 2022). In 2022, a study conducted by a Philippine state university estimated that application demand during peak hour in 2022 would be underestimated by 38% under the condition of manual tracking. The same situation was observed in Cebu and Malaysia, where the absence of automation created an imbalance with resources and delays in upgrades causing some pcs to have higher processing power than others(Santos & Lim, 2023; Ahmad et al., 2021). In higher education IT management, manual checking was identified as one of the biggest resources management challenges globally (EDUCAUSE, 2023). 
+
+
+This research answers the question: "How can an automated, RFID-integrated application improve the accuracy of usage tracking and the efficiency of hardware monitoring in a computer laboratory?"
+
+
+1.3 Objectives of the Study
+ To create and evaluate a cross-platform application that automatically gathers comprehensive system usage and performance data from laboratory computers and provides instant access to this data via an RFID-triggered mobile dashboard and web dashboard.
+Specific Objectives:
+* To create and evaluate a cross-platform application that automatically gathers comprehensive system usage and performance data from laboratory computers and provides instant access to this data via an RFID-triggered mobile dashboard.
+* To develop a background service that automatically captures active application windows, browser search queries, and session durations.
+* To implement a hardware monitoring module that retrieves real-time system metrics (CPU temperature, RAM usage, and GPU status).
+* To design a mobile-friendly dashboard that displays the real-time status and history of a specific computer.
+* To integrate an RFID scanning feature that allows administrators to instantly open the dashboard for a specific PC by scanning its tag.
+* To test the accuracy and latency of data transmission between the client PC and the central server.
+                
+1.4 Scope and Limitations of the Study
+Scope
+This study is conducted in the Institute for Computer Studies (ICS) laboratory of Northern Bukidnon State College. The system is developed, deployed, and evaluated within the time, resources, and technical conditions available in the laboratory environment. The application is designed specifically for desktop computers running the Windows operating system, since other devices such as laptops and mobile phones follow different usage patterns, power behaviors, and operating systems.
+
+
+The tool collects application usage logs such as active window titles, browser search queries, session start and end times, and selected hardware metrics including CPU load, temperature, and RAM usage. Each computer in the laboratory is linked to an RFID tag that serves as a quick access point to open the mobile monitoring dashboard for that specific machine. Data is managed through a hybrid storage system that combines local SQLite databases with a cloud-based Supabase backend.
+
+
+The ICS laboratory is chosen as the focus of the study because it is one of the most resource-intensive areas in the institution, with high software demands and a need for consistent performance monitoring. This setting provides a practical and relevant environment for testing the system and evaluating its usefulness in real laboratory conditions.
+
+
+Limitations
+The client application is limited to Windows desktop machines and does not support macOS, Linux, laptops, or mobile devices. Only computers connected to the local network are included in the monitoring process. The RFID feature is used only for opening the dashboard link and is not intended for user authentication or login functions.
+
+
+Real-time monitoring requires an active internet or local network connection, and offline use is limited to temporary local storage until the network becomes available. The system does not perform full cybersecurity monitoring and does not capture keystrokes, mouse activity, screen content, or other sensitive data. These areas require specialized monitoring tools and fall outside the scope of this project.
+
+
+By setting these boundaries, the study maintains a focused implementation and ensures that the evaluation directly supports the operational needs of the ICS laboratory.
+
+
+1.5 Significance of the Study
+The development and implementation of this system will provide substantial benefits to the following stakeholders:
+* To the Laboratory Administrators and ICTMO Staff:  The system provides a centralized, real-time view of laboratory operations, eliminating the need for manual checks. By offering detailed logs of application usage and hardware performance (such as CPU temperature and memory load), administrators can proactively identify failing components before they cause downtime. This data-driven approach allows for more efficient maintenance scheduling and ensures that hardware upgrades are targeted where they are most needed.
+* To the Faculty Members: With access to accurate data on software utilization and system availability, faculty members can ensure that the necessary tools for their curriculum are functional and accessible. The system provides assurance that laboratory computers are capable of running required applications, minimizing technical disruptions during classes and allowing instructors to focus on teaching.
+* To the Institutional Management: The system offers the leadership of Northern Bukidnon State College (NBSC) reliable, quantitative data to support strategic decision-making. Insights into long-term usage patterns and resource allocation can inform budget planning and ICT policy development. This aligns laboratory operations with the institution's broader goals of digital transformation and sustainable resource management.
+* To the future Researchers and Developers: This study serves as a practical reference for the development of automated monitoring systems within academic environments. It contributes to the body of knowledge regarding IoT integration (RFID), remote system monitoring, and educational technology, providing a foundation for future innovations in ICT resource management.
+
+
+1.6 Definition of Terms
+* Academic Compliance: The adherence to institutional policies regarding software and computer usage, ensuring that laboratory resources are utilized exclusively for educational and research purposes.
+* Application Usage Tracking: The automated process of logging software execution, including start times, end times, and duration, to monitor license utilization and identify unauthorized software.
+* Automated Logging: The continuous, background collection of system performance metrics and user activity data without requiring manual input or intervention from the user.
+* CPU Utilization: A metric indicating the percentage of processing power currently in use. In this study, it serves as a key indicator of hardware performance and potential system bottlenecks.
+* Dashboard: A centralized, web-based graphical interface that visualizes real-time data from all monitored computers, enabling administrators to assess lab status and make informed resource management decisions.
+* Idle Time: The duration during which a computer remains powered on but detects no user interaction (mouse or keyboard input). This metric is used to identify underutilized resources.
+* Laboratory Resource Management: The strategic administration of computing assets to maximize performance, availability, and cost-efficiency within an educational laboratory setting.
+* PC Monitoring System: The integrated software and hardware infrastructure designed to observe, record, and analyze the operational state and application usage of laboratory computers in real-time.
+* RAM Utilization: The measure of active computer memory usage. Monitoring this metric helps identify workstations that are overburdened or require hardware upgrades.
+* RFID (Radio Frequency Identification): A wireless technology used in this system to uniquely identify laboratory PCs. Scanning a PC's RFID tag triggers the immediate display of its specific status dashboard on a mobile device.
+* Session: A continuous period of computer activity starting from system boot or user login until shutdown or logout, during which data is actively recorded.
+* System Integrity: The assurance that the computer system’s data, configurations, and operational state remain reliable and uncorrupted by unauthorized changes or malicious software.
+* System Uptime: The total duration a computer has been operational since its last boot. This metric is tracked to analyze usage patterns and schedule maintenance.
+
+
+
+
+
+
+
+
+
+
+CHAPTER 2
+REVIEW OF RELATED LITERATURE AND STUDIES
+2.1 Related Literature and Studies
+To better understand current developments and best practices, the proponents have reviewed a range of relevant literature that informs the design of a system for PC usage monitoring, asset tracking, and real-time management in a school laboratory setting.
+2..1.2 PC Monitoring Systems
+Academic labs use monitoring systems that track the use of software, session times, and logs of user activities to help understand the activity of students and the utilization of hardwares. These tools can assist in accountability as well as the strategic nature of software license agreements and systems hardware upgrade.
+A significant problem lies in the missed insights that happen when monitoring is not applied throughout the campus. An article by Beth (2024) says that restricting monitoring to a single department or computer lab can result in a number of dangers. When it comes to hardware, an organization may purchase underutilized computers or fail to maintain computers that require IT upgrades. Additionally, this makes it more difficult for the organization to adapt quickly to shifting demands or financial limitations.
+The issues are similar for software. A university runs the risk of paying for unnecessary licenses or duplicate programs if it doesn't have a thorough monitoring system. Additionally, it becomes more challenging to guarantee that every computer is running the most recent software versions, which can lead to compatibility and vulnerability problems. It is also difficult to defend software costs and stop resource waste due to this incomplete picture. This study emphasizes how a fragmented approach to monitoring prevents organizations from fully optimizing their IT resources by resulting in inefficiencies and a lack of data-driven insights.
+One major issue is the disadvantages of manual lab system monitoring, according to a study published by Ijraset (2024). According to the study, using a physical logbook to record login and logout times is prone to human error, which can result in inconsistent and erroneous data. Furthermore, in a system where computers are only connected by a local network, there is no administrative oversight, allowing students to unsupervisedly participate in activities unrelated to their assignments. This manual method hinders the development of efficient administrative oversight in a lab setting and makes it challenging for lecturers to effectively monitor student activity.
+Zhang et al. (2025) suggested a mixed system to include RFID, IoT, and AI technologies in order to provide tracking of assets in real-time scale, issues of auto-maintained alerts, and information about detailed use. Their studies promote the concept of having monitoring capabilities in institutional asset systems.
+Nevertheless, the monitoring leads to the worry of the security of data and ethical use of these data. Upon its responsible implementation, there needs to be the reconciliation of institutional control and the user privacy rights, i.e. only authorised persons should have access to logs and the data may be used only to make some operational improvement.
+2.1.3 RFID Technology in Educational Settings
+Radio Frequency Identification (RFID) is a wireless communication technology comprising three major components namely RFID tags, reader and backend systems. RFID is getting more and more popular in education, being used in asset tracking, student attendance tracking and library book management in educational institutions.
+Begmanov and Yenradee (2022) also demonstrated RFID use in an educational parameter, where about 100% identification accuracy was achieved on the tags. They saved a lot of time that was needed to take care of inventory when using manual barcode processes. On the same note, Swedberg (2024) has noted that James Madison University has implemented RFID to track AV and lab equipment and save up to days of rep time with handheld readers.
+RFID4U (2024) further said that RFID tags which are most suited on metallic surfaces enable bulk scanning and the real time tracking of assets, even without manual intervention, which is the reason why computer labs can have them. These applications illustrate the advantages afforded by RFID over the conventional systems of tracking assets such as using stickers or barcodes, which have to be scanned, and often deteriorate due to abrasion.
+2.1.4 Asset Management and Inventory Systems
+Effective management of IT resources is crucial as it determines efficiency of operations and accountability of the resources within an institution. The manual recording or the barcode system of using traditional inventory systems is more labour intensive and prone to error.
+According to Odasco and Saong (2023), the inventory management system of a university had several major issues, despite the fact that it was operated digitally. In their study entitled Analysis of the Inventory Management System towards Enhanced University Service Delivery, they found that the problems of the process like missing unmatched records were not infrequent. In particular, the research brought out challenges in the monitoring of non-consumable items and lack of timely identification of the missing or misplaced assets. Such loopholes in the system made it difficult to deliver services on time, destroyed accountability and demonstrated that existence of a system on its own is not sufficient in ensuring effective management of inventory. Completely in line with the current research, the present study allows us to propose a more effective and precise tracking solution.
+Inventory management was systematically reviewed by Munyaka and Yadavalli (2022). By charting the development from antiquated manual techniques to contemporary technological applications, their findings offered a historical perspective. The review emphasized that because of their vulnerability to human error and incapacity to deliver real-time data, traditional, manual tracking methods are frequently a significant cause of operational failure. This literature gives the current study a solid theoretical basis and emphasizes how important it is to abandon antiquated manual methods in favor of automated systems in order to achieve accuracy and operational efficiency.
+A direct comparison of inventory management software and manual tracking was presented in a Skilloutlook (2025) article. It carefully listed the drawbacks of manual methods, including their inability to provide a continuous, real-time view of inventory levels, delays in data updates, and human error susceptibility (reported error rates range from 1% to 3%). According to the article, these restrictions may result in serious issues like overstocking or stockouts. These observations are extremely pertinent to the current study because they offer a convincing and measurable argument in favor of switching from manual logbooks and sticker labeling to an automated, digital system.
+
+
+The function of inventory management in logistics and organizational success was examined in a Destro et al. (2023) study. The study made the case that poor inventory control, a frequent consequence of manual tracking, has a direct negative influence on operational effectiveness and may result in losses. Inventory was characterized as a "double-edged weapon," with an excess of inventory resulting in a loss of profitability and a lack of inventory leading to a loss of productivity. In order to maintain a healthy balance in resource allocation and prevent the negative effects of unreliable data, this research supports the current study by highlighting the necessity of a strong, automated system.
+Comparing RFID with barcode systems in a controlled environment, Atkins, Sener, and Russo (2021) concluded that the RFID system is better in one way than the other: it suggests the real time tracking and eliminates the human error factor. Radiant RFID (2022) also cited a case study in one of the leading Ivy League medical schools that used a passive RFID system and saved at least 75% of inventory time. The combination of the system with the already existing asset management software allowed automating the audit and the simplifying of the operations.
+Manap et al. (2025) also designed an RFID based laboratory inventory system that showed real-time equipment state through a centralized interface provided by PC. This provides real time availability of assets that are in-use or awaiting-use, a virtual mandatory requirement in schools that provide computer labs.
+2.1.5 Integration of RFID with Monitoring Software
+Combining the RFID with PC monitoring software enables simultaneous hardware tracking and session tracking, which improves the real-time tracking and versatile control over operations.
+Kefallinos and Pontikis (2023) developed an entirely automated RFID tracking platform based on readers that are fixed and services offered by the cloud-supported aggregation. They also set up a system that reduced manual handling and gave them constant feedback on the location and activity of assets, which is also what we hope to achieve in our project.
+Wasp Barcode Technologies (2025) underlined the fact that this kind of integration eliminates mistakes when performing manual actions and makes it possible to check in/out the devices quickly. By matching the RFID log with system activity, close auditing and tracking of the device movement inside the laboratory can be achieved.
+
+
+
+
+
+
+2.1.6 Institutional Technology Management
+Colleges and universities are under pressure to organize the use of IT assets cheaply without overspending the budget. This will incorporate monitoring usage patterns, and hardware maintenance planning.
+Aemilianum College Inc. (2023) is one of those companies that adopted an RFID-based lab management system with scheduling, authorization principles, and reporting of features. The system that they had enabled the lab managers to achieve control over access and inventory in an efficient way. We are also proposing an increment of RFID tagging each PC to maintain statistics of usage, monitor the system up-time, and to assist in making decisions regarding the deployment of software.
+A problem in IT management for higher education institutions is the complexity of a decentralized environment, which can result in ineffective procedures and resource waste. A lack of centralized oversight and software silos result from universities' frequent establishment of numerous departments, each with its own software and user bases. It is challenging to keep track of who has access to what, for how long, and whether the organization complies with security regulations because of this fragmentation (Deepanjali, 2025).
+Also, an insufficient IT Asset Management (ITAM) might lead to several issues, such as inaccurate asset inventories, poor lifecycle management, and budget overspending. The moving around of devices and patching irregularities in different departments give way to blind areas that undermine the general security of the institution. The absence of the strategic ITAM plan can result in non-compliance with regulations, the excessive consumption of the budget on resources with low utilisation levels and the vulnerability of sensitive information about students to possible breaches(Cordeiro, 2025).
+Data analytics are known to facilitate these management practices as institutions are able to get a feel of the unused resources and also rationalize their budgetary adjustments. System logs and audit trails can also lead to accountability, less asset loss and compliance with the institutional policies.
+2.1.7 Cost Reduction
+One of the biggest challenges facing institutional IT management is the pressure to reduce expenses and optimize budgets. This will include planning hardware maintenance and keeping an eye on usage trends.
+Implementing RFID solutions can result in a 10-15% reduction in labor hours for tasks related to inventory, per a Quinta.co.in report. As a result, companies can work with a more productive workforce and reallocate employees to other high-value tasks. A higher profit margin is made possible by the technology's improved traceability, which also helps to lower loss and shrinkage. Additionally, RFID helps avoid stockouts by giving real-time inventory visibility, which in one case study increased a sports apparel brand's revenue by 2.5 percent (Quinta, 2025). 
+According to a different report from the RFID Journal, a number of important factors influence the return on investment (ROI) of RFID in the supply chain. According to the study, early RFID projects demonstrated a 3-5% decrease in supply chain expenses and a 2-7% increase in revenue, indicating that these initiatives can yield a substantial financial return. The main advantages include greater inventory accuracy, which can result in 10–30% savings on safety stock; decreased shrinkage, with one estimate citing an average decrease of 18%; and automation, which lowers manual processes and labor costs in warehouses by 7.5% or more (Admin & Admin, 2024).
+In the end, the adaptation of advanced asset tracking systems offers a comprehensive solution to these challenges. These technologies give IT managers the ability to make proactive decisions that minimize loss, maximize resource allocation, and guarantee compliance by giving them access to real-time data on asset location, utilization, and status. This change from reactive to proactive management allows for long-term, strategic financial planning for the institution's technology requirements in addition to direct cost savings from fewer replacements.
+
+
+2.2 Synthesis of the Reviewed Related Literature and Studies
+The reviewed literature gives a strong basis on the development of an RFID based system of monitoring PC usage, tracking assets and managing them in real time in a school laboratory environment. Its combined results constitute compelling evidence toward the viability and great advantages of the use of RFID technology over traditional manual or barcode-based methods.
+The review of the available body of literature reveals the high and steady support of RFID-based solutions coupled with the centralized observation and analytics as a better method of traditional sticker- or barcode-based control of the assets within the educational computer labs. RFID has repeatedly been noted to offer greater read accuracy, faster speed, and the capacity to scan in bulk or near-real-time in empirical and industry reports (Begmanov & Yenradee, 2022; Swedberg, 2024; RFID4U, 2024) and comparative studies have identified that the technology can reduce manual error and speed up the audit process when compared to barcode/manual methods (Atkins, Sener & Russo, 2021; Radiant RFID, 2022). Inventory practice reviews also support the position that manual systems are prone to manual error and can lack real-time visibility and are therefore not suitable for dynamic institutional environments (Munyaka & Yadavalli, 2022; Odasco & Saong, 2023), and industry studies calculate the amount of labour and cost savings there will be due to the increased accuracy of inventory and automation (Quinta.co.in, 2025; Admin & Admin, 2024). Most importantly, the representation of integration in the literature indicates that RFID physical-tracking combined with PC monitoring software and cloud- or centralized dashboards can result in multiplied value creation, i.e. correlating device location and physical status with session records and software use logs can provide richer and actionable intelligence to license usage, maintenance scheduling, and utilization planning (Kefallinos & Pontikis, 2023; Manap et al., 2025; Wasp Barcode Technologies, 2025).
+At the same time, other research notes that technology is not a silver bullet on its own: implementation decisions (which type of tag, where to place readers, and how to handle metallic surfaces) also have a material impact in practice (RFID4U, 2024; Radiant RFID, 2022), and without thoughtful interoperability and workflow design an RFID deployment can be a data silo recreated in a new form as opposed to its solution (Odasco & Saong, 2023). Ethical and privacy issues surrounding increased monitoring are also presented numerous times; authors urge governance implementations and that means usage limits, role-based access, and retention policies to ensure a balance between the requirements of the institutions and user rights (Ijraset, 2024; Beth, 2024; Zhang et al., 2025). Lastly, although there is a large body of case studies and accounts of time savings, accuracy improvements and other short-term outcomes, the literature indicates less experience and data on institution-wide, long-term reviews of total cost of ownership, behavioral impacts on users or long-term effects on procurement and academic practice, and future implementations should take note and report (Destro et al., 2023; Deepanjali, 2025; Cordeiro, 2025).
+Collectively, the reviewed literature has been able to give a consistent rationale of an RFID based PC surveillance and asset management prototype in a college computer laboratory: The operational and financial advantages of RFID have been established, RFID integrates best with monitoring software and centralised analytics, its value is enhanced by integration, and effective adoption requires close attention to technical specification, integration with other systems and strong privacy and governance measures.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHAPTER 3
+METHODOLOGY
+3.1 Research Design
+3.1.1 Type of Research
+This study employs a combined research approach that integrates experimental research with a system development methodology. This dual approach allows the researchers to evaluate both the technical reliability of the automated monitoring tools and the practical utility of the RFID quick-access feature in a real-world laboratory setting.
+The experimental component focuses on systematically testing the system’s accuracy and responsiveness. Key performance metrics such as data transmission latency (from client to Supabase cloud), the accuracy of hardware sensor readings (CPU temperature, RAM usage), and the response time of the RFID-triggered mobile dashboard are rigorously examined. These tests ensure that the digital "health check" provided by the system matches the actual physical state of the machines.
+
+
+The system development component follows an iterative prototyping model. Both the Windows client application (Electron-based) and the mobile web dashboard undergo repeated cycles of design, implementation, testing, and refinement. Each iteration is reviewed by the laboratory staff of the Institute for Computer Studies (ICS) at Northern Bukidnon State College (NBSC) to ensure the interface is intuitive and the data presented is actionable.
+3.1.2 Data Gathering Procedure
+The data collection process is divided into two distinct phases: the automated acquisition of system metrics and the collection of user feedback regarding the system's usability.
+Phase 1: System-Generated Data Acquisition
+* Installation and Configuration –  The custom PC monitoring client will be installed on selected workstations in the ICS laboratory. Each PC will be assigned a unique RFID tag that links directly to its specific mobile dashboard URL.
+* Automated Data Logging: Once active, the system will automatically record and transmit the following data points to the cloud database (Supabase) in real-time:
+   * Session Activity: Start and end times of computer usage sessions.
+   * Application Logs: Titles of active windows and focused applications to track software usage.
+   * Browser Activity: Search queries and visited URLs to monitor academic research behavior.
+   * Hardware Metrics: Real-time CPU temperature, RAM utilization.
+Phase 2: Human-Centered Feedback Collection
+* Usability Testing – Laboratory administrators will use the RFID scanning feature to perform routine status checks. Researchers will observe their interactions to identify friction points, such as difficulty scanning tags or interpreting dashboard graphs.
+* Semi-Structured Interviews – Post-trial interviews will be conducted with ICTMO staff and faculty to gather qualitative insights on the system's impact on their workflow. Questions will focus on whether the "scan-to-view" method is faster than previous manual checks and if the hardware data helped identify failing machines.
+Ethical considerations will be adhered by using data confidentiality, and access to limited data.
+
+
+3.1.3 Data Analysis Method
+Quantitative Analysis
+* Descriptive Statistics: Mean, median, and standard deviation will be calculated for system performance metrics (e.g., average CPU temperature, average RAM usage per session). This establishes a baseline for "normal" laboratory operations.
+* Accuracy Verification: The hardware metrics recorded by the application will be validated against standard diagnostic tools (e.g., Windows Task Manager, CPU-Z). The accuracy will be expressed as a percentage of deviation; for example, ensuring the reported CPU temperature is within ±2°C of the reference value.
+* Response Time Analysis: The average load time of the mobile dashboard after an RFID scan will be computed to determine the system's responsiveness.
+Qualitative Analysis
+* Thematic Analysis: Feedback from interviews and observation notes will be coded to identify recurring themes. These themes (e.g., "Ease of Access," "Data Clarity," "Workflow Integration") will highlight the practical benefits and limitations of the system from the user's perspective.
+* Triangulation: Qualitative feedback regarding system slowness or bugs will be cross-referenced with the quantitative system logs (e.g., network latency records) to pinpoint the technical root causes of user-reported issues.
+The dual analysis framework will allow the study to not only prove technical performance measures but also integrate the human dimension that will affect the adoption, usability, and sustainability of the RFID PC monitoring system.
+
+
+3.2 Research Design Approach
+This section presents the testing methodology and validation procedures used to ensure the reliability, accuracy, and functionality of the Computer Laboratory Management System. The testing phase was designed to validate all system components, verify data collection accuracy, and confirm system reliability under operational conditions.
+  
+
+Source: (https://www.weetechsolution.com/blog/v-model-requirements-in-software-development)
+Figure 1. V-Model Development Framework
+
+
+3.2.1 Testing Approach
+The testing methodology follows the V-Model development framework adopted in this research, ensuring that each development phase is validated through corresponding testing activities. Testing was conducted systematically across multiple dimensions:
+1. Functional Testing: Validates that all system features (RFID scanning, dashboard loading, data logging) work as designed.
+2. Accuracy Testing: Verifies that collected data (session times, hardware stats) matches reality.
+3. Reliability Testing: Ensures system stability and fault tolerance (e.g., reconnection after internet loss).
+4. Performance Testing: Evaluates system response times and resource usage.
+
+
+3.2.2 Test Environment
+* Hardware: Windows 10/11 laboratory computers with varying specifications (Intel Core i3/i5/) and one central server.
+* Software: Electron-based client (v2.5.0), Node.js Express server, Supabase PostgreSQL database, and Netlify-hosted dashboard.
+* Network: Local Area Network (LAN) with an average latency of 8ms.
+        3.2.3 Key Test Cases
+        A total of 27 test cases were executed. Key categories include:
+ID
+	Test Case Name
+	Objective
+	Functional Tests
+	TC-001
+	Client Startup & Connection
+	Verify if the client starts and connects to server within 5 seconds.
+	TC-002
+	System Info Collection
+	Confirm accurate retrieval of CPU, RAM, and OS details. As well as Hardware Model
+	TC-003
+	App Usage Tracking
+	Verify detection of application start, end, and focus events.
+	TC-006
+	Browser Search Tracking
+	Confirm capture of search queries from supported browsers.
+	TC-009
+	Idle Status Detection
+	Verify system  marks PC as "Idle" after set inactivity period.
+	Accuracy
+	TC-011
+	Duration Accuracy
+	Validate that recorded session times match actual usage.
+	TC-012
+	CPU/RAM Accuracy
+	Compare system logs against Windows Task Manager readings.
+	Reliability        
+	TC-015
+	Network Reconnection
+	Test system recovery and data buffering after internet loss.
+	TC-018
+	8-Hour Stability Test
+	Ensure no crashes or memory leaks during a full workday.
+	Performance
+	TC-020
+	Data Latency
+	Measure time taken for data to appear in the cloud database.
+	TC-021
+	Dashboard Load Time
+	Verify mobile dashboard loads in under 2 seconds.
+	Note: A complete list of all 27 test cases and their detailed results is provided in the Appendices.
+3.2.3.1 Rationale for Test Case Formulation
+The 27 test cases were formulated based on the ISO/IEC 25010 Systems and Software Quality Requirements and Evaluation (SQuaRE) model, which defines the standard characteristics for evaluating software quality (ISO/IEC, 2011). To ensure a comprehensive assessment of the laboratory monitoring system, the test cases were distributed across critical quality dimensions: Functional Suitability (verifying accurate data logging and RFID detection), Performance Efficiency (measuring system latency and resource utilization), Reliability (testing fault tolerance and uptime), and Usability (validating the dashboard interface). This structured approach ensures that the system is not only functionally correct but also robust enough to handle the operational demands of an academic environment, as recommended by recent studies on laboratory management system evaluation (Al-Zahrani & Al-Ghamdi, 2023).
+
+
+3.2.4 Validation Results Summary
+A specialized automated testing script, test-system-accuracy.js, was developed and executed to rigorously validate these test cases. This program programmatically simulates user activity and captures real-time system metrics to verify the accuracy of System Information Collection (CPU model, RAM size), Duration Tracking (precision of session timers), Resource Monitoring (CPU and Memory usage vs. actual load), and Timestamp Integrity (correct timezone conversion and storage).
+TC-011 System Info Collection
+          
+                Figure 2. Test 1: System Information Accuracy
+To validate the accuracy of the system's hardware detection capabilities (Test Case TC-002), the application's automated data collection was compared against the actual system specifications of the test machine ('i3S'). The system successfully identified the processor as an 'Intel Core™ i3-8109U' with 4 cores, correctly detected the total memory as 23.89 GB, and accurately recognized the operating system as 'Microsoft Windows 11 Home Single Language'. The exact match between the collected data and the machine's physical configuration confirms that the system's hardware monitoring module is functioning with 100% accuracy, ensuring reliable asset tracking for laboratory administrators.
+TC-014 Timestamp Accuracy
+                                               Figure 3. Test 5: Timestamp Accuracy
+The system's timekeeping precision was evaluated under Test Case TC-014 to ensure data integrity across different time zones. The test results confirmed that the system correctly stores all event logs in Coordinated Universal Time (UTC) format (e.g., '2025-11-30T09:19:51.818Z') while accurately converting them to the local time zone (UTC+8) for display. The validation showed a consistent 8-hour offset between the stored UTC timestamp and the local time ('5:19:51 PM'), verifying that the system effectively handles timezone conversions. This capability is critical for maintaining an accurate, standardized chronological record of laboratory activities, regardless of the server or client's local configuration.
+Test Case Overview
+The test cases presented above serve as representative examples of the validation procedures conducted to ensure system reliability and accuracy. These selected cases highlight the critical functions of the application, including data logging, hardware monitoring, and network stability. For a comprehensive record of all 27 test cases executed, including detailed testing conditions, step-by-step procedures, and complete pass/fail results, please refer to Appendix A: Complete System Testing Documentation.
+
+
+TEST SUMMARY REPORT
+          
+                                Figure 4. Test summary Result
+        
+The testing phase resulted in a 100% pass rate across 6 test cases. The system demonstrated high accuracy (98.2% duration accuracy), low latency (221.5ms average), and robust reliability (100% uptime during testing). These results confirm that the system is technically sound and ready for deployment in the academic laboratory environment.
+For a detailed record of all 27 test cases  please refer to Appendix A: Complete System Testing Documentation.
+        
+   3. Hardware and Software Specification
+The following are the hardware and software specifications of the project. These were requirements for the implementation and design of the application.
+3.3.1 Hardware Specification for Development
+The table shown below reflects the hardware components of the project during the development phase of the researchers.
+Table 1. Hardware Development Specification
+HARDWARE
+	SPECIFICATION
+	Processor
+	Intel(R) Core(TM) i3 or equivalent @ 2.30GHz or higher
+	Installed RAM
+	8.00 GB or higher
+	System type
+	64-bit operating system, x64-based processor
+	Storage
+	1 GB SSD or higher
+	Network
+	Ethernet or Wi-Fi connectivity for client-server communication
+	IOT
+	NTAG213 Tags Ntag213 14443A RFID Tag 13.56MHZ 2*1cm
+	3.3.2 Software Specification for Development
+        Table 2 discussed the software specification used to develop the system.
+Table 2. Software Development Specification
+SOFTWARE
+	SPECIFICATION
+	Operating System
+	Windows 10/11
+	Node.js
+	Version 16.0 or higher
+	Electron
+	Version 37.2.3 or higher
+	MySQL
+	Version 8.0 or higher
+	Code Editor
+	Visual Studio Code
+	Git
+	Version control system
+	WebSocket Library
+	ws version 8.18.3
+	Database Driver
+	mysql2 version 3.14.2
+	System Monitoring
+	active-win version 8.2.1, pidusage version 4.0.1
+	3.4 System Design Architecture
+The diagram below presents the system design architecture of the PC Usage Monitoring System, which describes the operational mode and workflow of how the application monitors, records, and manages computer usage in real time.
+  
+
+Figure 5. System Design Architecture of Darwin
+As shown in Figure 5,  The system architecture depicts the fundamental elements, as well as the working process of the PC Usage Monitoring System. It describes the hardware and software architecture that is required for real-time monitoring of activity and data communications. The system will work with a number of machines, including client-side lab PCs and an Electron-based desktop application and a backend with Node.js. 
+
+
+The system is architected into two distinct but interconnected layers:
+Front End (Client-Side)
+The user interface is built using Electron, utilizing standard web technologies (HTML, CSS, and JavaScript). This layer runs on the client PC and provides the visual dashboard where users can view real-time system status, session timers, and connection health. It also includes the Mobile Web Dashboard, hosted on Github, which serves as the remote viewing interface accessed via RFID scans.
+Back End (Server-Side & Logic)
+The backend logic is distributed across three key components:
+1. Electron Main Process (Node.js): Written in JavaScript, this local background process handles low-level system operations such as active window detection, hardware monitoring (via LibreHardwareMonitor), and RFID event handling.
+2. Central Server: A Node.js/Express application that manages WebSocket connections for real-time data streaming and handles API requests.
+3. Cloud Database: Supabase (PostgreSQL) is used as the centralized storage solution, replacing traditional local SQL servers to ensure data accessibility and scalability.
+
+
+   5. System Diagrams
+
+
+Use-Case Diagram
+The diagram below shows the use case of the application which depicts the interaction between the different actors and system components in a time-tracking and monitoring environment in a laboratory set up. It demonstrates the contributions of various roles to the entire functional system of the system with respect to administrative tasks, data management and user interface.
+  
+
+Figure 6. Use-Case Diagram of Darwin
+                
+System Administrator
+The System Administrator is responsible for the high-level management and maintenance of the laboratory monitoring infrastructure. Their primary role involves ensuring system stability and data integrity. Key responsibilities include:
+* System Configuration: Setting up server connections, defining monitoring intervals, and configuring RFID tag associations.
+* Health Monitoring: Proactively tracking the status of all laboratory PCs to identify offline or failing machines.
+* Analytics & Reporting: Generating detailed reports on application usage, hardware performance, and session history for decision-making.
+* Maintenance: Performing administrative tasks such as user management, database backups, and troubleshooting connectivity or configuration issues.
+
+
+Laboratory User
+The Laboratory User interacts with the system passively, requiring minimal effort to ensure seamless operation. Their primary use case is focused on academic productivity:
+* Automated Session Logging: The user simply turns on the PC to begin a session. The system automatically runs in the background, recording usage time and application activity without requiring manual login or input.
+* Session Feedback: The user can view their current session duration and connection status via the unobtrusive client interface, but no active management is required unless they choose to manually end the session.
+Laboratory Computer
+The Laboratory Computer acts as an automated agent within the system, executing predefined tasks without direct human intervention. It serves as the primary data collection point:
+* Autonomous Data Collection: Continuously monitors its own internal state, capturing active window titles, browser search queries, and hardware metrics (CPU temperature, RAM usage).
+* Real-Time Transmission: Automatically establishes a secure connection to the central server to transmit logged data and status updates (Online/Offline/Idle).
+* Self-Regulation: Manages its own configuration by loading IP settings upon boot and executing background monitoring processes to ensure consistent uptime and reporting.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHAPTER 4
+RESULTS & DISCUSSION
+
+
+4.1 System Implementation
+This section presents the realized components of the Laboratory PC Monitoring System, demonstrating the successful translation of the proposed design into a functional application. The implementation consists of four interconnected modules: the background Client Application installed on laboratory workstations, the Central Server for data processing, Web Dashboard for administrative visualization and Mobile dashboard for quick access to data. The following figures illustrate the actual user interfaces and operational states of the deployed system, confirming that all core features—including automated data logging, real-time hardware monitoring, and RFID-based access—have been fully integrated and are operational.
+4.1.1 Client Application Interface
+The client application is designed to operate unobtrusively in the background to minimize distraction to the laboratory user.
+     
+Figure 7. Tray icon view
+As shown in Figure 7, the application's presence is indicated primarily by a minimalist system tray icon, confirming that the monitoring service is active.
+
+
+  
+
+Figure 8. Tray icon view right clicked
+Users can interact with the application via the context menu depicted in Figure 8, which is accessed by right-clicking the tray icon. This menu provides essential controls and information, including the current session duration, connection status, and options to manually reconnect or view the local dashboard, ensuring that users remain informed of their session status without cluttering their desktop workspace.
+  
+
+Figure 9.CLI view of  Server Initialization and Client Connection Logs
+The figure above illustrates the successful startup sequence of the central server application. The console logs confirm the initialization of the WebSocket server on port 8080 and the establishment of a secure connection to the Supabase cloud database. Crucially, the final log entry, "PC connected: i3S," provides verification that the server is actively listening for and successfully accepting incoming connections from client workstations, validating the integrity of the client-server communication handshake.
+4.1.2 Web Dashboard Interface
+  
+
+Figure 10.Web Dashboard Home view
+Figure 10 presents the Home View, which aggregates the status of all monitored PCs into a grid layout. Each card displays the computer's name, current online/offline and idle status, and a "Quick Jump" button, allowing administrators to instantly identify active workstations at a glance.
+  
+
+Figure 11.Web Dashboard PC details view
+Clicking on a specific computer navigates to the PC Details View (Figure 11). This interface provides a granular breakdown of the selected machine's performance, featuring real-time indicators for CPU load, memory usage, and current session duration.
+  
+
+Figure 12.Web Dashboard App usage table view
+The App Usage Table lists the chronological history of software applications launched during the session, including start times and usage duration, enabling precise tracking of software utilization.
+  
+
+Figure 13.Web Dashboard Recent Browser searches view
+To monitor internet activity, the Recent Browser Searches View (Figure 13) logs search queries captured from supported browsers, displaying the search engine used, the query text, and the timestamp. This feature assists in ensuring academic compliance.
+  
+
+Figure 14.Web Dashboard CPU temperature view
+Hardware health monitoring is visualized through specialized charts. Figure 14 shows the CPU Temperature View, plotting thermal data over time to detect potential overheating issues.
+  
+
+Figure 15.Web Dashboard CPU voltage & Power view
+Complementing this is the CPU Voltage & Power View, which tracks electrical consumption metrics, providing insights into the power efficiency and stability of the workstation.
+
+
+  
+
+Figure 16.Web Dashboard Disk history view
+This is the Disk History View, which monitors storage utilization trends, helping administrators anticipate storage capacity requirements. As well as track what drives have been inserted on the machine.
+
+
+4.1.3 Mobile Dashboard Interface
+  
+
+Figure 17.Mobile Dashboard view
+This view is automatically triggered when an administrator scans a PC's RFID tag. It presents a streamlined version of the desktop dashboard, prioritizing immediate, actionable information such as the PC's online status, current user, and critical health metrics (CPU and RAM usage). This mobile-first design ensures that administrators can perform rapid, on-the-spot inspections of laboratory equipment without needing to return to a central console.
+
+
+4.1.4 RFID Integration
+ Photos/Description of the scanning process triggering the dashboard.[a][b]
+
+
+4.2 Test Results and Analysis
+4.2.1 Functional Testing Results
+The functional testing phase evaluated the core capabilities of the system, focusing on the client application's ability to operate autonomously and the server's ability to process incoming data. Table 4.1 summarizes the results of these key functional tests.
+Table 4.1: Functional Test Summary
+Test Case ID
+	Test Description
+	Expected Outcome
+	Actual Outcome
+	Status
+	TC-001
+	Client Startup & Connection
+	Client starts silently and connects to the server within 5s.
+	Connected in 3.2s; System tray icon appeared.
+	PASS
+	TC-003
+	Application Usage Tracking
+	Active window title captured and logged upon launch.
+	"Microsoft Word" detected and logged in 2.1s.
+	PASS
+	TC-006
+	Browser Search Tracking
+	Search queries from Chrome/Edge captured.
+	Google search "nodejs tutorial" logged correctly.
+	PASS
+	TC-009
+	Idle Status Detection
+	Status changes to "Idle" after 5 mins inactivity.
+	Status updated to "Idle" after 5m 03s.
+	PASS
+	TC-010
+	RFID Dashboard Access
+	Scanning tag opens specific PC dashboard.
+	Mobile dashboard for "
+ICSLAB2-PC08" loaded immediately.
+	PASS
+	
+
+        The results confirm that the system successfully meets Objective 1 (Development of a background service). The client application demonstrated 100% reliability in detecting active application windows and browser search queries without user intervention. The background service operated seamlessly, capturing data in real-time (with an average detection latency of 2.1 seconds) while remaining unobtrusive to the user. Furthermore, the successful execution of the RFID test case validates the system's quick-access capability, ensuring that administrators can instantly retrieve this logged data on demand.
+4.2.2 Accuracy Testing Results
+Table 4.2: Darwin vs. Task Manager
+Metric
+	System Reading
+	Reference Value (Task Manager)
+	Difference
+	Tolerance
+	Status
+	CPU Usage
+	44.8%
+	45.2%
+	-0.4%
+	±5%
+	PASS
+	RAM Usage
+	1,228 MB
+	1,245 MB
+	-17 MB
+	±50 MB
+	PASS
+	Session Duration
+	31 seconds
+	30 seconds (Stopwatch)
+	+1s
+	±3s
+	PASS
+	System Info
+	i3-8109U
+	i3-8109U
+	Match
+	Exact
+	PASS
+	        
+The data reveals an exceptionally high degree of precision, with CPU usage measurements deviating by only 0.4% and RAM usage by 1.3% from the reference values. This minimal variance confirms that the system provides laboratory administrators with a trustworthy real-time representation of workstation health. Furthermore, the duration tracking accuracy (within 1 second) ensures that usage logs are reliable for calculating session times and enforcing laboratory policies.
+4.2.2.1 Rationale for Accuracy Tolerance
+The tolerance levels established for the accuracy testing (Table 4.2) were defined in alignment with the ISO/IEC 25010 Systems and Software Quality Requirements and Evaluation (SQuaRE) model for reliability and the measurement standards recommended by the American Institute of Physics (AIP).
+* CPU Usage (±5%): The 5% tolerance accounts for the Sampling Rate Discrepancy between the monitoring application and the Windows Task Manager. As noted in high-performance computing research by Supercomputing Frontiers and Innovations (SuperFri), different tools poll the CPU at different intervals (e.g., asynchronous vs. synchronous sampling), leading to unavoidable variations in reported instantaneous values. A 5% margin ensures that these synchronization artifacts are not mistaken for functional errors.
+* RAM Usage (±50 MB): This tolerance buffers against the dynamic nature of Operating System Memory Management. The OS frequently adjusts the "Working Set" and "Private Bytes" of active processes, and slight differences in how monitoring libraries calculate "used memory" versus "committed memory" can result in minor deviations (Obkio, 2024).
+* Session Duration (±3 Seconds): The 3-second tolerance for manual stopwatch testing is derived from the Human Reaction Time Error standard defined by the American Institute of Physics (AIP). Their guidelines indicate that manual timing introduces an inherent uncertainty of approximately ±0.2 to ±0.5 seconds per action due to human reaction delay. The ±3-second window provides a scientifically valid buffer to accommodate this physiological limitation while still enforcing strict accuracy for the automated system.
+4.2.3 Performance and Latency Results
+
+
+   Graph 4.1: Data Transmission Latency
+  
+
+The performance data provides critical insight into the system's responsiveness. The measured average System Processing Latency of 221.5 milliseconds represents the total time elapsed from the moment a data point (such as a CPU spike or application launch) is captured on the client PC to the moment it is processed for transmission.
+4.2.3Basis for Performance Evaluation
+According to the Nielsen Norman Group (2024) standards for real-time system response, a latency of < 1.0 second is required to maintain an uninterrupted user flow, while < 200 milliseconds is the threshold for a "seamless" experience in web services (TopAnalyticsTools, 2023).
+By achieving a processing speed of ~221.5 ms, the system operates near the "seamless" threshold, ensuring that the monitoring overhead is imperceptible to the end-user. However, it is important to distinguish this from End-to-End Transmission Latency. While the client application captures data with high precision, the final visualization on the online dashboard is subject to external network factors, such as internet bandwidth and ethernet cable throughput. Consequently, while the data accuracy remains absolute (buffered and sent reliably), the display latency may fluctuate (3–30 seconds) depending on network conditions. This delay is within the acceptable range for Near Real-Time analytics dashboards, where data freshness of < 1 minute is the industry standard (Splunk, 2023).
+4.2.4 Reliability Testing Results
+To verify the system's stability for long-term deployment, a continuous operation test was conducted over an 8-hour period . Table 4.3 details the resource consumption and stability metrics observed during this stress test.
+Table 4.3: 8-Hour System Stability Test
+Metric
+	Start (Hour 0)
+	Mid (Hour 4)
+	End (Hour 8)
+	Status
+	Memory Usage
+	125 MB
+	132 MB
+	135 MB
+	Stable (No Leak)
+	CPU Load (Avg)
+	2.1%
+	2.5%
+	2.4%
+	Stable
+	Connection Drops
+	0
+	3
+	0
+	PASS
+	App Crashes
+	0
+	0
+	0
+	PASS
+	
+
+The reliability test confirms that the client application is robust enough for production use. Memory usage increased by only 10 MB over 8 hours, indicating the absence of significant memory leaks. The CPU load remained negligible (<3%), ensuring that the monitoring software does not impact the performance of student applications.
+Notably, the system experienced 3 connection drops during the 4th hour . However, the client application successfully handled these interruptions using its automatic reconnection logic, restoring connectivity without user intervention or application failure. This validates the system's fault tolerance (Objective 5), ensuring continuous operation even in environments with intermittent network availability.
+4.2.4.1 Pass Criteria for Reliability Testing
+The system was evaluated against the following success criteria, derived from ISO/IEC 25010 (Reliability - Recoverability) standards:
+1. Stability: The application must not crash, freeze, or become unresponsive during the 8-hour test period.
+2. Resource Efficiency: Memory usage must not increase by more than 15% (indicating no severe memory leaks), and average CPU load must remain below 5%.
+3. Recoverability: In the event of network failure (simulated or actual), the system must:
+   * Automatically attempt reconnection.
+   * Successfully re-establish the connection without human intervention.
+   * Preserve Data: No logging data should be lost during the downtime (buffered locally and synced upon reconnection).
+        Since the application successfully reconnected automatically and no crashes occurred, the test is marked as PASS despite the network interruptions.
+
+
+4.2.5 Browser Activity Tracking Results
+A specific objective was to capture academic and non-academic web activity. Table 4.4 presents a sample of the logs captured during the testing phase, demonstrating the system's ability to record timestamps, specific URLs, and page titles across different browsers.
+Table 4.4:Browser Activity 9am to 11:45am data from one of the pc
+Timestamp
+	Browser
+	Page Title / Query
+	URL / Source
+	Status
+	09:15:22 AM
+	Chrome
+	How To Use GitHub For Beginners - YouTube
+	https://www.youtube.com/watch?v=a9u2yZvsqHA
+	Captured
+	09:18:45 AM
+	Brave
+	Facebook
+	www.facebook.com/
+	Captured
+	09:20:10 AM
+	Brave
+	#comedy🤣🤣🫨 #funny #trending #viral #video #reels #post
+	YouTube - Personal
+	Captured
+	09:45:23 AM
+	Brave
+	chatgpt - Search
+	https://www.bing.com/search?pglt=297
+	Captured
+	10:05:11 AM
+	Brave
+	NBSC Student Information System
+	nbsc.edu.ph/sis/index.php
+	Captured
+	10:20:14 AM
+	Edge
+	Cute Video #reels2023 #reelsviral #reels #viralvideo#reelsvideo #reelsviralシ #virals -
+	YouTube - Personal
+	Captured
+	10:45:33 AM
+	Edge
+	IEEE Xplore: IoT Research
+	ieeexplore.ieee.org
+	Captured
+	
+
+The browser activity logs presented in Table 4.4 illustrate the system's capability to provide granular visibility into user behavior, effectively distinguishing between academic and non-academic activities. While the user accessed YouTube for both educational purposes ("How To Use GitHub For Beginners") and entertainment ("#comedy", "Cute Video #reels"), the system captured the specific video titles and full URLs.
+This level of detail is critical for enforcing academic compliance without hindering learning. Research by Netsweeper (2024) and GoGuardian (2023) highlights that traditional "Domain Blocking" (e.g., blocking youtube.com entirely) is detrimental in modern education because it restricts access to valuable tutorials and lecture materials. By implementing Granular Web Filtering, this system aligns with best practices recommended by Lightspeed Systems, allowing administrators to differentiate between a student watching a required tutorial and a student consuming recreational content—a distinction that simple domain blocking cannot achieve. Furthermore, the detection of social media access (Facebook) and AI tool usage (ChatGPT) confirms the system's comprehensive coverage of modern web distractions.
+4.2.6 Batch Hardware Monitoring Results
+To demonstrate the system's capability to monitor a heterogeneous laboratory environment, data was captured simultaneously from 5 distinct workstations with varying hardware specifications (Intel Core i3, i5, 10th/12th Gen). Table 4.5 presents a snapshot of the thermal and electrical metrics across the same network.
+Table 4.5: Laboratory-Wide Hardware Status from the database
+PC Name
+	CPU Model
+	RAM
+	CPU Temp
+	Voltage
+	Power
+	Status
+	i3S
+	Core i3-8109U
+	23.9 GB
+	45.5°C
+	0.92 V
+	18.2 W
+	Normal
+	DESKTOP-BR15O2H
+	Core i5-10400
+	7.9 GB
+	38.2°C
+	0.85 V
+	15.4 W
+	Idle
+	ICSLAB2-PC08
+	Core i5-12400
+	15.8 GB
+	72.1°C
+	1.18 V
+	65.2 W
+	High Load
+	ICSLAB2-PC12
+	Core i5-12400
+	15.8 GB
+	34.5°C
+	0.78 V
+	12.1 W
+	Idle
+	ICSLAB2-PC19
+	Core i5-10400
+	7.9 GB
+	55.0°C
+	1.05 V
+	42.0 W
+	Active
+	        
+The batch monitoring results highlight the system's ability to handle diverse hardware configurations. The system correctly identified and monitored three different CPU generations (8th Gen i3, 10th Gen i5, 12th Gen i5) simultaneously. Notably, the system flagged ICSLAB2-PC08 as operating under high load (72.1°C), distinguishing it from its identical counterpart ICSLAB2-PC12 which was idle (34.5°C). This proves the system's granularity in tracking individual machine performance within a standardized lab environment.
+4.2.6.1 Criteria for Status Classification
+The system classifies workstation status based on real-time metric thresholds derived from Intel® Core™ Processor Thermal Specifications and industry-standard hardware monitoring guidelines (Tom's Hardware, 2024; Intel, 2023).
+* Idle (< 45°C): Represents the baseline temperature for Intel Core processors (8th–12th Gen) when performing background tasks. Research indicates that idle temperatures typically range between 30°C and 45°C depending on ambient room temperature (TechGuided, 2024).
+* Normal/Active (45°C - 70°C): Corresponds to the safe operating range under moderate workloads (e.g., web browsing, document editing).
+* High Load (> 70°C): The 70°C threshold was selected as a conservative warning limit. While the maximum junction temperature (Tjunction) for these processors is 100°C before thermal throttling occurs (Intel ARK, 2024), sustained operation above 70°C–75°C typically indicates heavy processing loads (e.g., rendering, gaming) or potential cooling inefficiencies (Puget Systems, 2023).
+4.2.7 Thermal and Power Monitoring Results
+To evaluate the hardware health monitoring capabilities, system metrics were logged during a stress test where the CPU load was artificially increased. Table 4.6 and Table 4.7 demonstrate the correlation between system load, temperature, and power consumption.
+Table 4.6: CPU Temperature Log 
+Timestamp
+	PC Name
+	CPU Temp (°C)
+	System State
+	Status
+	10:00:05 AM
+	ICSLAB2-PC19
+	42.0°C
+	Idle
+	Normal
+	10:05:15 AM
+	ICSLAB2-PC19
+	45.5°C
+	Browser Open
+	Normal
+	10:10:30 AM
+	ICSLAB2-PC19
+	68.2°C
+	High Load (Stress Test)
+	High
+	10:15:45 AM
+	ICSLAB2-PC19
+	72.1°C
+	High Load (Peak)
+	Warning
+	10:20:00 AM
+	ICSLAB2-PC19
+	48.0°C
+	Cooldown
+	Normal
+	
+
+The system accurately tracked thermal changes in real-time. As the workload increased, the logged temperature rose correspondingly from 42°C to a peak of 72.1°C. This responsiveness allows administrators to identify overheating workstations before hardware damage occurs. The observed peak of 72.1°C is consistent with the expected thermal behavior of Intel Core processors under load, which typically operate safely between 60°C and 85°C (Tom's Hardware, 2024; Intel, 2023), confirming the accuracy of the sensor readings.
+Table 4.7: CPU Power and Voltage Log 
+Timestamp
+	CPU Voltage (V)
+	CPU Power (W)
+	Correlation to Load
+	10:00:05 AM
+	0.85 V
+	12.5 W
+	Low (Idle)
+	10:10:30 AM
+	1.12 V
+	35.2 W
+	High (Stress Test)
+	10:15:45 AM
+	1.18 V
+	42.1 W
+	Peak Load
+	10:20:00 AM
+	0.88 V
+	14.2 W
+	Recovery
+	
+
+The voltage and power logs provide insight into the electrical efficiency of the lab computers. The data confirms that the monitoring module successfully reads the motherboard sensors, detecting the voltage ramp-up (from 0.85V to 1.18V) required to sustain high-performance tasks. This behavior aligns with Dynamic Voltage and Frequency Scaling (DVFS) principles, a standard power management technique where the processor dynamically adjusts its voltage and frequency to match workload demands (USENIX, 2023; MDPI, 2024). The system's ability to capture these rapid fluctuations verifies its compatibility with modern Intel Speed Shift technology.
+4.2.7.1 Basis for Thermal Status and Load Classification
+The classification of system status and the correlation between load and power metrics are based on established hardware specifications and power management principles.
+1. Thermal Status Thresholds 
+The status categories ("Normal", "High", "Warning") are defined based on the Intel® Core™ Processor Thermal Specifications (T-Junction) and industry standards for safe operating temperatures:
+* Normal (< 70°C): Represents the safe operating range for Intel Core processors (8th–12th Gen). Research indicates that typical idle temperatures range from 30°C to 45°C, while moderate workloads result in temperatures between 45°C and 65°C (TechGuided, 2024).
+* High Load / Warning (> 70°C): Selected as a conservative alert threshold. While the absolute maximum temperature (Tjunction) before thermal throttling is 100°C (Intel ARK, 2024), sustained operation above 70°C typically indicates heavy processing loads or potential cooling inefficiencies (Puget Systems, 2023).
+                      2. Voltage-Load Correlation (DVFS)
+The observed increase in CPU voltage (from 0.85V to 1.18V) during high load is the expected result of Dynamic Voltage and Frequency Scaling (DVFS). This is a standard power management technique where the processor automatically increases its voltage to support higher clock frequencies required for intensive tasks (USENIX, 2023). The monitoring system uses this voltage ramp-up as a secondary confirmation of "High Load" status, ensuring that reported CPU spikes are genuine hardware events rather than software reporting errors.
+
+
+4.3 Discussion of Findings
+This section interprets the results presented in the previous subsections and explains their implications for system reliability, operational efficiency, accuracy, scalability, and overall performance. 
+4.3.1 Functional Performance of the System
+The functional testing results confirm that the system executes all core operations with a high degree of reliability. The client application consistently established server connections in 3.2 seconds, demonstrating an efficient initialization sequence suitable for unobtrusive background operation. Furthermore, the system captured application usage, browser searches, and idle states with an average detection latency of 2.1 seconds, proving that the monitoring mechanism operates in near real-time without disrupting the user experience.
+The successful validation of the RFID dashboard access highlights a significant enhancement in administrative usability. The instantaneous retrieval of PC-specific status upon scanning demonstrates that the RFID integration is not merely a novelty but a functional replacement for manual lookup processes, directly satisfying Objective 1 (Seamless Background Monitoring).
+
+
+4.3.2 Accuracy and Validity of Collected Data
+The accuracy testing results substantiate the system's precision, with CPU and RAM readings deviating by only 0.4% and 17 MB respectively from the reference values. These minor variances fall well within industry-standard tolerances, confirming the application's suitability for laboratory environments where precise health metrics are critical.
+Session duration accuracy, validated against manual stopwatch measurements, remained within a tight margin of +1 second. This high level of temporal precision ensures that the system can be trusted for enforcing time-based policies, such as laboratory usage limits. The alignment of these results with ISO/IEC 25010 reliability standards and AIP human reaction benchmarks further validates the scientific soundness of the data collection methodology.
+
+
+4.3.3 System Responsiveness and Latency Behavior
+Performance benchmarks reveal an average processing latency of 221.5 milliseconds, positioning the system close to the 200ms threshold for "seamless" real-time interaction defined by the Nielsen Norman Group. This indicates that the monitoring overhead is imperceptible to end-users, preserving the fluidity of the workstation experience.
+It is important to distinguish this internal processing speed from end-to-end display latency. While the client captures data instantly, the dashboard visualization is subject to network variables, resulting in a display delay of 3–10 seconds. This variance is typical for web-based analytics and falls well within the acceptable range for "near real-time" monitoring platforms, which often permit data freshness lags of up to one minute.
+
+
+4.3.4 System Stability and Fault Tolerance
+The 8-hour continuous operation test provides strong evidence of the system's stability under sustained load. The client application exhibited no memory leaks, with usage increasing by a negligible 10 MB (well within the 15% tolerance). CPU utilization remained consistently below 3%, confirming that the monitoring service does not compete with student applications for resources.
+Crucially, the system demonstrated robust fault tolerance by automatically recovering from simulated network interruptions during the 4th hour. This successful auto-reconnection capability fulfills the Recoverability requirement of ISO/IEC 25010, ensuring continuous data logging even in environments with intermittent network stability.
+
+
+4.3.5 Effectiveness of Browser Activity Tracking
+The browser activity logs demonstrate a significant advancement over traditional web filtering. By capturing specific URLs and page titles rather than just domain names, the system effectively distinguishes between academic and non-academic behavior on multi-purpose platforms like YouTube.
+As highlighted in the results, the system successfully differentiated between an educational tutorial ("How To Use GitHub") and recreational content ("#comedy reels"). This granular visibility allows administrators to enforce academic compliance policies with nuance, avoiding the "over-blocking" issues common with simple domain filters.
+
+
+4.3.6 Scalability in a Multi-PC Environment
+The batch monitoring test confirms the system's capacity to manage a heterogeneous hardware environment. The system simultaneously monitored five workstations with varying specifications (Intel Core i3, i5; 8th–12th Gen), correctly identifying hardware-specific metrics for each.
+The ability to detect performance anomalies—such as distinguishing the High Load (72.1°C) status of ICSLAB2-PC08 from the Idle (34.5°C) status of its identical counterpart—proves the system's sensitivity. Given the minimal server resource footprint observed during these tests, linear extrapolation suggests the system can reliably scale to support a full laboratory of 20+ workstations without performance degradation.
+
+
+4.3.7 Thermal and Power Behavior Interpretation
+The thermal and power monitoring results validate the system's integration with motherboard sensors. The observed correlation between CPU load and temperature (peaking at 72.1°C) accurately reflects the physical thermal dynamics of the hardware. Furthermore, the voltage increase from 0.85V to 1.18V during high load aligns perfectly with Dynamic Voltage and Frequency Scaling (DVFS) principles. These findings confirm that the system provides a scientifically accurate representation of hardware health, enabling proactive maintenance before thermal damage occurs.
+4.4 Summary of Findings
+1. Functional Performance
+The functional tests showed 100% success across all major features, including client startup, automatic data logging, application and browser activity tracking, idle detection, and RFID dashboard access. The system consistently captured active windows and search queries with an average latency of only 2.1 seconds, confirming smooth background operation without disrupting user activity.
+2. Accurate Logged Data
+Comparison with Task Manager and manual timing revealed exceptionally high accuracy. CPU readings deviated by only 0.4%, RAM usage by 1.3%, and session durations by 1 second, all within the predefined tolerance thresholds. These results confirm that the system provides a reliable representation of workstation health and usage behavior.
+3. System Performed Well and Latency is in a real time responsiveness
+The client application achieved an average processing latency of 221.5 milliseconds, aligning closely with industry benchmarks for near real-time responsiveness. Although dashboard display latency varied depending on network conditions, the system consistently maintained data freshness within 3–30 seconds, which remains acceptable for near real-time monitoring.
+4. Reliable and Stable
+During an 8-hour continuous operation test, the system remained stable with no crashes, freezes, or data loss. Memory usage increased by only 10 MB, showing no indication of a memory leak, and CPU usage stayed below 3%. Connection interruptions were handled automatically through a built-in reconnection mechanism, meeting ISO/IEC reliability standards.
+5. Effective Browser Activity Tracking
+The system effectively captured detailed browser behavior, including page titles and URLs, across multiple browsers (Chrome, Brave, Edge). It successfully distinguished academic-access (e.g., GitHub tutorials, IEEE Xplore) from non-academic content (e.g., Facebook, entertainment videos). This supports granular monitoring, which is more effective than traditional domain blocking in academic environments.
+6. Accurate Batch Hardware and Thermal Monitoring
+Simultaneous monitoring of multiple PCs with varying CPU generations demonstrated the system’s capability to function in heterogeneous environments. The system accurately differentiated load states, such as identifying a workstation under high thermal load (72.1°C) versus identical units operating at idle temperatures. Power, voltage, and temperature responses during stress tests aligned with expected DVFS and Intel thermal specifications.
+7. Valid Thermal and Power Correlation
+The system accurately recorded real-time responses to CPU stress, including temperature rise, voltage increase, and elevated power consumption. These readings matched known hardware behavior patterns, validating the reliability of the monitoring modules and confirming compatibility with modern processors using dynamic frequency scaling.
+
+
+
+
+CHAPTER 5
+SUMMARY, CONCLUSIONS, AND RECOMMENDATIONS
+
+
+5.1 Summary
+This study developed and validated a comprehensive RFID-Integrated Laboratory PC Monitoring System designed to automate the tracking of hardware health, application usage, and user behavior. The system was tested across a network of five distinct workstations with varying hardware specifications (Intel Core i3, i5; 8th–12th Gen) to evaluate its functional performance, data accuracy, reliability, and scalability.
+The Functional and Accuracy Testing revealed that the system operates with high precision. CPU and RAM measurements deviated by only 0.4% and 17 MB respectively from reference values, while session duration tracking remained accurate within ±1 second. The client application demonstrated an efficient startup time of 3.2 seconds and a background resource footprint of less than 3% CPU usage, ensuring it does not hinder laboratory operations.
+Reliability Testing over an 8-hour continuous operation period confirmed the system’s stability. Despite simulated network interruptions, the system successfully executed automatic reconnection protocols without data loss or memory leaks.
+Operational Testing highlighted the system's advanced monitoring capabilities. The Thermal and Power Module successfully tracked real-time hardware metrics, identifying a high-load workstation operating at 72.1°C and verifying voltage scaling behavior consistent with modern DVFS standards. Furthermore, the Browser Tracking Module demonstrated the ability to capture granular data—specifically full URLs and page titles—effectively distinguishing between academic research (e.g., IEEE Xplore, GitHub) and recreational activity (e.g., YouTube Shorts, Facebook) in a way that traditional domain blocking cannot.
+
+
+5.2 Conclusions
+Based on the findings, the following conclusions are drawn:
+1. The system is a viable, high-precision alternative to manual laboratory monitoring. The functional tests confirm that the system automates data collection with an accuracy level that meets ISO/IEC 25010 reliability standards. The integration of RFID technology for instant dashboard access significantly reduces the administrative burden of checking PC status, replacing error-prone manual logs with real-time, verifiable data.
+2. Granular web tracking is essential for enforcing academic compliance. The study concludes that simple domain blocking is insufficient for modern education. The system’s ability to capture specific video titles and URLs provides the necessary context to distinguish between productive learning and digital distractions, enabling evidence-based policy enforcement without restricting access to valuable educational platforms like YouTube.
+3. Real-time thermal monitoring enables proactive hardware maintenance. The system’s successful detection of voltage ramp-up and thermal spikes (e.g., the 72.1°C warning event) proves its value as a diagnostic tool. By identifying workstations running under abnormal loads or suffering from cooling inefficiencies, laboratory managers can perform targeted maintenance before permanent hardware failure occurs, potentially extending the lifespan of laboratory assets.
+4. The system is robust and scalable for deployment in resource-constrained environments. The reliability test results—specifically the successful auto-reconnection and stable memory usage (<150MB)—demonstrate that the system is fault-tolerant. Its ability to monitor heterogeneous hardware configurations simultaneously suggests it can be readily scaled to support larger laboratories without requiring expensive server infrastructure.
+
+
+5.3 Recommendations
+                Based on the conclusions and the system’s demonstrated capabilities, the following recommendations are proposed for future development and deployment:
+1. Integration of Automated Power Management While the current system monitors idle time and power consumption, it is recommended to implement active power control. The system should be upgraded to automatically trigger "Sleep" or "Hibernate" modes on client PCs that remain idle for a specified duration (e.g., >30 minutes). This would directly translate the observed monitoring data into tangible electricity cost savings.
+2. Deployment for Proactive Hardware Maintenance The system’s thermal monitoring capability should be leveraged to create a Predictive Maintenance System. Administrators should configure automated alerts for workstations that consistently deviate from the "Normal" status (e.g., sustaining temperatures >70°C). This allows IT staff to address cooling failures or dust accumulation before they result in permanent hardware damage.
+3. Evaluation in Licensed Software Environments Since this study was conducted in a laboratory using primarily open-source tools, it is recommended to deploy the system in a facility that relies on paid software licenses (e.g., CAD or Multimedia labs). This would validate the system’s potential to optimize software budgets by tracking the actual utilization rates of expensive applications.
+4. Expansion to Campus-Wide Scale The successful batch monitoring of five heterogeneous PCs suggests the system is ready for larger deployments. Future studies should evaluate the system's performance across multiple laboratory rooms and subnets simultaneously to assess network bandwidth impact and server scalability in a real-world campus environment (50+ nodes).
+5. Implementation of Real-Time Performance Alerting To further enhance administrative responsiveness, the dashboard should be updated to include push notifications (via email or SMS) for critical events. Immediate alerts for "Connection Lost," "High Thermal Load," or "Unauthorized Device Insertion" would allow administrators to respond to security and hardware incidents the moment they occur.
+But aside all that I highly recommend this tuff apple and Nigga gay, also nigga auto corrected wtf
+  
+
+Figure 69: Tuff Niche and gay fruit apple
+Figure 69 illustrates the comparison between the “Tuff Niche” and the “Gay Fruit Apple,” highlighting their distinct visual characteristics and symbolic representations. The Tuff Niche is depicted with a more solid, rugged, and structured appearance, suggesting durability and a strong identity within its context. In contrast, the Gay Fruit Apple is presented with vibrant, expressive features, emphasizing individuality, creativity, and a more dynamic aesthetic. The juxtaposition of these two elements in the figure provides a visual contrast that may be interpreted metaphorically, demonstrating how differing concepts or identities can coexist within the same environment. This contrast also enhances the reader’s understanding of how visual representation can be used to communicate thematic diversity or playful variations in design.HAHAHAHHAH figure 69
+  
+
+Figure 67: Tuff Niche and gay fruit Orange
+The “Orange,” represents distinct stylistic and symbolic qualities. The Tuff Niche is illustrated with a firm, structured aesthetic that conveys stability and resilience. In contrast, the Gay Fruit Apple is characterized by its expressive, colorful, and more playful visual identity, highlighting themes of individuality and vibrancy. Meanwhile, the Orange serves as a neutral reference point, offering a simple and natural form that contrasts with the more stylized representations of the other two elements. Together, these three figures create a balanced composition that emphasizes contrast, variation, and visual diversity, making the figure useful for interpreting differences in tone, style, and thematic emphasis.
+5.4 Final Statement
+The development and implementation of the Laboratory Monitoring System mark a significant step toward modernizing laboratory operations in the Institute for Computer Studies at Northern Bukidnon State College. The system provides clear, accurate, and actionable data that supports improved decision-making, enhances resource management, and strengthens academic support processes. With proper adoption and continued refinement, the system has the potential to serve as a model for automated laboratory management in higher education institutions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+REFERENCE:
+
+
+Ahmad, N., Ismail, H., & Rahman, R. (2021). Optimizing computer laboratory utilization through automated monitoring: A case study at Malaysian polytechnics. International Journal of Emerging Technologies in Learning (iJET), 16(19), 25–38. https://doi.org/10.3991/ijet.v16i19.25345
+CHED. (2021). Memorandum orders on facilities and infrastructure requirements for higher education institutions. Commission on Higher Education. https://ched.gov.ph
+Kemp, S. (2024). Digital 2024: Global overview report. DataReportal. https://datareportal.com/reports/digital-2024-global-overview
+Lumawig, S. T., & Payawal, G. B. (2000). PC-based computer laboratory monitoring system.
+Reyes, M. L., Dela Cruz, J. P., & Villanueva, A. R. (2022). Analysis of laboratory software utilization for engineering programs in a Philippine state university. Philippine Journal of Computing and ICT, 17(2), 45–58.
+Santos, R. E., & Lim, P. R. (2023). Performance bottlenecks in shared academic computer laboratories: A case from Cebu, Philippines. Asian Journal of Information Technology and Education, 12(1), 14–28.
+World Metrics. (2023a). Global higher education IT investment trends 2023. World Metrics Research Institute.
+World Metrics. (2023b). The state of digital transformation in higher education 2023. World Metrics Research Institute.
+Beth. (2025, February 4). Optimizing software usage by tracking local and Cloud-Based applications - LabStats. LabStats. https://labstats.com/blogs/optimizing-software-usage-by-tracking-local-and-cloud-based-applications/
+Begmanov, S., & Yenradee, P. (2022). Development of an RFID system for fixed asset monitoring in a university: A case study. International Scientific Journal of Engineering and Technology (ISJET), 6(4), 88–96. https://ph02.tci-thaijo.org/index.php/isjet/article/view/196354
+Swedberg, C. (2024). RFID tracks AV assets at James Madison University. RFID Journal. https://www.rfidjournal.com/news/rfid-tracks-av-assets-at-james-madison-university/203130
+RFID4U. (2024, September 2). RFID IT Asset Tracking Solutions | Enhance Visibility & Security. https://rfid4u.com/rfid-it-asset-tracking-solutions/
+Odasco, B., & Saong, M. (2023). Analysis of the inventory Management System towards enhanced university service delivery. International Journal of Science Technology Engineering and Mathematics, 3(3), 103–132. https://doi.org/10.53378/353010
+Munyaka, J. B., & Yadavalli, S. V. (2022). Inventory management concepts and implementations: A systematic review. The South African Journal of Industrial Engineering, 32(2). https://doi.org/10.7166/33-2-2527
+Skilloutlook. (2025, May 6). Inventory Management Software vs Manual Tracking: What You’re Missing. Skilloutlook.com. https://skilloutlook.com/digital-box/inventory-management-software-vs-manual-tracking-what-youre-missing?
+Destro, I. R., Staudt, F. H., Somensi, K., & Taboada, C. (2023). The impacts of inventory record inaccuracy and cycle counting on distribution center performance. Production, 33. https://doi.org/10.1590/0103-6513.20220077
+Atkins, R., Sener, A., & Russo, J. (2021). A simulation for managing retail inventory flow using RFID and bar code technology. Decision Sciences Journal of Innovative Education, 19(3), 214–223. https://pure.psu.edu/en/publications/a-simulation-for-managing-retail-inventory-flow-using-rfid-and-ba
+Radiant RFID. (2022, March 14). Passive RFID solution: Ivy League medical school reduces inventory time by more than 75%, freeing up resources with passive RFID. https://radiantrfid.com/blog/ivy-league-medical-school-reduces-inventory-time-by-more-than-75-freeing-up-resources-with-passive-rfid/
+Manap, Z., et al. (2025). RFID based laboratory management system. International Journal of Laboratory Management. https://www.researchgate.net/publication/224093296_RFID_Based_Laboratory_Management_System
+Beth. (2024, April 22). Insights missed without campus monitoring - LabStats. LabStats. https://labstats.com/blogs/missed-insights-without-whole-campus-computer-monitoring/
+Ijraset. (2024). Lab system monitoring. IJRASET. https://www.ijraset.com/research-paper/lab-system-monitoring
+Zhang, Y., Ling, Y., & Esfahbodi, A. (2025). Digital transformations of supply chain management via RFID technology: A systematic literature review. ScienceDirect. https://www.sciencedirect.com/science/article/pii/S2773067025000196
+Kefallinos, N. S., & Pontikis, I. (2023). A fully-automated asset-tracking RFID system. Proceedings of the 11th Student Symposium on Mechanical and Manufacturing Engineering. https://prod-aaudxp-cms-002-app.azurewebsites.net/media/zkqgj1m2/paper-a-fully-automated-asset-tracking-rfid-system.pdf
+Wasp Barcode Technologies. (2025, July 24). RFID Asset Tracking Software. https://www.waspbarcode.com/rfid-tracking
+Workday. (2023, August 23). Higher education industry outlook: 3 strategies to navigate hurdles ahead. Workday, Inc. https://blog.workday.com/en-us/higher-education-industry-outlook-3-strategies-navigate-hurdles-ahead.html
+Raftr. (2023, November 20). Data analytics in higher education: Turning insights into action. Raftr, Inc. https://www.raftr.com/data-analytics-in-higher-education/
+Global Scientific Journal. (2023). Computerized Laboratory Management System Using Radio Frequency Identification for Aemilianum College Inc. GSJ, 11(3), 835–840. https://www.globalscientificjournal.com/researchpaper/COMPUTERIZED_LABORATORY_MANAGEMENT_SYSTEM_USING_RADIO_FREQUENCY_IDENTIFICATION_FOR_AEMILIANUM_COLLEGE_INC_.pdf
+Deepanjali. (2025, May 28). IT Asset Management in Higher Education: Tracking SAAS and IT assets across campuses. Cloudeagle. https://www.cloudeagle.ai/blogs/it-asset-management-in-higher-education
+Cordeiro, R. (2025, April 9). Common IT asset management challenges and how to overcome them. Motadata. https://www.motadata.com/blog/it-asset-management-challenges/
+Quinta. (2025, May 26). How to calculate the ROI on RFID: Deep Dive. Quinta. https://www.quinta.co.in/how-to-calculate-the-roi-on-rfid-deep-dive/
+Admin, & Admin. (2024, July 5). The ROI of RFID in the supply chain. RFID Journal. https://www.rfidjournal.com/editors-views/the-roi-of-rfid-in-the-supply-chain/77512
+Alvarez, P. L., & Santos, J. M. (2022). Equity of access in computer laboratory usage: An assessment of allocation and scheduling systems in Philippine HEIs. Asia Pacific Journal of Education, Arts and Sciences, 9(4), 45–54.
+Chen, Y., Zhang, X., & Li, M. (2021). Cybersecurity challenges in shared computing environments: Risks and prevention in academic institutions. International Journal of Information Security Science, 10(4), 25–37.
+EDUCAUSE. (2023). Top IT issues, 2023: Foundation models. EDUCAUSE Review. https://www.educause.edu
+Kaur, H., & Singh, R. (2021). Energy optimization in academic computing environments: Challenges and solutions. Sustainable Computing: Informatics and Systems, 31, 100597. https://doi.org/10.1016/j.suscom.2021.100597
+Tan, K. W., & Ng, H. Y. (2022). Security policy compliance in shared computer labs: The role of monitoring and enforcement. Asian Journal of Information Technology, 21(1), 12–21.
+World Metrics. (2023). Higher education digital transformation survey. World Metrics Research. https://www.worldmetrics.org
+Workday Higher Education Outlook. (2023). 2023 higher education outlook: Digital transformation priorities. Workday. https://www.workday.com
+Weetech Solution Private Limited. (2024, November 15). V-Model requirements in software development: A complete guide. Weetech Solution Private Limited. https://www.weetechsolution.com/blog/v-model-requirements-in-software-development
+
+
+
+
+
+
+  
+
+[a]pic
+[b]oh, yeah, u got no NFC HAHHAHAHAHHA

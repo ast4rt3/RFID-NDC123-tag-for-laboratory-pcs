@@ -28,13 +28,13 @@ console.log('╚═════════════════════�
 async function testSystemInfoAccuracy() {
     console.log('📊 Test 1: System Information Accuracy');
     console.log('──────────────────────────────────────\n');
-    
+
     try {
         // Get actual system info
         const cpu = await si.cpu();
         const mem = await si.mem();
         const osInfo = await si.osInfo();
-        
+
         const actualData = {
             hostname: os.hostname(),
             cpuModel: cpu.manufacturer + ' ' + cpu.brand,
@@ -44,13 +44,13 @@ async function testSystemInfoAccuracy() {
             osPlatform: osInfo.platform,
             osVersion: osInfo.distro || osInfo.release
         };
-        
+
         console.log('Actual System Information:');
         console.table(actualData);
-        
+
         console.log('\n✅ System information collection test complete');
         console.log('   Expected: All values should be collected correctly\n');
-        
+
         return {
             test: 'System Information Accuracy',
             status: 'PASS',
@@ -72,22 +72,22 @@ async function testSystemInfoAccuracy() {
 async function testDurationAccuracy() {
     console.log('⏱️  Test 2: Duration Calculation Accuracy');
     console.log('─────────────────────────────────────────\n');
-    
+
     const results = [];
-    
+
     for (const targetDuration of TEST_DURATION_SECONDS) {
         console.log(`Testing ${targetDuration} second duration...`);
-        
+
         const startTime = Date.now();
-        
+
         // Simulate activity by waiting
         await new Promise(resolve => setTimeout(resolve, targetDuration * 1000));
-        
+
         const endTime = Date.now();
         const actualDuration = Math.floor((endTime - startTime) / 1000);
         const difference = Math.abs(actualDuration - targetDuration);
         const accuracy = difference <= ACCURACY_TOLERANCE_SECONDS;
-        
+
         results.push({
             target: targetDuration + 's',
             actual: actualDuration + 's',
@@ -95,14 +95,14 @@ async function testDurationAccuracy() {
             tolerance: `±${ACCURACY_TOLERANCE_SECONDS}s`,
             status: accuracy ? '✅ PASS' : '❌ FAIL'
         });
-        
+
         console.log(`   Target: ${targetDuration}s, Actual: ${actualDuration}s, Difference: ${difference}s ${accuracy ? '✅' : '❌'}\n`);
     }
-    
+
     console.table(results);
-    
+
     const allPassed = results.every(r => r.status === '✅ PASS');
-    
+
     return {
         test: 'Duration Calculation Accuracy',
         status: allPassed ? 'PASS' : 'FAIL',
@@ -116,43 +116,43 @@ async function testDurationAccuracy() {
 async function testCpuMeasurement() {
     console.log('🔢 Test 3: CPU Usage Measurement');
     console.log('─────────────────────────────────\n');
-    
+
     try {
         console.log('Collecting CPU usage data...\n');
-        
+
         const measurements = [];
         const iterations = 10;
-        
+
         for (let i = 0; i < iterations; i++) {
             const cpuData = await si.currentLoad();
             const cpuPercent = cpuData.currentLoad;
-            
+
             measurements.push({
                 iteration: i + 1,
                 cpuPercent: cpuPercent.toFixed(2) + '%',
                 timestamp: new Date().toISOString()
             });
-            
+
             // Wait 2 seconds between measurements
             if (i < iterations - 1) {
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
-        
+
         console.table(measurements);
-        
+
         const avgCpu = measurements.reduce((sum, m) => sum + parseFloat(m.cpuPercent), 0) / iterations;
         const maxCpu = Math.max(...measurements.map(m => parseFloat(m.cpuPercent)));
         const minCpu = Math.min(...measurements.map(m => parseFloat(m.cpuPercent)));
-        
+
         console.log('\nSummary:');
         console.log(`   Average CPU: ${avgCpu.toFixed(2)}%`);
         console.log(`   Min CPU: ${minCpu.toFixed(2)}%`);
         console.log(`   Max CPU: ${maxCpu.toFixed(2)}%`);
-        
+
         console.log('\n✅ CPU measurement test complete');
         console.log('   Note: Compare these values with Task Manager\n');
-        
+
         return {
             test: 'CPU Usage Measurement',
             status: 'PASS',
@@ -177,27 +177,27 @@ async function testCpuMeasurement() {
 async function testMemoryMeasurement() {
     console.log('💾 Test 4: Memory Usage Measurement');
     console.log('────────────────────────────────────\n');
-    
+
     try {
         const memData = await si.mem();
         const totalGB = (memData.total / (1024 * 1024 * 1024)).toFixed(2);
         const usedGB = (memData.used / (1024 * 1024 * 1024)).toFixed(2);
         const freeGB = (memData.free / (1024 * 1024 * 1024)).toFixed(2);
         const usedPercent = ((memData.used / memData.total) * 100).toFixed(2);
-        
+
         const memoryInfo = {
             total: totalGB + ' GB',
             used: usedGB + ' GB',
             free: freeGB + ' GB',
             usedPercent: usedPercent + '%'
         };
-        
+
         console.log('Current Memory Usage:');
         console.table(memoryInfo);
-        
+
         console.log('\n✅ Memory measurement test complete');
         console.log('   Note: Compare with Task Manager\n');
-        
+
         return {
             test: 'Memory Usage Measurement',
             status: 'PASS',
@@ -219,13 +219,13 @@ async function testMemoryMeasurement() {
 async function testTimestampAccuracy() {
     console.log('🕐 Test 5: Timestamp Accuracy');
     console.log('─────────────────────────────\n');
-    
+
     try {
         const now = new Date();
         const isoString = now.toISOString();
         const localString = now.toLocaleString();
         const utcOffset = -now.getTimezoneOffset() / 60;
-        
+
         const timestampInfo = {
             'UTC ISO': isoString,
             'Local Time': localString,
@@ -233,10 +233,10 @@ async function testTimestampAccuracy() {
             'Unix Timestamp': now.getTime(),
             'Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone
         };
-        
+
         console.log('Timestamp Formats:');
         console.table(timestampInfo);
-        
+
         // Test timezone conversion
         console.log('\nTesting timezone conversion:');
         const testDates = [
@@ -244,16 +244,16 @@ async function testTimestampAccuracy() {
             new Date('2024-11-12T14:30:00Z'),
             new Date('2024-11-12T14:30:00+08:00')
         ];
-        
+
         testDates.forEach(date => {
             console.log(`   ISO: ${date.toISOString()}`);
             console.log(`   Local: ${date.toLocaleString()}`);
             console.log('');
         });
-        
+
         console.log('✅ Timestamp accuracy test complete');
         console.log('   Expected: UTC stored in database, local displayed on dashboard\n');
-        
+
         return {
             test: 'Timestamp Accuracy',
             status: 'PASS',
@@ -275,11 +275,11 @@ async function testTimestampAccuracy() {
 async function testApplicationDetection() {
     console.log('🖥️  Test 6: Application Detection');
     console.log('─────────────────────────────────\n');
-    
+
     try {
         const activeWin = require('active-win');
         const processes = await si.processes();
-        
+
         console.log('Current Active Window:');
         try {
             const active = await activeWin();
@@ -291,7 +291,7 @@ async function testApplicationDetection() {
         } catch (err) {
             console.log('   Could not detect active window (may require permissions)\n');
         }
-        
+
         console.log('Top 5 Processes by CPU:');
         const topProcesses = processes.list
             .sort((a, b) => b.cpu - a.cpu)
@@ -301,11 +301,11 @@ async function testApplicationDetection() {
                 cpu: p.cpu.toFixed(2) + '%',
                 memory: (p.mem / 1024).toFixed(2) + ' MB'
             }));
-        
+
         console.table(topProcesses);
-        
+
         console.log('\n✅ Application detection test complete\n');
-        
+
         return {
             test: 'Application Detection',
             status: 'PASS',
@@ -328,21 +328,21 @@ function generateReport(results) {
     console.log('\n╔════════════════════════════════════════════════════════════╗');
     console.log('║                    TEST SUMMARY REPORT                      ║');
     console.log('╚════════════════════════════════════════════════════════════╝\n');
-    
+
     const summary = results.map(r => ({
         Test: r.test,
         Status: r.status === 'PASS' ? '✅ PASS' : '❌ FAIL',
         'Notes': r.error || 'Complete'
     }));
-    
+
     console.table(summary);
-    
+
     const passed = results.filter(r => r.status === 'PASS').length;
     const total = results.length;
     const passRate = ((passed / total) * 100).toFixed(1);
-    
+
     console.log(`\nOverall Results: ${passed}/${total} tests passed (${passRate}%)\n`);
-    
+
     // Save report to file
     const fs = require('fs');
     const reportPath = 'test-accuracy-report.json';
@@ -356,7 +356,7 @@ function generateReport(results) {
         },
         results: results
     }, null, 2));
-    
+
     console.log(`📄 Detailed report saved to: ${reportPath}\n`);
 }
 
@@ -365,25 +365,25 @@ function generateReport(results) {
  */
 async function runTests() {
     const results = [];
-    
+
     // Run all tests
     results.push(await testSystemInfoAccuracy());
     console.log('\n');
-    
+
     results.push(await testDurationAccuracy());
     console.log('\n');
-    
+
     results.push(await testCpuMeasurement());
     console.log('\n');
-    
+
     results.push(await testMemoryMeasurement());
     console.log('\n');
-    
+
     results.push(await testTimestampAccuracy());
     console.log('\n');
-    
+
     results.push(await testApplicationDetection());
-    
+
     // Generate report
     generateReport(results);
 }
