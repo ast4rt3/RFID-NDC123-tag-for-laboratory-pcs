@@ -1,3 +1,9 @@
+##
+Mega download link on application
+```
+https://mega.nz/file/EPkW0QDQ#59ODbRN-mP2IwzUEAiNwgf017qPWzDorjTBxJ0pcDo8
+```
+
 # RFID NDC123 Laboratory PC Logger
 
 A cross-platform application for tracking laboratory PC usage and application activity, using RFID authentication and real-time logging to a central server.
